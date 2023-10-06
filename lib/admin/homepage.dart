@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:resvago/admin/signup_screen.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 
 import '../components/app_colors.dart';

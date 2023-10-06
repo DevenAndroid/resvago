@@ -5,11 +5,8 @@ import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
-import 'package:resvago/admin/signup_screen.dart';
-
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import '../components/square_tile.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -23,6 +20,7 @@ final GoogleSignIn googleSignIn = GoogleSignIn();
 class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,111 +92,17 @@ class _LogInScreenState extends State<LogInScreen> {
                       Get.to(const LineChartSample1());
                     }).catchError((error) {
                       Fluttertoast.showToast(msg: 'Failed to login up: $error');
-                      throw Exception(error);
                     });
                   },
                   text: 'Login In',
                 ),
 
                 const SizedBox(height: 50),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 50),
-
-                // google + apple sign in buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // google button
-                    GestureDetector(
-                        onTap: () {
-                          signInWithGoogle();
-                        },
-                        child: SquareTile(imagePath: 'assets/images/google.png')),
-
-                    SizedBox(width: 25),
-
-                    // apple button
-                    SquareTile(imagePath: 'assets/images/apple.png')
-                  ],
-                ),
-
-                const SizedBox(height: 50),
-
-                // not a member? register now
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Not a member?',
-                      style: TextStyle(color: Colors.grey[700]),
-                    ),
-                    const SizedBox(width: 4),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(SignupScreen());
-                      },
-                      child: const Text(
-                        'SignUp now',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-Future<void> signInWithGoogle() async {
-  try {
-    final GoogleSignInAccount? googleSignInAccount = await googleSignIn.signIn();
-    final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
-
-    final AuthCredential credential = GoogleAuthProvider.credential(
-      accessToken: googleSignInAuthentication.accessToken,
-      idToken: googleSignInAuthentication.idToken,
-    );
-
-    final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    final User? user = userCredential.user;
-    if (user != null) {
-      Get.to(const LineChartSample1());
-    }
-  } catch (e) {
-    print(e.toString());
   }
 }
