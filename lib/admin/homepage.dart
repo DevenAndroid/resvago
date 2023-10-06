@@ -19,81 +19,81 @@ class _LineChart extends StatelessWidget {
   }
 
   LineChartData get sampleData1 => LineChartData(
-    lineTouchData: lineTouchData1,
-    gridData: gridData,
-    titlesData: titlesData1,
-    borderData: borderData,
-    lineBarsData: lineBarsData1,
-    minX: 0,
-    maxX: 14,
-    maxY: 4,
-    minY: 0,
-  );
+        lineTouchData: lineTouchData1,
+        gridData: gridData,
+        titlesData: titlesData1,
+        borderData: borderData,
+        lineBarsData: lineBarsData1,
+        minX: 0,
+        maxX: 14,
+        maxY: 4,
+        minY: 0,
+      );
 
   LineChartData get sampleData2 => LineChartData(
-    lineTouchData: lineTouchData2,
-    gridData: gridData,
-    titlesData: titlesData2,
-    borderData: borderData,
-    lineBarsData: lineBarsData2,
-    minX: 0,
-    maxX: 14,
-    maxY: 6,
-    minY: 0,
-  );
+        lineTouchData: lineTouchData2,
+        gridData: gridData,
+        titlesData: titlesData2,
+        borderData: borderData,
+        lineBarsData: lineBarsData2,
+        minX: 0,
+        maxX: 14,
+        maxY: 6,
+        minY: 0,
+      );
 
   LineTouchData get lineTouchData1 => LineTouchData(
-    handleBuiltInTouches: true,
-    touchTooltipData: LineTouchTooltipData(
-      tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
-    ),
-  );
+        handleBuiltInTouches: true,
+        touchTooltipData: LineTouchTooltipData(
+          tooltipBgColor: Colors.blueGrey.withOpacity(0.8),
+        ),
+      );
 
   FlTitlesData get titlesData1 => FlTitlesData(
-    bottomTitles: AxisTitles(
-      sideTitles: bottomTitles,
-    ),
-    rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    leftTitles: AxisTitles(
-      sideTitles: leftTitles(),
-    ),
-  );
+        bottomTitles: AxisTitles(
+          sideTitles: bottomTitles,
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: leftTitles(),
+        ),
+      );
 
   List<LineChartBarData> get lineBarsData1 => [
-    lineChartBarData1_1,
-    lineChartBarData1_2,
-    lineChartBarData1_3,
-  ];
+        lineChartBarData1_1,
+        lineChartBarData1_2,
+        lineChartBarData1_3,
+      ];
 
   LineTouchData get lineTouchData2 => const LineTouchData(
-    enabled: false,
-  );
+        enabled: false,
+      );
 
   FlTitlesData get titlesData2 => FlTitlesData(
-    bottomTitles: AxisTitles(
-      sideTitles: bottomTitles,
-    ),
-    rightTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    topTitles: const AxisTitles(
-      sideTitles: SideTitles(showTitles: false),
-    ),
-    leftTitles: AxisTitles(
-      sideTitles: leftTitles(),
-    ),
-  );
+        bottomTitles: AxisTitles(
+          sideTitles: bottomTitles,
+        ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: leftTitles(),
+        ),
+      );
 
   List<LineChartBarData> get lineBarsData2 => [
-    lineChartBarData2_1,
-    lineChartBarData2_2,
-    lineChartBarData2_3,
-  ];
+        lineChartBarData2_1,
+        lineChartBarData2_2,
+        lineChartBarData2_3,
+      ];
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -125,11 +125,11 @@ class _LineChart extends StatelessWidget {
   }
 
   SideTitles leftTitles() => SideTitles(
-    getTitlesWidget: leftTitleWidgets,
-    showTitles: true,
-    interval: 1,
-    reservedSize: 40,
-  );
+        getTitlesWidget: leftTitleWidgets,
+        showTitles: true,
+        interval: 1,
+        reservedSize: 40,
+      );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -160,134 +160,134 @@ class _LineChart extends StatelessWidget {
   }
 
   SideTitles get bottomTitles => SideTitles(
-    showTitles: true,
-    reservedSize: 32,
-    interval: 1,
-    getTitlesWidget: bottomTitleWidgets,
-  );
+        showTitles: true,
+        reservedSize: 32,
+        interval: 1,
+        getTitlesWidget: bottomTitleWidgets,
+      );
 
   FlGridData get gridData => const FlGridData(show: false);
 
   FlBorderData get borderData => FlBorderData(
-    show: true,
-    border: Border(
-      bottom:
-      BorderSide(color: AppColors.primary.withOpacity(0.2), width: 4),
-      left: const BorderSide(color: Colors.transparent),
-      right: const BorderSide(color: Colors.transparent),
-      top: const BorderSide(color: Colors.transparent),
-    ),
-  );
+        show: true,
+        border: Border(
+          bottom:
+              BorderSide(color: AppColors.primary.withOpacity(0.2), width: 4),
+          left: const BorderSide(color: Colors.transparent),
+          right: const BorderSide(color: Colors.transparent),
+          top: const BorderSide(color: Colors.transparent),
+        ),
+      );
 
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.contentColorGreen,
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 1.5),
-      FlSpot(5, 1.4),
-      FlSpot(7, 3.4),
-      FlSpot(10, 2),
-      FlSpot(12, 2.2),
-      FlSpot(13, 1.8),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.contentColorGreen,
+        barWidth: 8,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 1),
+          FlSpot(3, 1.5),
+          FlSpot(5, 1.4),
+          FlSpot(7, 3.4),
+          FlSpot(10, 2),
+          FlSpot(12, 2.2),
+          FlSpot(13, 1.8),
+        ],
+      );
 
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.contentColorPink,
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(
-      show: false,
-      color: AppColors.contentColorPink.withOpacity(0),
-    ),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 2.8),
-      FlSpot(7, 1.2),
-      FlSpot(10, 2.8),
-      FlSpot(12, 2.6),
-      FlSpot(13, 3.9),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.contentColorPink,
+        barWidth: 8,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+          show: false,
+          color: AppColors.contentColorPink.withOpacity(0),
+        ),
+        spots: const [
+          FlSpot(1, 1),
+          FlSpot(3, 2.8),
+          FlSpot(7, 1.2),
+          FlSpot(10, 2.8),
+          FlSpot(12, 2.6),
+          FlSpot(13, 3.9),
+        ],
+      );
 
   LineChartBarData get lineChartBarData1_3 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.contentColorCyan,
-    barWidth: 8,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 2.8),
-      FlSpot(3, 1.9),
-      FlSpot(6, 3),
-      FlSpot(10, 1.3),
-      FlSpot(13, 2.5),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.contentColorCyan,
+        barWidth: 8,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 2.8),
+          FlSpot(3, 1.9),
+          FlSpot(6, 3),
+          FlSpot(10, 1.3),
+          FlSpot(13, 2.5),
+        ],
+      );
 
   LineChartBarData get lineChartBarData2_1 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: AppColors.contentColorGreen.withOpacity(0.5),
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 4),
-      FlSpot(5, 1.8),
-      FlSpot(7, 5),
-      FlSpot(10, 2),
-      FlSpot(12, 2.2),
-      FlSpot(13, 1.8),
-    ],
-  );
+        isCurved: true,
+        curveSmoothness: 0,
+        color: AppColors.contentColorGreen.withOpacity(0.5),
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 1),
+          FlSpot(3, 4),
+          FlSpot(5, 1.8),
+          FlSpot(7, 5),
+          FlSpot(10, 2),
+          FlSpot(12, 2.2),
+          FlSpot(13, 1.8),
+        ],
+      );
 
   LineChartBarData get lineChartBarData2_2 => LineChartBarData(
-    isCurved: true,
-    color: AppColors.contentColorPink.withOpacity(0.5),
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: false),
-    belowBarData: BarAreaData(
-      show: true,
-      color: AppColors.contentColorPink.withOpacity(0.2),
-    ),
-    spots: const [
-      FlSpot(1, 1),
-      FlSpot(3, 2.8),
-      FlSpot(7, 1.2),
-      FlSpot(10, 2.8),
-      FlSpot(12, 2.6),
-      FlSpot(13, 3.9),
-    ],
-  );
+        isCurved: true,
+        color: AppColors.contentColorPink.withOpacity(0.5),
+        barWidth: 4,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: false),
+        belowBarData: BarAreaData(
+          show: true,
+          color: AppColors.contentColorPink.withOpacity(0.2),
+        ),
+        spots: const [
+          FlSpot(1, 1),
+          FlSpot(3, 2.8),
+          FlSpot(7, 1.2),
+          FlSpot(10, 2.8),
+          FlSpot(12, 2.6),
+          FlSpot(13, 3.9),
+        ],
+      );
 
   LineChartBarData get lineChartBarData2_3 => LineChartBarData(
-    isCurved: true,
-    curveSmoothness: 0,
-    color: AppColors.contentColorCyan.withOpacity(0.5),
-    barWidth: 2,
-    isStrokeCapRound: true,
-    dotData: const FlDotData(show: true),
-    belowBarData: BarAreaData(show: false),
-    spots: const [
-      FlSpot(1, 3.8),
-      FlSpot(3, 1.9),
-      FlSpot(6, 5),
-      FlSpot(10, 3.3),
-      FlSpot(13, 4.5),
-    ],
-  );
+        isCurved: true,
+        curveSmoothness: 0,
+        color: AppColors.contentColorCyan.withOpacity(0.5),
+        barWidth: 2,
+        isStrokeCapRound: true,
+        dotData: const FlDotData(show: true),
+        belowBarData: BarAreaData(show: false),
+        spots: const [
+          FlSpot(1, 3.8),
+          FlSpot(3, 1.9),
+          FlSpot(6, 5),
+          FlSpot(10, 3.3),
+          FlSpot(13, 4.5),
+        ],
+      );
 }
 
 class LineChartSample1 extends StatefulWidget {
@@ -299,30 +299,6 @@ class LineChartSample1 extends StatefulWidget {
 
 class LineChartSample1State extends State<LineChartSample1> {
   late bool isShowingMainData;
-  List<String> itemNames = [
-    'User Data',
-    'Category',
-    'Table Booking',
-    'Menu',
-    'Item 5',
-    'Item 6',
-    'Item 7',
-    'Item 8',
-    'Item 9',
-    'Item 10',
-  ];
-  final List<Color> itemColors = [
-    Colors.red,
-    Colors.blue,
-    Colors.green,
-    Colors.yellow,
-    Colors.orange,
-    Colors.purple,
-    Colors.teal,
-    Colors.pink,
-    Colors.indigo,
-    Colors.cyan,
-  ];
   @override
   void initState() {
     super.initState();
@@ -333,6 +309,75 @@ class LineChartSample1State extends State<LineChartSample1> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
+        title: const Text(
+          'Resvago Admin App',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xff3B5998),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Resvago Admin App',
+                    style: TextStyle(
+                      color: Color(0xff3B5998),
+                      fontSize: 24,
+                    ),
+                  ),
+                  Image.asset('assets/images/logo.png',height: 100,width: 100,)
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Add User'),
+              onTap: () {
+                Get.to(const UserDataScreen());
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () {
+                Navigator.pop(context); // Closes the drawer
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.countertops_outlined),
+              title: Text('Coupens'),
+              onTap: () {
+                Navigator.pop(context); // Closes the drawer
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.food_bank),
+              title: Text('Add Resturent Category'),
+              onTap: () {
+                Navigator.pop(context); // Closes the drawer
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.menu_book),
+              title: Text('Add Menu Category'),
+              onTap: () {
+                Navigator.pop(context); // Closes the drawer
+              },
+            ),
+          ],
+        ),
+      ),
       body: Column(
         children: [
           Container(
@@ -364,7 +409,8 @@ class LineChartSample1State extends State<LineChartSample1> {
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.only(right: 16, left: 6),
-                          child: _LineChart(isShowingMainData: isShowingMainData),
+                          child:
+                              _LineChart(isShowingMainData: isShowingMainData),
                         ),
                       ),
                       const SizedBox(
@@ -377,7 +423,8 @@ class LineChartSample1State extends State<LineChartSample1> {
                     child: IconButton(
                       icon: Icon(
                         Icons.refresh,
-                        color: Colors.black.withOpacity(isShowingMainData ? 1.0 : 0.5),
+                        color: Colors.black
+                            .withOpacity(isShowingMainData ? 1.0 : 0.5),
                       ),
                       onPressed: () {
                         setState(() {
@@ -390,39 +437,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               ),
             ),
           ),
-          Expanded(
-            child: GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2, // Number of columns
-              ),
-              itemCount: itemNames.length, // Number of items
-              itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    if(index == 0){
-                      Get.to(const UserDataScreen());
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: Duration(seconds: 1),
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(color: itemColors[index],borderRadius: BorderRadius.circular(15)),
-                    margin: EdgeInsets.all(8),
-                    child: Center(
-                      child: Text(
-                        itemNames[index],
-                        style: const TextStyle(color: Colors.white, fontSize: 25),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-
         ],
-
       ),
     );
   }

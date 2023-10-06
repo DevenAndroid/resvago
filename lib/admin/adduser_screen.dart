@@ -1,12 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:resvago/admin/user_model.dart';
 
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 
 class AddUserScreen extends StatefulWidget {
-  const AddUserScreen({Key? key}) : super(key: key);
+  final bool isEditMode;
+  final String? documentId;
+  final String? name;
+  final String? email;
+  final String? password;
+  final String? phonenumber;
+
+  const AddUserScreen(
+      {super.key,
+      required this.isEditMode,
+      this.documentId,
+      this.name,
+      this.email,
+      this.password,
+      this.phonenumber});
 
   @override
   State<AddUserScreen> createState() => _AddUserScreenState();
@@ -25,9 +41,31 @@ class _AddUserScreenState extends State<AddUserScreen> {
     String phoneNumber = phoneNumberController.text;
 
     if (name.isNotEmpty && email.isNotEmpty) {
-      UserData user = UserData(name: name, email: email, password: password, phoneNumber: phoneNumber,);
-      FirebaseFirestore.instance.collection('users').add(user.toMap());
+      UserData user = UserData(
+          name: name,
+          email: email,
+          password: password,
+          phoneNumber: phoneNumber,
+          deactivate: false);
+      if (widget.isEditMode) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.documentId)
+            .update(user.toMap());
+      } else {
+        FirebaseFirestore.instance.collection('users').add(user.toMap());
+      }
     }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    nameController.text = widget.name ?? "";
+    emailController.text = widget.email ?? "";
+    passwordController.text = widget.password ?? "";
+    phoneNumberController.text = widget.phonenumber ?? "";
   }
 
   @override
@@ -90,13 +128,22 @@ class _AddUserScreenState extends State<AddUserScreen> {
                 // sign in button
                 MyButton(
                   onTap: () {
-                    addUserToFirestore();
-                    nameController.clear();
-                    passwordController.clear();
-                    emailController.clear();
-                    phoneNumberController.clear();
+                    if (nameController.text.isEmpty &&
+                        emailController.text.isEmpty &&
+                        passwordController.text.isEmpty &&
+                        phoneNumberController.text.isEmpty){
+                      Fluttertoast.showToast(msg: 'Please enter Fields');
+                    }else{
+                      addUserToFirestore();
+                      nameController.clear();
+                      passwordController.clear();
+                      emailController.clear();
+                      phoneNumberController.clear();
+                      Get.back();
+                    }
+
                   },
-                  text: 'Add User Data',
+                  text: widget.isEditMode ? 'Update user' : 'Add User',
                 ),
 
                 const SizedBox(height: 50),
