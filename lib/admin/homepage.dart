@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:resvago/admin/resturent_datalist.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 
 import '../components/app_colors.dart';
@@ -365,7 +366,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               leading: Icon(Icons.food_bank),
               title: Text('Add Resturent Category'),
               onTap: () {
-                Navigator.pop(context); // Closes the drawer
+                Get.to(ResturentDataScreen()); // Closes the drawer
               },
             ),
             ListTile(
