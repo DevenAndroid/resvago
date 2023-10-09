@@ -39,9 +39,13 @@ dependencies:
   google_sign_in: ^6.1.5
   firebase_core: ^2.17.0
   fluttertoast: ^8.2.2
-  get: ^4.6.6
+  get: ^4.6.5
   fl_chart: ^0.63.0
   cloud_firestore: ^4.9.3
+  image_cropper: ^5.0.0
+  image_picker: ^0.8.7+4
+  firebase_storage: ^11.2.8
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:

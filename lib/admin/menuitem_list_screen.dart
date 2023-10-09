@@ -1,21 +1,18 @@
 import 'dart:developer';
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:resvago/admin/addResturent_screen.dart';
-import 'package:resvago/admin/resturent_model.dart';
+import 'package:resvago/admin/addmenuitem_screen.dart';
+import 'package:resvago/admin/menuitem_model.dart';
 
-class ResturentDataScreen extends StatefulWidget {
-  const ResturentDataScreen({Key? key}) : super(key: key);
+class MenuItemListScreen extends StatefulWidget {
+  const MenuItemListScreen({Key? key}) : super(key: key);
 
   @override
-  State<ResturentDataScreen> createState() => _ResturentDataScreenState();
+  State<MenuItemListScreen> createState() => _MenuItemListScreenState();
 }
 
-class _ResturentDataScreenState extends State<ResturentDataScreen> {
+class _MenuItemListScreenState extends State<MenuItemListScreen> {
   bool userDeactivate = false;
   @override
   void initState() {
@@ -27,7 +24,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Restaurant List'),
+        title: const Text('Menu Item List'),
         leading: GestureDetector(
             onTap: () {
               Get.back();
@@ -36,7 +33,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
         actions: [
           GestureDetector(
               onTap: () {
-                Get.to(const AddResturentScreen(
+                Get.to(const AddMenuItemScreen(
                   isEditMode: false,
                 ));
               },
@@ -52,15 +49,14 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            StreamBuilder<List<ResturentData>>(
-              stream: getResturentStreamFromFirestore(),
+            StreamBuilder<List<MenuItemData>>(
+              stream: getMenuItemStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator(); // Show a loading indicator while data is being fetched
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                 // List<ResturentData> users = snapshot.data ?? [];
                   return snapshot.data!.isNotEmpty
                       ? ListView.builder(
                       itemCount: snapshot.data!.length,
@@ -92,7 +88,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                             leading: CircleAvatar(
                               radius: 20,
                               child: Image.network(item.image.toString(),
-                                    errorBuilder: (_,__,___)=>const Icon(Icons.shopping_cart),
+                                errorBuilder: (_,__,___)=>const Icon(Icons.shopping_cart),
                               ),
                             ),
                             subtitle: Text(item.description),
@@ -107,7 +103,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                     PopupMenuItem(
                                       value: 1,
                                       onTap: () {
-                                        Get.to(AddResturentScreen(
+                                        Get.to(AddMenuItemScreen(
                                           isEditMode: true,
                                           documentId: item.docid,
                                           name: item.name,
@@ -145,7 +141,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                               TextButton(
                                                 onPressed: () {
                                                   FirebaseFirestore.instance
-                                                      .collection("resturent")
+                                                      .collection("menuitem")
                                                       .doc(item.docid)
                                                       .delete()
                                                       .then((value) {
@@ -175,7 +171,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                       value: 1,
                                       onTap: () {
                                         FirebaseFirestore.instance
-                                            .collection('resturent')
+                                            .collection('menuitem')
                                             .doc(item.docid)
                                             .update({"deactivate": true});
                                       },
@@ -197,12 +193,12 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
     );
   }
 }
-Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-  return FirebaseFirestore.instance.collection('resturent').snapshots().map((querySnapshot) {
-    List<ResturentData> resturent = [];
+Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
+  return FirebaseFirestore.instance.collection('menuitem').snapshots().map((querySnapshot) {
+    List<MenuItemData> itemmenu = [];
     try {
       for (var doc in querySnapshot.docs) {
-        resturent.add(ResturentData(
+        itemmenu.add(MenuItemData(
           name: doc.data()['name'],
           description: doc.data()['description'],
           image: doc.data()['image'],
@@ -214,6 +210,6 @@ Stream<List<ResturentData>> getResturentStreamFromFirestore() {
       print(e.toString());
       throw Exception(e.toString());
     }
-    return resturent;
+    return itemmenu;
   });
 }

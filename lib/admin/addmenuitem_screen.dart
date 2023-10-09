@@ -8,51 +8,41 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:resvago/admin/user_model.dart';
-
+import 'package:resvago/admin/menuitem_model.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 
-class AddUsersScreen extends StatefulWidget {
+class AddMenuItemScreen extends StatefulWidget {
   final bool isEditMode;
   final String? documentId;
   final String? name;
-  final String? email;
-  final String? password;
-  final String? phoneNumber;
+  final String? description;
   final String? image;
 
-  const AddUsersScreen({
+  const AddMenuItemScreen({
     super.key,
     required this.isEditMode,
     this.documentId,
     this.name,
-    this.phoneNumber,
-    this.image,
-    this.email,
-    this.password,
+    this.description, this.image,
   });
 
   @override
-  State<AddUsersScreen> createState() => _AddUsersScreenState();
+  State<AddMenuItemScreen> createState() => _AddMenuItemScreenState();
 }
 
 final _formKey = GlobalKey<FormState>();
 Rx<File> file = File("").obs;
 String imagePath = "";
 
-class _AddUsersScreenState extends State<AddUsersScreen> {
-  TextEditingController emailController = TextEditingController();
+class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
+  TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneNumberController = TextEditingController();
 
-  Future<void> addusersToFirestore() async {
+  Future<void> addmenuitemToFirestore() async {
     String name = nameController.text;
-    String email = emailController.text;
-    String password = passwordController.text;
-    String phoneNumber = phoneNumberController.text;
+    String description = descriptionController.text;
     String? imageUrl;
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
@@ -62,12 +52,12 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
 
       imageUrl = await snapshot.ref.getDownloadURL();
     }
-    if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
-      UserData users = UserData(name: name, email: email, deactivate: false,image: imageUrl, password: password,phoneNumber: phoneNumber);
+    if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
+      MenuItemData menuitem = MenuItemData(name: name, description: description, deactivate: false,image: imageUrl);
       if (widget.isEditMode) {
-        FirebaseFirestore.instance.collection('users').doc(widget.documentId).update(users.toMap());
+        FirebaseFirestore.instance.collection('menuitem').doc(widget.documentId).update(menuitem.toMap());
       } else {
-        FirebaseFirestore.instance.collection('users').add(users.toMap());
+        FirebaseFirestore.instance.collection('menuitem').add(menuitem.toMap());
       }
     }
   }
@@ -77,9 +67,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     // TODO: implement initState
     super.initState();
     nameController.text = widget.name ?? "";
-    emailController.text = widget.email ?? "";
-    passwordController.text = widget.password ?? "";
-    phoneNumberController.text = widget.phoneNumber ?? "";
+    descriptionController.text = widget.description ?? "";
   }
 
   @override
@@ -111,7 +99,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                         ),
                       ),
                       const Text(
-                        "Add Users",
+                        "Add Menu Item",
                         style:
                         TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.w700),
                       ),
@@ -202,47 +190,32 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                   ),
                                   MyTextField(
                                     controller: nameController,
-                                    hintText: 'User Name',
+                                    hintText: 'Menu Item Name',
                                     obscureText: false,
                                   ),
 
                                   const SizedBox(height: 10),
 
                                   MyTextField(
-                                    controller: emailController,
+                                    controller: descriptionController,
                                     hintText: 'Description',
                                     obscureText: false,
                                   ),
                                   const SizedBox(height: 10),
-                                  MyTextField(
-                                    controller: passwordController,
-                                    hintText: 'Password',
-                                    obscureText: false,
-                                  ),
 
-                                  const SizedBox(height: 10),
-
-                                  MyTextField(
-                                    controller: phoneNumberController,
-                                    hintText: 'Phone Number',
-                                    obscureText: false,
-                                  ),
-                                  const SizedBox(height: 10),
                                   // sign in button
                                   MyButton(
                                     onTap: () {
-                                      if (nameController.text.isEmpty && emailController.text.isEmpty) {
+                                      if (nameController.text.isEmpty && descriptionController.text.isEmpty) {
                                         Fluttertoast.showToast(msg: 'Please enter Fields');
                                       } else {
-                                        addusersToFirestore();
+                                        addmenuitemToFirestore();
                                         nameController.clear();
-                                        emailController.clear();
-                                        passwordController.clear();
-                                        phoneNumberController.clear();
+                                        descriptionController.clear();
                                         Get.back();
                                       }
                                     },
-                                    text: widget.isEditMode ? 'Update User' : 'Add User',
+                                    text: widget.isEditMode ? 'Update Menu Item' : 'Add Menu Item',
                                   ),
 
                                   const SizedBox(height: 50),
