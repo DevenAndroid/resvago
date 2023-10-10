@@ -21,69 +21,82 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
+        child: Container(
+          height: Get.height,
+          decoration: const BoxDecoration(
+              image: DecorationImage(fit: BoxFit.fill,
+                  image: AssetImage(
+            "assets/images/login.png",
+          ))),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal:10.0,vertical: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 50),
-
-                // logo
-                const Icon(
-                  Icons.lock,
-                  size: 100,
-                ),
-
-                const SizedBox(height: 50),
-                Text(
-                  'Welcome back to\'LogIn',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
+                const SizedBox(height: 150,),
+                const Align(
+                  alignment: Alignment.center,
+                  child:  Text(
+                    'Welcome back to\'LogIn',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
-
                 const SizedBox(height: 25),
-
+                const Padding(
+                  padding:  EdgeInsets.only(left: 25),
+                  child: Text(
+                    'Enter Your Email',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 2,
+                ),
                 MyTextField(
                   controller: emailController,
                   hintText: 'Email',
                   obscureText: false,
+                  color: Colors.transparent
                 ),
-
                 const SizedBox(height: 10),
-
+                const Padding(
+                  padding:  EdgeInsets.only(left: 25),
+                  child: Text(
+                    'Password',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 2,
+                ),
                 MyTextField(
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
+                    color: Colors.transparent
+
                 ),
-
-                const SizedBox(height: 10),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // sign in button
+                const SizedBox(height: 35),
                 MyButton(
+                  color: Color(0xff3B5998),
+                  backgroundcolor: Colors.white,
                   onTap: () {
                     FirebaseAuth.instance
                         .signInWithEmailAndPassword(
@@ -94,9 +107,8 @@ class _LogInScreenState extends State<LogInScreen> {
                       Fluttertoast.showToast(msg: 'Failed to login up: $error');
                     });
                   },
-                  text: 'Login In',
+                  text: 'Log In',
                 ),
-
                 const SizedBox(height: 50),
               ],
             ),

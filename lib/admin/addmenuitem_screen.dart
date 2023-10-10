@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:resvago/admin/menuitem_model.dart';
+import 'package:resvago/admin/model/menuitem_model.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -74,7 +74,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xff3B5998),
         body: Obx(() {
           return SizedBox(
             height: size.height,
@@ -93,7 +93,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                           },
                           child: const Icon(
                             Icons.arrow_back_ios,
-                            color: Colors.black,
+                            color: Colors.white,
                             size: 20,
                           ),
                         ),
@@ -101,7 +101,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                       const Text(
                         "Add Menu Item",
                         style:
-                        TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.w700),
+                        TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -139,7 +139,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                               ),
                                               margin: EdgeInsets.only(right: size.width * .04, left: size.width * .015),
                                               child: CircleAvatar(
-                                                radius: size.height * .05,
+                                                radius: size.height * .07,
                                                 backgroundImage: NetworkImage(''),
                                               ))
                                               : Container(
@@ -148,7 +148,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                               shape: BoxShape.circle,
                                               color: Colors.white,
                                             ),
-                                            margin: EdgeInsets.only(right: size.width * .04, left: size.width * .015),
+                                            margin: EdgeInsets.only(right: size.width * .04, left: size.width * .04),
                                             child: CircleAvatar(
                                               radius: size.height * .05,
                                               backgroundImage: FileImage(file.value),
@@ -156,7 +156,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                           ),
                                           Positioned(
                                             top: 03,
-                                            right: 06,
+                                            right: 20,
                                             child: InkWell(
                                               onTap: () {
                                                 _showActionSheet(context);
@@ -167,10 +167,10 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                                 const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                                                 child: Container(
                                                   padding: const EdgeInsets.all(5),
-                                                  decoration: const BoxDecoration(shape: BoxShape.circle,color: Colors.redAccent),
+                                                  decoration: const BoxDecoration(shape: BoxShape.circle,color: Color(0xff3B5998)),
                                                   child: Icon(
                                                     Icons.edit,
-                                                    color: Colors.black,
+                                                    color: Colors.white,
                                                     size: size.height * .015,
                                                   ),
                                                 ),
@@ -192,6 +192,8 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                     controller: nameController,
                                     hintText: 'Menu Item Name',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
+
                                   ),
 
                                   const SizedBox(height: 10),
@@ -200,11 +202,15 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                     controller: descriptionController,
                                     hintText: 'Description',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
+
                                   ),
                                   const SizedBox(height: 10),
 
                                   // sign in button
                                   MyButton(
+                                    color: Colors.white,
+                                    backgroundcolor: Color(0xff3B5998),
                                     onTap: () {
                                       if (nameController.text.isEmpty && descriptionController.text.isEmpty) {
                                         Fluttertoast.showToast(msg: 'Please enter Fields');

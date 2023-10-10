@@ -8,11 +8,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:resvago/admin/user_model.dart';
 
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import 'model/user_model.dart';
 
 class AddUsersScreen extends StatefulWidget {
   final bool isEditMode;
@@ -54,16 +54,19 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     String password = passwordController.text;
     String phoneNumber = phoneNumberController.text;
     String? imageUrl;
+    Timestamp currentTime = Timestamp.now();
+
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
-      FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
+          FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
 
       TaskSnapshot snapshot = await uploadTask;
 
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
-      UserData users = UserData(name: name, email: email, deactivate: false,image: imageUrl, password: password,phoneNumber: phoneNumber);
+      UserData users = UserData(
+          name: name, email: email, deactivate: false, image: imageUrl, password: password, phoneNumber: phoneNumber, time: currentTime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('users').doc(widget.documentId).update(users.toMap());
       } else {
@@ -86,7 +89,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xff3B5998),
         body: Obx(() {
           return SizedBox(
             height: size.height,
@@ -105,15 +108,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                           },
                           child: const Icon(
                             Icons.arrow_back_ios,
-                            color: Colors.black,
+                            color: Colors.white,
                             size: 20,
                           ),
                         ),
                       ),
                       const Text(
                         "Add Users",
-                        style:
-                        TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.w700),
+                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -129,7 +131,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                         child: Container(
                           decoration: const BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+                              borderRadius:
+                                  BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
                           child: Form(
                             key: _formKey,
                             child: Padding(
@@ -144,31 +147,33 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                         children: [
                                           file.value.path == ""
                                               ? Container(
-                                              padding: const EdgeInsets.all(2),
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.white,
-                                              ),
-                                              margin: EdgeInsets.only(right: size.width * .04, left: size.width * .015),
-                                              child: CircleAvatar(
-                                                radius: size.height * .05,
-                                                backgroundImage: NetworkImage(''),
-                                              ))
+                                                  padding: const EdgeInsets.all(2),
+                                                  decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.white,
+                                                  ),
+                                                  margin:
+                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .05),
+                                                  child: CircleAvatar(
+                                                    radius: size.height * .07,
+                                                    backgroundImage: NetworkImage(''),
+                                                  ))
                                               : Container(
-                                            padding: const EdgeInsets.all(2),
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors.white,
-                                            ),
-                                            margin: EdgeInsets.only(right: size.width * .04, left: size.width * .015),
-                                            child: CircleAvatar(
-                                              radius: size.height * .05,
-                                              backgroundImage: FileImage(file.value),
-                                            ),
-                                          ),
+                                                  padding: const EdgeInsets.all(2),
+                                                  decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.white,
+                                                  ),
+                                                  margin:
+                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .015),
+                                                  child: CircleAvatar(
+                                                    radius: size.height * .05,
+                                                    backgroundImage: FileImage(file.value),
+                                                  ),
+                                                ),
                                           Positioned(
                                             top: 03,
-                                            right: 06,
+                                            right: 20,
                                             child: InkWell(
                                               onTap: () {
                                                 _showActionSheet(context);
@@ -176,13 +181,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                               child: Container(
                                                 padding: const EdgeInsets.all(2),
                                                 decoration:
-                                                const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                                    const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                                                 child: Container(
                                                   padding: const EdgeInsets.all(5),
-                                                  decoration: const BoxDecoration(shape: BoxShape.circle,color: Colors.redAccent),
+                                                  decoration: const BoxDecoration(
+                                                      shape: BoxShape.circle, color: Color(0xff3B5998)),
                                                   child: Icon(
                                                     Icons.edit,
-                                                    color: Colors.black,
+                                                    color: Colors.white,
                                                     size: size.height * .015,
                                                   ),
                                                 ),
@@ -193,17 +199,19 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       ),
                                       const Text(
                                         "",
-                                        style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                                        style:
+                                            TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(
-                                    height: 5,
+                                    height: 20,
                                   ),
                                   MyTextField(
                                     controller: nameController,
                                     hintText: 'User Name',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
                                   ),
 
                                   const SizedBox(height: 10),
@@ -212,12 +220,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     controller: emailController,
                                     hintText: 'Description',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
                                   ),
                                   const SizedBox(height: 10),
                                   MyTextField(
                                     controller: passwordController,
                                     hintText: 'Password',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
                                   ),
 
                                   const SizedBox(height: 10),
@@ -226,10 +236,13 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     controller: phoneNumberController,
                                     hintText: 'Phone Number',
                                     obscureText: false,
+                                    color: Color(0xff3B5998),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 100),
                                   // sign in button
                                   MyButton(
+                                    color: Colors.white,
+                                    backgroundcolor: Color(0xff3B5998),
                                     onTap: () {
                                       if (nameController.text.isEmpty && emailController.text.isEmpty) {
                                         Fluttertoast.showToast(msg: 'Please enter Fields');

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:resvago/admin/coupen_model.dart';
+import 'package:resvago/admin/model/coupen_model.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 
@@ -85,18 +85,12 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
               children: [
                 const SizedBox(height: 50),
                 const Icon(
-                  Icons.person,
+                  Icons.card_giftcard,
                   size: 100,
+                  color: Color(0xff3B5998),
                 ),
 
                 const SizedBox(height: 50),
-                Text(
-                  'Fill All The \'Fields',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
-                  ),
-                ),
 
                 const SizedBox(height: 25),
 
@@ -104,6 +98,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   controller: titleController,
                   hintText: 'Title',
                   obscureText: false,
+                  color: Color(0xff3B5998),
+
                 ),
 
                 const SizedBox(height: 10),
@@ -112,6 +108,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   controller: descriptionController,
                   hintText: 'Description',
                   obscureText: false,
+                  color: Color(0xff3B5998),
+
                 ),
                 const SizedBox(height: 10),
 
@@ -119,6 +117,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   controller: codeController,
                   hintText: 'Code',
                   obscureText: false,
+                  color: Color(0xff3B5998),
                 ),
                 const SizedBox(height: 10),
 
@@ -126,6 +125,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   controller: discountController,
                   hintText: 'Discount',
                   obscureText: false,
+                  color: Color(0xff3B5998),
+
                 ),
                 const SizedBox(height: 10),
 
@@ -133,12 +134,16 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   controller: validtilldateController,
                   hintText: 'Valid Date',
                   obscureText: false,
+                  color: Color(0xff3B5998),
+
                 ),
 
                 const SizedBox(height: 25),
 
                 // sign in button
                 MyButton(
+                  color: Colors.white,
+                  backgroundcolor: Color(0xff3B5998),
                   onTap: () {
                     if (titleController.text.isEmpty &&
                         descriptionController.text.isEmpty &&

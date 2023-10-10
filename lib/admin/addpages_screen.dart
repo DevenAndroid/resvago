@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:resvago/admin/Pages_model.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import 'model/Pages_model.dart';
 
 class AddPagesScreen extends StatefulWidget {
   final bool isEditMode;
@@ -12,9 +12,7 @@ class AddPagesScreen extends StatefulWidget {
   final String? title;
   final String? longdescription;
 
-
-  const AddPagesScreen(
-      {super.key, required this.isEditMode, this.documentId, this.title, this.longdescription});
+  const AddPagesScreen({super.key, required this.isEditMode, this.documentId, this.title, this.longdescription});
 
   @override
   State<AddPagesScreen> createState() => _AddPagesScreenState();
@@ -24,14 +22,12 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
   TextEditingController titleController = TextEditingController();
   TextEditingController longdescriptionController = TextEditingController();
 
-
   void addUserToFirestore() {
     String title = titleController.text;
     String longdescription = longdescriptionController.text;
 
     if (title.isNotEmpty && longdescription.isNotEmpty) {
-      PagesData pages =
-          PagesData(title: title, longdescription: longdescription, deactivate: false);
+      PagesData pages = PagesData(title: title, longdescription: longdescription, deactivate: false);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('Pages').doc(widget.documentId).update(pages.toMap());
       } else {
@@ -60,25 +56,18 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
               children: [
                 const SizedBox(height: 50),
                 const Icon(
-                  Icons.person,
+                  Icons.pages,
                   size: 100,
+                  color: Color(0xff3B5998),
                 ),
 
-                const SizedBox(height: 50),
-                Text(
-                  'Fill All The \'Fields',
-                  style: TextStyle(
-                    color: Colors.grey[700],
-                    fontSize: 16,
-                  ),
-                ),
-
-                const SizedBox(height: 25),
+                const SizedBox(height: 75),
 
                 MyTextField(
                   controller: titleController,
                   hintText: 'Title',
                   obscureText: false,
+                  color: Color(0xff3B5998),
                 ),
 
                 const SizedBox(height: 10),
@@ -87,15 +76,17 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
                   controller: longdescriptionController,
                   hintText: 'Long Description',
                   obscureText: false,
+                  color: Color(0xff3B5998),
                 ),
 
                 const SizedBox(height: 25),
 
                 // sign in button
                 MyButton(
+                  color: Colors.white,
+                  backgroundcolor: Color(0xff3B5998),
                   onTap: () {
-                    if (titleController.text.isEmpty &&
-                        longdescriptionController.text.isEmpty) {
+                    if (titleController.text.isEmpty && longdescriptionController.text.isEmpty) {
                       Fluttertoast.showToast(msg: 'Please enter Fields');
                     } else {
                       addUserToFirestore();
