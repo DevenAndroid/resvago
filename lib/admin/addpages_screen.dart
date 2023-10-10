@@ -25,9 +25,9 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
   void addUserToFirestore() {
     String title = titleController.text;
     String longdescription = longdescriptionController.text;
-
+    Timestamp currenttime = Timestamp.now();
     if (title.isNotEmpty && longdescription.isNotEmpty) {
-      PagesData pages = PagesData(title: title, longdescription: longdescription, deactivate: false);
+      PagesData pages = PagesData(title: title, longdescription: longdescription, deactivate: false,time: currenttime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('Pages').doc(widget.documentId).update(pages.toMap());
       } else {

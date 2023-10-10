@@ -46,6 +46,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
     String discount = discountController.text;
     String validtilldate = validtilldateController.text;
 
+    Timestamp currenttime  = Timestamp.now();
+
     if (title.isNotEmpty && description.isNotEmpty) {
       CouponData user = CouponData(
           title: title,
@@ -53,6 +55,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
           code: code,
           discount: discount,
           validtilldate: validtilldate,
+          time: currenttime                     ,
           deactivate: false);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('coupon').doc(widget.documentId).update(user.toMap());

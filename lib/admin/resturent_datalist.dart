@@ -40,13 +40,14 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                 ));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 5),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+
         ],
       ),
       body: SingleChildScrollView(

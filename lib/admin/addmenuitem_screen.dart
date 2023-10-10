@@ -44,6 +44,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     String name = nameController.text;
     String description = descriptionController.text;
     String? imageUrl;
+    Timestamp currenttime = Timestamp.now();
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
       FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
@@ -53,7 +54,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
-      MenuItemData menuitem = MenuItemData(name: name, description: description, deactivate: false,image: imageUrl);
+      MenuItemData menuitem = MenuItemData(name: name, description: description, deactivate: false,image: imageUrl,time: currenttime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('menuitem').doc(widget.documentId).update(menuitem.toMap());
       } else {

@@ -46,6 +46,7 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
     String name = nameController.text;
     String description = descriptionController.text;
     String? imageUrl;
+    DateTime currenttime = DateTime.now();
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
           FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
@@ -55,7 +56,7 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
-      ResturentData resturent = ResturentData(name: name, description: description, deactivate: false, image: imageUrl);
+      ResturentData resturent = ResturentData(name: name, description: description, deactivate: false, image: imageUrl,time: currenttime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('resturent').doc(widget.documentId).update(resturent.toMap());
       } else {

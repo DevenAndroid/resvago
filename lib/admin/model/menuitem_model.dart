@@ -4,8 +4,9 @@ class MenuItemData {
   final dynamic description;
   final dynamic image;
   final bool deactivate;
+  final dynamic time;
 
-  MenuItemData({required this.deactivate, this.docid, required this.description,required this.name,required this.image});
+  MenuItemData( {required this.deactivate, this.docid,this.time, required this.description,required this.name,required this.image});
 
   Map<String, dynamic> toMap() {
     return {
@@ -14,6 +15,7 @@ class MenuItemData {
       'description': description,
       'docid': docid,
       'deactivate': deactivate,
+      'time': time,
     };
   }
 
@@ -24,6 +26,7 @@ class MenuItemData {
       image: map['image'],
       deactivate: map['deactivate'],
       docid: map['docid'],
+      time: map['time'],
     );
   }
 }
