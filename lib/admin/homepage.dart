@@ -56,14 +56,14 @@ class LineChartSample1State extends State<LineChartSample1> {
                       'Williams Jones',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 17,
+                        fontSize: 15,
                       ),
                     ),
                     Text(
                       'williamsjones@gmail.com',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 17,
+                        fontSize: 15,
                       ),
                     ),
                   ],
@@ -104,7 +104,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               ),
               ListTile(
                 leading: const Icon(Icons.food_bank),
-                title: const Text('Add Resturent Category'),
+                title: const Text('Add Product Category'),
                 onTap: () {
                   Get.to(const ResturentDataScreen()); // Closes the drawer
                 },
@@ -115,7 +115,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               ),
               ListTile(
                 leading: const Icon(Icons.menu_book),
-                title: const Text('Add Menu Category'),
+                title: const Text('Add Vendor Category'),
                 onTap: () {
                   Get.to(const MenuItemListScreen()); // Closes the drawer
                 },

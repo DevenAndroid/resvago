@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,6 +55,13 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     String? imageUrl;
     Timestamp currentTime = Timestamp.now();
 
+    List<String> arrangeNumbers = [];
+    String? userNumber = (name ?? "");
+    arrangeNumbers.clear();
+    for (var i = 0; i < userNumber.length; i++) {
+      arrangeNumbers.add(userNumber.substring(0, i + 1));
+    }
+
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
           FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
@@ -66,7 +72,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     }
     if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
       UserData users = UserData(
-          name: name, email: email, deactivate: false, image: imageUrl, password: password, phoneNumber: phoneNumber, time: currentTime);
+          name: name,
+          searchName: arrangeNumbers,
+          email: email,
+          deactivate: false,
+          image: imageUrl,
+          password: password,
+          phoneNumber: phoneNumber,
+          time: currentTime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('users').doc(widget.documentId).update(users.toMap());
       } else {
@@ -268,7 +281,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     color: Colors.white,
                                     backgroundcolor: Color(0xff3B5998),
                                     onTap: () {
-                                      if(formKey.currentState!.validate()){
+                                      if (formKey.currentState!.validate()) {
                                         addusersToFirestore();
                                         nameController.clear();
                                         emailController.clear();

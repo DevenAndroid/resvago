@@ -217,7 +217,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
   }
 }
 Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
-  return FirebaseFirestore.instance.collection('menuitem').snapshots().map((querySnapshot) {
+  return FirebaseFirestore.instance.collection('menuitem').orderBy('time', descending: true).snapshots().map((querySnapshot) {
     List<MenuItemData> itemmenu = [];
     try {
       for (var doc in querySnapshot.docs) {

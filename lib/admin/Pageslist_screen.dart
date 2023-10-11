@@ -220,7 +220,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
 
 Future<List<PagesData>> getPagesFromFirestore() async {
   QuerySnapshot<Map<String, dynamic>> querySnapshot =
-  await FirebaseFirestore.instance.collection('Pages').get();
+  await FirebaseFirestore.instance.collection('Pages').orderBy('time', descending: true).get();
 
   List<PagesData> pages = [];
   try {

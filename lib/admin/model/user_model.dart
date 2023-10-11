@@ -1,6 +1,7 @@
 class UserData {
   final dynamic? docid;
   final dynamic name;
+  final dynamic searchName;
   final dynamic email;
   final dynamic password;
   final dynamic phoneNumber;
@@ -8,7 +9,7 @@ class UserData {
   final dynamic time;
   final bool deactivate;
 
-  UserData({required this.image,required this.deactivate, this.docid, this.time, required this.password, required this.phoneNumber,required this.name, required this.email});
+  UserData( {required this.image,required this.deactivate, this.docid, this.time,this.searchName, required this.password, required this.phoneNumber,required this.name, required this.email});
 
   Map<String, dynamic> toMap() {
     return {
@@ -20,6 +21,7 @@ class UserData {
       'deactivate': deactivate,
       'image': image,
       'time': time,
+      'searchName': searchName,
     };
   }
 
@@ -33,6 +35,7 @@ class UserData {
       image: map['image'],
        docid: map['docid'],
        time: map['time'],
+      searchName: map['searchName'],
     );
   }
 }

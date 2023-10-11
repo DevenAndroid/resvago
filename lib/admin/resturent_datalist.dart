@@ -220,7 +220,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
 }
 
 Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-  return FirebaseFirestore.instance.collection('resturent').snapshots().map((querySnapshot) {
+  return FirebaseFirestore.instance.collection('resturent').orderBy('time', descending: true).snapshots().map((querySnapshot) {
     List<ResturentData> resturent = [];
     try {
       for (var doc in querySnapshot.docs) {

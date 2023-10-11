@@ -221,7 +221,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
 }
 
 Future<List<CouponData>> getCouponFromFirestore() async {
-  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('coupon').get();
+  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('coupon').orderBy('time', descending: true).get();
 
   List<CouponData> coupon = [];
   try {
