@@ -26,8 +26,6 @@ class AddCouponScreen extends StatefulWidget {
     this.validtilldate,
   });
 
-
-
   @override
   State<AddCouponScreen> createState() => _AddCouponScreenState();
 }
@@ -38,6 +36,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   TextEditingController codeController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController validtilldateController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void addCouponToFirestore() {
     String title = titleController.text;
@@ -46,7 +45,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
     String discount = discountController.text;
     String validtilldate = validtilldateController.text;
 
-    Timestamp currenttime  = Timestamp.now();
+    Timestamp currenttime = Timestamp.now();
 
     if (title.isNotEmpty && description.isNotEmpty) {
       CouponData user = CouponData(
@@ -55,10 +54,13 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
           code: code,
           discount: discount,
           validtilldate: validtilldate,
-          time: currenttime                     ,
+          time: currenttime,
           deactivate: false);
       if (widget.isEditMode) {
-        FirebaseFirestore.instance.collection('coupon').doc(widget.documentId).update(user.toMap());
+        FirebaseFirestore.instance
+            .collection('coupon')
+            .doc(widget.documentId)
+            .update(user.toMap());
       } else {
         FirebaseFirestore.instance.collection('coupon').add(user.toMap());
       }
@@ -80,93 +82,112 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[300],
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 50),
-                const Icon(
-                  Icons.card_giftcard,
-                  size: 100,
-                  color: Color(0xff3B5998),
-                ),
+      body: Form(
+        key: formKey,
+        child: SingleChildScrollView(
+          child: SafeArea(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 50),
+                  const Icon(
+                    Icons.card_giftcard,
+                    size: 100,
+                    color: Color(0xff3B5998),
+                  ),
 
-                const SizedBox(height: 50),
+                  const SizedBox(height: 50),
 
-                const SizedBox(height: 25),
+                  const SizedBox(height: 25),
 
-                MyTextField(
-                  controller: titleController,
-                  hintText: 'Title',
-                  obscureText: false,
-                  color: Color(0xff3B5998),
+                  MyTextField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter Title';
+                      }
+                    },
+                    controller: titleController,
+                    hintText: 'Title',
+                    obscureText: false,
+                    color: Color(0xff3B5998),
+                  ),
 
-                ),
+                  const SizedBox(height: 10),
 
-                const SizedBox(height: 10),
+                  MyTextField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter Description';
+                      }
+                    },
+                    controller: descriptionController,
+                    hintText: 'Description',
+                    obscureText: false,
+                    color: Color(0xff3B5998),
+                  ),
+                  const SizedBox(height: 10),
 
-                MyTextField(
-                  controller: descriptionController,
-                  hintText: 'Description',
-                  obscureText: false,
-                  color: Color(0xff3B5998),
+                  MyTextField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter Code';
+                      }
+                    },
+                    controller: codeController,
+                    hintText: 'Code',
+                    obscureText: false,
+                    color: Color(0xff3B5998),
+                  ),
+                  const SizedBox(height: 10),
 
-                ),
-                const SizedBox(height: 10),
+                  MyTextField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter Discount';
+                      }
+                    },
+                    controller: discountController,
+                    hintText: 'Discount',
+                    obscureText: false,
+                    color: Color(0xff3B5998),
+                  ),
+                  const SizedBox(height: 10),
 
-                MyTextField(
-                  controller: codeController,
-                  hintText: 'Code',
-                  obscureText: false,
-                  color: Color(0xff3B5998),
-                ),
-                const SizedBox(height: 10),
+                  MyTextField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter Valid date';
+                      }
+                    },
+                    controller: validtilldateController,
+                    hintText: 'Valid Date',
+                    obscureText: false,
+                    color: Color(0xff3B5998),
+                  ),
 
-                MyTextField(
-                  controller: discountController,
-                  hintText: 'Discount',
-                  obscureText: false,
-                  color: Color(0xff3B5998),
+                  const SizedBox(height: 25),
 
-                ),
-                const SizedBox(height: 10),
+                  // sign in button
+                  MyButton(
+                    color: Colors.white,
+                    backgroundcolor: Color(0xff3B5998),
+                    onTap: () {
+                      if (formKey.currentState!.validate()) {
+                        addCouponToFirestore();
+                        titleController.clear();
+                        descriptionController.clear();
+                        codeController.clear();
+                        discountController.clear();
+                        Get.back();
+                      }
+                    },
+                    text: widget.isEditMode ? 'Update Coupon' : 'Add Coupon',
+                  ),
 
-                MyTextField(
-                  controller: validtilldateController,
-                  hintText: 'Valid Date',
-                  obscureText: false,
-                  color: Color(0xff3B5998),
-
-                ),
-
-                const SizedBox(height: 25),
-
-                // sign in button
-                MyButton(
-                  color: Colors.white,
-                  backgroundcolor: Color(0xff3B5998),
-                  onTap: () {
-                    if (titleController.text.isEmpty &&
-                        descriptionController.text.isEmpty &&
-                        codeController.text.isEmpty &&
-                        discountController.text.isEmpty) {
-                      Fluttertoast.showToast(msg: 'Please enter Fields');
-                    } else {
-                      addCouponToFirestore();
-                      titleController.clear();
-                      descriptionController.clear();
-                      codeController.clear();
-                      discountController.clear();
-                      Get.back();
-                    }
-                  },
-                  text: widget.isEditMode ? 'Update Coupon' : 'Add Coupon',
-                ),
-
-                const SizedBox(height: 50),
-              ],
+                  const SizedBox(height: 50),
+                ],
+              ),
             ),
           ),
         ),

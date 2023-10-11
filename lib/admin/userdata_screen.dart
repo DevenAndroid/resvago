@@ -34,6 +34,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
             },
             child: const Icon(Icons.arrow_back)),
         actions: [
+          const Padding(
+            padding: EdgeInsets.only(right: 5),
+            child: Icon(
+              Icons.search,
+              size: 30,
+              color: Colors.white,
+            ),
+          ),
           GestureDetector(
               onTap: () {
                 Get.to(const AddUsersScreen(
@@ -41,13 +49,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                 ));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 10),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+
         ],
       ),
       body: SingleChildScrollView(
@@ -64,6 +73,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                   // List<ResturentData> users = snapshot.data ?? [];
                   return snapshot.data!.isNotEmpty
                       ? ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
                       itemCount: snapshot.data!.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {

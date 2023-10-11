@@ -38,7 +38,6 @@ class AddUsersScreen extends StatefulWidget {
   State<AddUsersScreen> createState() => _AddUsersScreenState();
 }
 
-final _formKey = GlobalKey<FormState>();
 Rx<File> file = File("").obs;
 String imagePath = "";
 
@@ -47,6 +46,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> addusersToFirestore() async {
     String name = nameController.text;
@@ -90,51 +90,51 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Color(0xff3B5998),
-        body: Obx(() {
-          return SizedBox(
-            height: size.height,
-            width: size.width,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
-                        child: InkWell(
-                          onTap: () {
-                            Get.back();
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                            size: 20,
+        body: Form(
+          key: formKey,
+          child: Obx(() {
+            return SizedBox(
+              height: size.height,
+              width: size.width,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
+                          child: InkWell(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
-                      ),
-                      const Text(
-                        "Add Users",
-                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
-                      ),
-                    ],
+                        const Text(
+                          "Add Users",
+                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: size.height * .135,
-                  right: 0,
-                  left: 0,
-                  bottom: 0,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
-                          child: Form(
-                            key: _formKey,
+                  Positioned(
+                    top: size.height * .135,
+                    right: 0,
+                    left: 0,
+                    bottom: 0,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
                                   .copyWith(bottom: 0),
@@ -208,8 +208,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     height: 20,
                                   ),
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter your name';
+                                      }
+                                    },
                                     controller: nameController,
-                                    hintText: 'User Name',
+                                    hintText: 'Enter User Name',
+                                    keyboardtype: TextInputType.name,
                                     obscureText: false,
                                     color: Color(0xff3B5998),
                                   ),
@@ -217,25 +223,43 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                   const SizedBox(height: 10),
 
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter your email';
+                                      }
+                                    },
                                     controller: emailController,
-                                    hintText: 'Description',
+                                    hintText: 'Enter Email',
                                     obscureText: false,
+                                    keyboardtype: TextInputType.emailAddress,
                                     color: Color(0xff3B5998),
                                   ),
                                   const SizedBox(height: 10),
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter your password';
+                                      }
+                                    },
                                     controller: passwordController,
-                                    hintText: 'Password',
+                                    hintText: 'Enter Password',
                                     obscureText: false,
+                                    keyboardtype: TextInputType.visiblePassword,
                                     color: Color(0xff3B5998),
                                   ),
 
                                   const SizedBox(height: 10),
 
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter your phone number';
+                                      }
+                                    },
                                     controller: phoneNumberController,
-                                    hintText: 'Phone Number',
+                                    hintText: 'Enter Phone Number',
                                     obscureText: false,
+                                    keyboardtype: TextInputType.phone,
                                     color: Color(0xff3B5998),
                                   ),
                                   const SizedBox(height: 100),
@@ -244,9 +268,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     color: Colors.white,
                                     backgroundcolor: Color(0xff3B5998),
                                     onTap: () {
-                                      if (nameController.text.isEmpty && emailController.text.isEmpty) {
-                                        Fluttertoast.showToast(msg: 'Please enter Fields');
-                                      } else {
+                                      if(formKey.currentState!.validate()){
                                         addusersToFirestore();
                                         nameController.clear();
                                         emailController.clear();
@@ -264,14 +286,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }));
+                ],
+              ),
+            );
+          }),
+        ));
   }
 }
 

@@ -39,6 +39,7 @@ String imagePath = "";
 class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> addmenuitemToFirestore() async {
     String name = nameController.text;
@@ -76,51 +77,51 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Color(0xff3B5998),
-        body: Obx(() {
-          return SizedBox(
-            height: size.height,
-            width: size.width,
-            child: Stack(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
-                        child: InkWell(
-                          onTap: () {
-                            Get.back();
-                          },
-                          child: const Icon(
-                            Icons.arrow_back_ios,
-                            color: Colors.white,
-                            size: 20,
+        body: Form(
+          key: formKey,
+          child: Obx(() {
+            return SizedBox(
+              height: size.height,
+              width: size.width,
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
+                          child: InkWell(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: const Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                           ),
                         ),
-                      ),
-                      const Text(
-                        "Add Menu Item",
-                        style:
-                        TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
-                      ),
-                    ],
+                        const Text(
+                          "Add Menu Item",
+                          style:
+                          TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: size.height * .135,
-                  right: 0,
-                  left: 0,
-                  bottom: 0,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
-                          child: Form(
-                            key: _formKey,
+                  Positioned(
+                    top: size.height * .135,
+                    right: 0,
+                    left: 0,
+                    bottom: 0,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
                                   .copyWith(bottom: 0),
@@ -190,6 +191,11 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                     height: 5,
                                   ),
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter Menu Item Name';
+                                      }
+                                    },
                                     controller: nameController,
                                     hintText: 'Menu Item Name',
                                     obscureText: false,
@@ -200,6 +206,11 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                   const SizedBox(height: 10),
 
                                   MyTextField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Please enter Description';
+                                      }
+                                    },
                                     controller: descriptionController,
                                     hintText: 'Description',
                                     obscureText: false,
@@ -213,9 +224,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                     color: Colors.white,
                                     backgroundcolor: Color(0xff3B5998),
                                     onTap: () {
-                                      if (nameController.text.isEmpty && descriptionController.text.isEmpty) {
-                                        Fluttertoast.showToast(msg: 'Please enter Fields');
-                                      } else {
+                                      if(formKey.currentState!.validate()){
                                         addmenuitemToFirestore();
                                         nameController.clear();
                                         descriptionController.clear();
@@ -231,14 +240,14 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          );
-        }));
+                ],
+              ),
+            );
+          }),
+        ));
   }
 }
 
