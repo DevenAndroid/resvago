@@ -44,7 +44,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
             onTap: () {
               Get.back();
             },
-            child: const Icon(Icons.arrow_back)),
+            child: const Icon(Icons.arrow_back_ios)),
         actions: [
           InkWell(
             onTap: () {

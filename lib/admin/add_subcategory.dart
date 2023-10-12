@@ -10,98 +10,75 @@ import 'package:image_picker/image_picker.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import 'model/user_model.dart';
+import 'model/resturent_model.dart';
 
-class AddUsersScreen extends StatefulWidget {
+class AddSubcategoryScreen extends StatefulWidget {
   final bool isEditMode;
   final String? documentId;
   final String? name;
-  final String? email;
-  final String? password;
-  final String? phoneNumber;
+  final String? description;
   final String? image;
 
-  const AddUsersScreen({
+  const AddSubcategoryScreen({
     super.key,
     required this.isEditMode,
     this.documentId,
     this.name,
-    this.phoneNumber,
+    this.description,
     this.image,
-    this.email,
-    this.password,
   });
 
   @override
-  State<AddUsersScreen> createState() => _AddUsersScreenState();
+  State<AddSubcategoryScreen> createState() => _AddSubcategoryScreenState();
 }
 
+final _formKey = GlobalKey<FormState>();
 Rx<File> file = File("").obs;
 String imagePath = "";
 
-class _AddUsersScreenState extends State<AddUsersScreen> {
-  TextEditingController emailController = TextEditingController();
+class _AddSubcategoryScreenState extends State<AddSubcategoryScreen> {
+  TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController phoneNumberController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  Future<void> addusersToFirestore() async {
+  Future<void> addresturentToFirestore() async {
     String name = nameController.text;
-    String email = emailController.text;
-    String password = passwordController.text;
-    String phoneNumber = phoneNumberController.text;
+    String description = descriptionController.text;
     String? imageUrl;
-    Timestamp currentTime = Timestamp.now();
-
-    List<String> arrangeNumbers = [];
-    String? userNumber = (name ?? "");
-    arrangeNumbers.clear();
-    for (var i = 0; i < userNumber.length; i++) {
-      arrangeNumbers.add(userNumber.substring(0, i + 1));
-    }
-
+    DateTime currenttime = DateTime.now();
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
-          FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
+      FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
 
       TaskSnapshot snapshot = await uploadTask;
-
       imageUrl = await snapshot.ref.getDownloadURL();
     }
-    if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
-      UserData users = UserData(
-          name: name,
-          searchName: arrangeNumbers,
-          email: email,
+    if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
+      ResturentData resturent =
+      ResturentData(name: name,
+          description: description,
           deactivate: false,
           image: imageUrl,
-          password: password,
-          phoneNumber: phoneNumber,
-          time: currentTime);
-      if (widget.isEditMode) {
-        FirebaseFirestore.instance.collection('users').doc(widget.documentId).update(users.toMap());
-      } else {
-        FirebaseFirestore.instance.collection('users').add(users.toMap());
+          time: currenttime);
+
+        FirebaseFirestore.instance.collection('resturent').doc().collection(name).doc(widget.documentId).set(resturent.toMap());
       }
     }
-  }
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     nameController.text = widget.name ?? "";
-    emailController.text = widget.email ?? "";
-    passwordController.text = widget.password ?? "";
-    phoneNumberController.text = widget.phoneNumber ?? "";
+    descriptionController.text = widget.description ?? "";
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor: const Color(0xff3B5998),
         body: Form(
           key: formKey,
           child: Obx(() {
@@ -116,7 +93,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
-                          child: GestureDetector(
+                          child: InkWell(
                             onTap: () {
                               Get.back();
                             },
@@ -128,7 +105,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                           ),
                         ),
                         const Text(
-                          "Add Users",
+                          "Add Product",
                           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                         ),
                       ],
@@ -146,7 +123,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                             decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius:
-                                    BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+                                BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
                                   .copyWith(bottom: 0),
@@ -159,30 +136,30 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                         children: [
                                           file.value.path == ""
                                               ? Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .05),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .07,
-                                                    backgroundImage: NetworkImage(''),
-                                                  ))
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.white,
+                                              ),
+                                              margin:
+                                              EdgeInsets.only(right: size.width * .04, left: size.width * .05),
+                                              child: CircleAvatar(
+                                                radius: size.height * .07,
+                                                backgroundImage: const NetworkImage(''),
+                                              ))
                                               : Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .015),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .05,
-                                                    backgroundImage: FileImage(file.value),
-                                                  ),
-                                                ),
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: Colors.white,
+                                            ),
+                                            margin:
+                                            EdgeInsets.only(right: size.width * .04, left: size.width * .015),
+                                            child: CircleAvatar(
+                                              radius: size.height * .05,
+                                              backgroundImage: FileImage(file.value),
+                                            ),
+                                          ),
                                           Positioned(
                                             top: 03,
                                             right: 20,
@@ -193,7 +170,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                               child: Container(
                                                 padding: const EdgeInsets.all(2),
                                                 decoration:
-                                                    const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                                const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                                                 child: Container(
                                                   padding: const EdgeInsets.all(5),
                                                   decoration: const BoxDecoration(
@@ -212,24 +189,24 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       const Text(
                                         "",
                                         style:
-                                            TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                                        TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(
-                                    height: 20,
+                                    height: 10,
                                   ),
                                   MyTextField(
                                     validator: (value) {
                                       if (value!.isEmpty) {
-                                        return 'Please enter your name';
+                                        return 'Please enter Restaurant Name';
                                       }
+                                      return null;
                                     },
                                     controller: nameController,
-                                    hintText: 'Enter User Name',
-                                    keyboardtype: TextInputType.name,
+                                    hintText: 'Product Name',
                                     obscureText: false,
-                                    color: Color(0xff3B5998),
+                                    color: const Color(0xff3B5998),
                                   ),
 
                                   const SizedBox(height: 10),
@@ -237,61 +214,30 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                   MyTextField(
                                     validator: (value) {
                                       if (value!.isEmpty) {
-                                        return 'Please enter your email';
+                                        return 'Please enter Description';
                                       }
+                                      return null;
                                     },
-                                    controller: emailController,
-                                    hintText: 'Enter Email',
+                                    controller: descriptionController,
+                                    hintText: 'Description',
                                     obscureText: false,
-                                    keyboardtype: TextInputType.emailAddress,
-                                    color: Color(0xff3B5998),
+                                    color: const Color(0xff3B5998),
                                   ),
-                                  const SizedBox(height: 10),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                    },
-                                    controller: passwordController,
-                                    hintText: 'Enter Password',
-                                    obscureText: false,
-                                    keyboardtype: TextInputType.visiblePassword,
-                                    color: Color(0xff3B5998),
-                                  ),
+                                  const SizedBox(height: 100),
 
-                                  const SizedBox(height: 10),
-
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your phone number';
-                                      }
-                                    },
-                                    controller: phoneNumberController,
-                                    hintText: 'Enter Phone Number',
-                                    obscureText: false,
-                                    keyboardtype: TextInputType.phone,
-                                    color: Color(0xff3B5998),
-                                  ),
                                   // sign in button
-                                  SizedBox(
-                                    height: size.height * .2,
-                                  ),
                                   MyButton(
                                     color: Colors.white,
-                                    backgroundcolor: Color(0xff3B5998),
+                                    backgroundcolor: const Color(0xff3B5998),
                                     onTap: () {
                                       if (formKey.currentState!.validate()) {
-                                        addusersToFirestore();
+                                        addresturentToFirestore();
                                         nameController.clear();
-                                        emailController.clear();
-                                        passwordController.clear();
-                                        phoneNumberController.clear();
+                                        descriptionController.clear();
                                         Get.back();
                                       }
                                     },
-                                    text: widget.isEditMode ? 'Update User' : 'Add User',
+                                    text: widget.isEditMode ? 'Update Product' : 'Add Product',
                                   ),
 
                                   const SizedBox(height: 50),

@@ -15,6 +15,14 @@ class CouponListScreen extends StatefulWidget {
 
 class _CouponListScreenState extends State<CouponListScreen> {
   bool userDeactivate = false;
+  String searchQuery = '';
+  bool isTextFieldVisible = false;
+  bool isDescendingOrder = true;
+  void toggleTextFieldVisibility() {
+    setState(() {
+      isTextFieldVisible = !isTextFieldVisible;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -35,8 +43,23 @@ class _CouponListScreenState extends State<CouponListScreen> {
             onTap: () {
               Get.back();
             },
-            child: Icon(Icons.arrow_back)),
+            child: Icon(Icons.arrow_back_ios)),
         actions: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                isDescendingOrder = !isDescendingOrder;
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.filter_list,
+                size: 30,
+                color: Colors.white,
+              ),
+            ),
+          ),
           GestureDetector(
               onTap: () {
                 Get.to(const AddCouponScreen(
@@ -44,14 +67,45 @@ class _CouponListScreenState extends State<CouponListScreen> {
                 ));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: toggleTextFieldVisibility,
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
+          child: Visibility(
+            visible: isTextFieldVisible,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -66,12 +120,14 @@ class _CouponListScreenState extends State<CouponListScreen> {
                       child: Text("No Coupon Found"),
                     );
                   }
-                  return snapshot.data!.isNotEmpty
+                  List<CouponData> users = snapshot.data ?? [];
+                  final filteredUsers = filterUsers(users, searchQuery);
+                  return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                          itemCount: snapshot.data!.length,
+                          itemCount: filteredUsers.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            final item = snapshot.data![index];
+                            final item = filteredUsers[index];
                             // if (item.deactivate) {
                             //   return SizedBox.shrink();
                             // }
@@ -218,28 +274,42 @@ class _CouponListScreenState extends State<CouponListScreen> {
       ),
     );
   }
-}
-
-Future<List<CouponData>> getCouponFromFirestore() async {
-  QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance.collection('coupon').orderBy('time', descending: true).get();
-
-  List<CouponData> coupon = [];
-  try {
-    for (var doc in querySnapshot.docs) {
-      log(doc.data().toString());
-      coupon.add(CouponData(
-          title: doc.data()['title'],
-          description: doc.data()['description'],
-          code: doc.data()['code'],
-          discount: doc.data()['discount'],
-          validtilldate: doc.data()['validtilldate'],
-          deactivate: doc.data()['deactivate'] ?? false,
-          docid: doc.id));
+  List<CouponData> filterUsers(List<CouponData> users, String query) {
+    if (query.isEmpty) {
+      return users; // Return all users if the search query is empty
+    } else {
+      // Filter the users based on the search query
+      return users.where((user) {
+        if (user.title is String) {
+          return user.title.toLowerCase().contains(query.toLowerCase());
+        }
+        return false;
+      }).toList();
     }
-  } catch (e) {
-    log(e.toString());
-    throw Exception();
   }
-  log(querySnapshot.docs.map((e) => e.data().toString()).toString());
-  return coupon;
+  Future<List<CouponData>> getCouponFromFirestore() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
+        .collection('coupon').orderBy('time', descending: isDescendingOrder).get();
+
+    List<CouponData> coupon = [];
+    try {
+      for (var doc in querySnapshot.docs) {
+        log(doc.data().toString());
+        coupon.add(CouponData(
+            title: doc.data()['title'],
+            description: doc.data()['description'],
+            code: doc.data()['code'],
+            discount: doc.data()['discount'],
+            validtilldate: doc.data()['validtilldate'],
+            deactivate: doc.data()['deactivate'] ?? false,
+            docid: doc.id));
+      }
+    } catch (e) {
+      log(e.toString());
+      throw Exception();
+    }
+    log(querySnapshot.docs.map((e) => e.data().toString()).toString());
+    return coupon;
+  }
 }
+

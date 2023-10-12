@@ -46,6 +46,14 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
     String description = descriptionController.text;
     String? imageUrl;
     Timestamp currenttime = Timestamp.now();
+
+    List<String> arrangeNumbers = [];
+    String? userNumber = (name ?? "");
+    arrangeNumbers.clear();
+    for (var i = 0; i < userNumber.length; i++) {
+      arrangeNumbers.add(userNumber.substring(0, i + 1));
+    }
+
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
       FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
@@ -55,7 +63,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
-      MenuItemData menuitem = MenuItemData(name: name, description: description, deactivate: false,image: imageUrl,time: currenttime);
+      MenuItemData menuitem = MenuItemData(name: name,searchName: arrangeNumbers, description: description, deactivate: false,image: imageUrl,time: currenttime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('menuitem').doc(widget.documentId).update(menuitem.toMap());
       } else {
@@ -103,7 +111,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                           ),
                         ),
                         const Text(
-                          "Add Menu Item",
+                          "Add Vendor Category",
                           style:
                           TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                         ),
@@ -217,7 +225,7 @@ class _AddMenuItemScreenState extends State<AddMenuItemScreen> {
                                     color: Color(0xff3B5998),
 
                                   ),
-                                  const SizedBox(height: 10),
+                                   SizedBox(height: size.height * .4,),
 
                                   // sign in button
                                   MyButton(

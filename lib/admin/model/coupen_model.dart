@@ -2,13 +2,14 @@ class CouponData {
   final dynamic? docid;
   final dynamic title;
   final dynamic description;
+  final dynamic searchName;
   final dynamic code;
   final dynamic discount;
   final dynamic validtilldate;
   final bool deactivate;
   final dynamic time;
 
-  CouponData({required this.deactivate, this.docid, this.time, required this.title, required this.description,required this.code, required this.discount,required this.validtilldate});
+  CouponData({required this.deactivate, this.docid, this.time,this.searchName, required this.title, required this.description,required this.code, required this.discount,required this.validtilldate});
 
   Map<String, dynamic> toMap() {
     return {
@@ -20,6 +21,7 @@ class CouponData {
       'deactivate': deactivate,
       'validtilldate': validtilldate,
       'time': time,
+      'searchName': searchName,
     };
   }
 
@@ -33,6 +35,7 @@ class CouponData {
        docid: map['docid'],
       validtilldate: map['validtilldate'],
       time: map['time'],
+      searchName: map['searchName'],
     );
   }
 }

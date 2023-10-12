@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addResturent_screen.dart';
+import 'add_subcategory.dart';
 import 'model/resturent_model.dart';
 
 class ResturentDataScreen extends StatefulWidget {
@@ -14,6 +15,14 @@ class ResturentDataScreen extends StatefulWidget {
 
 class _ResturentDataScreenState extends State<ResturentDataScreen> {
   bool userDeactivate = false;
+  String searchQuery = '';
+  bool isTextFieldVisible = false;
+  bool isDescendingOrder = true;
+  void toggleTextFieldVisibility() {
+    setState(() {
+      isTextFieldVisible = !isTextFieldVisible;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -25,14 +34,29 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Color(0xff3B5998),
-        title: const Text('Restaurant List',style: TextStyle(color: Colors.white),),
+        backgroundColor: const Color(0xff3B5998),
+        title: const Text('Product List',style: TextStyle(color: Colors.white),),
         leading: GestureDetector(
             onTap: () {
               Get.back();
             },
-            child: const Icon(Icons.arrow_back)),
+            child: const Icon(Icons.arrow_back_ios)),
         actions: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isDescendingOrder = !isDescendingOrder;
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.filter_list,
+                size: 30,
+                color: Colors.white,
+              ),
+            ),
+          ),
           GestureDetector(
               onTap: () {
                 Get.to(const AddResturentScreen(
@@ -47,8 +71,38 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                   color: Colors.white,
                 ),
               )),
-
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: toggleTextFieldVisibility,
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
+          child: Visibility(
+            visible: isTextFieldVisible,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -61,13 +115,15 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
+                  List<ResturentData> resturent = snapshot.data ?? [];
+                  final filteredUsers = filterUsers(resturent, searchQuery);
                   // List<ResturentData> users = snapshot.data ?? [];
-                  return snapshot.data!.isNotEmpty
+                  return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                          itemCount: snapshot.data!.length,
+                          itemCount: filteredUsers.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            final item = snapshot.data![index];
+                            final item = filteredUsers[index];
                             log(item.image.toString());
                             // if (item.deactivate) {
                             //   return SizedBox.shrink();
@@ -199,6 +255,13 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                               },
                                               child: Text(item.deactivate ? "Activate" : "Deactivate"),
                                             ),
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                Get.to(AddSubcategoryScreen(isEditMode: false,));
+                                              },
+                                              child: const Text('Add SubCategory'),
+                                            ),
                                           ];
                                         })),
                               ),
@@ -217,25 +280,42 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
       ),
     );
   }
+  List<ResturentData> filterUsers(List<ResturentData> users, String query) {
+    if (query.isEmpty) {
+      return users; // Return all users if the search query is empty
+    } else {
+      return users.where((user) {
+        if (user.name is String) {
+          return user.name.toLowerCase().contains(query.toLowerCase());
+        }
+        return false;
+      }).toList();
+    }
+  }
+
+  Stream<List<ResturentData>> getResturentStreamFromFirestore() {
+    return FirebaseFirestore.instance
+        .collection('resturent')
+        .orderBy('time', descending: isDescendingOrder)
+        .snapshots()
+        .map((querySnapshot) {
+      List<ResturentData> resturent = [];
+      try {
+        for (var doc in querySnapshot.docs) {
+          resturent.add(ResturentData(
+            name: doc.data()['name'],
+            description: doc.data()['description'],
+            image: doc.data()['image'],
+            deactivate: doc.data()['deactivate'] ?? false,
+            docid: doc.id,
+          ));
+        }
+      } catch (e) {
+        print(e.toString());
+        throw Exception(e.toString());
+      }
+      return resturent;
+    });
+  }
 }
 
-Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-  return FirebaseFirestore.instance.collection('resturent').orderBy('time', descending: true).snapshots().map((querySnapshot) {
-    List<ResturentData> resturent = [];
-    try {
-      for (var doc in querySnapshot.docs) {
-        resturent.add(ResturentData(
-          name: doc.data()['name'],
-          description: doc.data()['description'],
-          image: doc.data()['image'],
-          deactivate: doc.data()['deactivate'] ?? false,
-          docid: doc.id,
-        ));
-      }
-    } catch (e) {
-      print(e.toString());
-      throw Exception(e.toString());
-    }
-    return resturent;
-  });
-}

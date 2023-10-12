@@ -16,6 +16,14 @@ class PagesListScreen extends StatefulWidget {
 
 class _PagesListScreenState extends State<PagesListScreen> {
   bool userDeactivate = false;
+  String searchQuery = '';
+  bool isTextFieldVisible = false;
+  bool isDescendingOrder = true;
+  void toggleTextFieldVisibility() {
+    setState(() {
+      isTextFieldVisible = !isTextFieldVisible;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -32,8 +40,23 @@ class _PagesListScreenState extends State<PagesListScreen> {
             onTap: () {
               Get.back();
             },
-            child: Icon(Icons.arrow_back)),
+            child: Icon(Icons.arrow_back_ios)),
         actions: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isDescendingOrder = !isDescendingOrder;
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.filter_list,
+                size: 30,
+                color: Colors.white,
+              ),
+            ),
+          ),
           GestureDetector(
               onTap: () {
                 Get.to(AddPagesScreen(
@@ -41,14 +64,45 @@ class _PagesListScreenState extends State<PagesListScreen> {
                 ));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: toggleTextFieldVisibility,
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
+          child: Visibility(
+            visible: isTextFieldVisible,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -64,12 +118,14 @@ class _PagesListScreenState extends State<PagesListScreen> {
                       child: Text("No Pages Found"),
                     );
                   }
-                  return snapshot.data!.isNotEmpty
+                  List<PagesData> coupon = snapshot.data ?? [];
+                  final filteredUsers = filterUsers(coupon, searchQuery);
+                  return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredUsers.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final item = snapshot.data![index];
+                        final item = filteredUsers[index];
                         // if (item.deactivate) {
                         //   return SizedBox.shrink();
                         // }
@@ -216,26 +272,39 @@ class _PagesListScreenState extends State<PagesListScreen> {
       ),
     );
   }
-}
-
-Future<List<PagesData>> getPagesFromFirestore() async {
-  QuerySnapshot<Map<String, dynamic>> querySnapshot =
-  await FirebaseFirestore.instance.collection('Pages').orderBy('time', descending: true).get();
-
-  List<PagesData> pages = [];
-  try {
-    for (var doc in querySnapshot.docs) {
-      log(doc.data().toString());
-      pages.add(PagesData(
-          title: doc.data()['title'],
-          longdescription: doc.data()['longdescription'],
-          deactivate: doc.data()['deactivate'] ?? false,
-          docid: doc.id));
+  List<PagesData> filterUsers(List<PagesData> users, String query) {
+    if (query.isEmpty) {
+      return users; // Return all users if the search query is empty
+    } else {
+      // Filter the users based on the search query
+      return users.where((user) {
+        if (user.title is String) {
+          return user.title.toLowerCase().contains(query.toLowerCase());
+        }
+        return false;
+      }).toList();
     }
-  } catch (e) {
-    log(e.toString());
-    throw Exception();
   }
-  log(querySnapshot.docs.map((e) => e.data().toString()).toString());
-  return pages;
+  Future<List<PagesData>> getPagesFromFirestore() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+    await FirebaseFirestore.instance.collection('Pages').orderBy('time', descending: isDescendingOrder).get();
+
+    List<PagesData> pages = [];
+    try {
+      for (var doc in querySnapshot.docs) {
+        log(doc.data().toString());
+        pages.add(PagesData(
+            title: doc.data()['title'],
+            longdescription: doc.data()['longdescription'],
+            deactivate: doc.data()['deactivate'] ?? false,
+            docid: doc.id));
+      }
+    } catch (e) {
+      log(e.toString());
+      throw Exception();
+    }
+    log(querySnapshot.docs.map((e) => e.data().toString()).toString());
+    return pages;
+  }
 }
+

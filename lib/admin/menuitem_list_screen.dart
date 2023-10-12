@@ -14,6 +14,14 @@ class MenuItemListScreen extends StatefulWidget {
 
 class _MenuItemListScreenState extends State<MenuItemListScreen> {
   bool userDeactivate = false;
+  String searchQuery = '';
+  bool isTextFieldVisible = false;
+  bool isDescendingOrder = true;
+  void toggleTextFieldVisibility() {
+    setState(() {
+      isTextFieldVisible = !isTextFieldVisible;
+    });
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -26,13 +34,28 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Color(0xff3B5998),
-        title: const Text('Menu Item List',style: TextStyle(color: Colors.white),),
+        title: const Text('Vendor Category List',style: TextStyle(color: Colors.white),),
         leading: GestureDetector(
             onTap: () {
               Get.back();
             },
-            child: const Icon(Icons.arrow_back)),
+            child: const Icon(Icons.arrow_back_ios)),
         actions: [
+          InkWell(
+            onTap: () {
+              setState(() {
+                isDescendingOrder = !isDescendingOrder;
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Icon(
+                Icons.filter_list,
+                size: 30,
+                color: Colors.white,
+              ),
+            ),
+          ),
           GestureDetector(
               onTap: () {
                 Get.to(const AddMenuItemScreen(
@@ -40,14 +63,45 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                 ));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 20),
+                padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: toggleTextFieldVisibility,
+          )
         ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
+          child: Visibility(
+            visible: isTextFieldVisible,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  hintText: 'Search...',
+                  hintStyle: TextStyle(color: Colors.white),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                  ),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value;
+                  });
+                },
+              ),
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -60,12 +114,14 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  return snapshot.data!.isNotEmpty
+                  List<MenuItemData> users = snapshot.data ?? [];
+                  final filteredUsers = filterUsers(users, searchQuery); //
+                  return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredUsers.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final item = snapshot.data![index];
+                        final item = filteredUsers[index];
                         log(item.image.toString());
                         // if (item.deactivate) {
                         //   return SizedBox.shrink();
@@ -215,24 +271,37 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
       ),
     );
   }
-}
-Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
-  return FirebaseFirestore.instance.collection('menuitem').orderBy('time', descending: true).snapshots().map((querySnapshot) {
-    List<MenuItemData> itemmenu = [];
-    try {
-      for (var doc in querySnapshot.docs) {
-        itemmenu.add(MenuItemData(
-          name: doc.data()['name'],
-          description: doc.data()['description'],
-          image: doc.data()['image'],
-          deactivate: doc.data()['deactivate'] ?? false,
-          docid: doc.id,
-        ));
-      }
-    } catch (e) {
-      print(e.toString());
-      throw Exception(e.toString());
+  List<MenuItemData> filterUsers(List<MenuItemData> users, String query) {
+    if (query.isEmpty) {
+      return users; // Return all users if the search query is empty
+    } else {
+      // Filter the users based on the search query
+      return users.where((user) {
+        if (user.name is String) {
+          return user.name.toLowerCase().contains(query.toLowerCase());
+        }
+        return false;
+      }).toList();
     }
-    return itemmenu;
-  });
+  }
+  Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
+    return FirebaseFirestore.instance.collection('menuitem').orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
+      List<MenuItemData> itemmenu = [];
+      try {
+        for (var doc in querySnapshot.docs) {
+          itemmenu.add(MenuItemData(
+            name: doc.data()['name'],
+            description: doc.data()['description'],
+            image: doc.data()['image'],
+            deactivate: doc.data()['deactivate'] ?? false,
+            docid: doc.id,
+          ));
+        }
+      } catch (e) {
+        print(e.toString());
+        throw Exception(e.toString());
+      }
+      return itemmenu;
+    });
+  }
 }

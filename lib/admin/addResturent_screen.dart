@@ -4,11 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -48,16 +46,27 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
     String description = descriptionController.text;
     String? imageUrl;
     DateTime currenttime = DateTime.now();
+    List<String> arrangeNumbers = [];
+    String? userNumber = (name ?? "");
+    arrangeNumbers.clear();
+    for (var i = 0; i < userNumber.length; i++) {
+      arrangeNumbers.add(userNumber.substring(0, i + 1));
+    }
     if (imagePath.isNotEmpty) {
       UploadTask uploadTask =
           FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
 
       TaskSnapshot snapshot = await uploadTask;
-
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
-      ResturentData resturent = ResturentData(name: name, description: description, deactivate: false, image: imageUrl,time: currenttime);
+      ResturentData resturent =
+          ResturentData(name: name,
+              description: description,
+              deactivate: false,
+              searchName: arrangeNumbers,
+              image: imageUrl,
+              time: currenttime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance.collection('resturent').doc(widget.documentId).update(resturent.toMap());
       } else {
@@ -78,7 +87,7 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor: const Color(0xff3B5998),
         body: Form(
           key: formKey,
           child: Obx(() {
@@ -105,7 +114,7 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
                           ),
                         ),
                         const Text(
-                          "Add Restaurant",
+                          "Add Product",
                           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                         ),
                       ],
@@ -145,7 +154,7 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
                                                       EdgeInsets.only(right: size.width * .04, left: size.width * .05),
                                                   child: CircleAvatar(
                                                     radius: size.height * .07,
-                                                    backgroundImage: NetworkImage(''),
+                                                    backgroundImage: const NetworkImage(''),
                                                   ))
                                               : Container(
                                                   padding: const EdgeInsets.all(2),
@@ -204,9 +213,9 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
                                       return null;
                                     },
                                     controller: nameController,
-                                    hintText: 'Restaurant Name',
+                                    hintText: 'Product Name',
                                     obscureText: false,
-                                    color: Color(0xff3B5998),
+                                    color: const Color(0xff3B5998),
                                   ),
 
                                   const SizedBox(height: 10),
@@ -221,23 +230,23 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
                                     controller: descriptionController,
                                     hintText: 'Description',
                                     obscureText: false,
-                                    color: Color(0xff3B5998),
+                                    color: const Color(0xff3B5998),
                                   ),
-                                  const SizedBox(height: 100),
+                                  SizedBox(height: size.height * .4,),
 
                                   // sign in button
                                   MyButton(
                                     color: Colors.white,
-                                    backgroundcolor: Color(0xff3B5998),
+                                    backgroundcolor: const Color(0xff3B5998),
                                     onTap: () {
-                                      if(formKey.currentState!.validate()){
+                                      if (formKey.currentState!.validate()) {
                                         addresturentToFirestore();
                                         nameController.clear();
                                         descriptionController.clear();
                                         Get.back();
                                       }
                                     },
-                                    text: widget.isEditMode ? 'Update Restaurant' : 'Add Restaurant',
+                                    text: widget.isEditMode ? 'Update Product' : 'Add Product',
                                   ),
 
                                   const SizedBox(height: 50),
