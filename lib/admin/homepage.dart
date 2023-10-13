@@ -118,7 +118,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                 leading: const Icon(Icons.menu_book),
                 title: const Text('Add Vendor Category'),
                 onTap: () {
-                  Get.to(const MenuItemListScreen()); // Closes the drawer
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> MenuItemListScreen(collectionReference: FirebaseFirestore.instance.collection("vendorCategory"),key: ValueKey(DateTime.now().millisecondsSinceEpoch),)));
                 },
               ),
               Divider(
