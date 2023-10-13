@@ -32,7 +32,6 @@ class AddResturentScreen extends StatefulWidget {
   State<AddResturentScreen> createState() => _AddResturentScreenState();
 }
 
-final _formKey = GlobalKey<FormState>();
 Rx<File> file = File("").obs;
 String imagePath = "";
 

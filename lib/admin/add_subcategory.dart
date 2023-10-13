@@ -32,7 +32,6 @@ class AddSubcategoryScreen extends StatefulWidget {
   State<AddSubcategoryScreen> createState() => _AddSubcategoryScreenState();
 }
 
-final _formKey = GlobalKey<FormState>();
 Rx<File> file = File("").obs;
 String imagePath = "";
 
@@ -61,7 +60,8 @@ class _AddSubcategoryScreenState extends State<AddSubcategoryScreen> {
           image: imageUrl,
           time: currenttime);
 
-        FirebaseFirestore.instance.collection('resturent').doc().collection(name).doc(widget.documentId).set(resturent.toMap());
+        FirebaseFirestore.instance.collection('resturent')
+            .doc(widget.documentId).collection(name).doc(name+currenttime.toString()).set(resturent.toMap());
       }
     }
 

@@ -14,19 +14,16 @@ class ResturentDataScreen extends StatefulWidget {
 }
 
 class _ResturentDataScreenState extends State<ResturentDataScreen> {
+
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
   bool isDescendingOrder = true;
+
   void toggleTextFieldVisibility() {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
     });
-  }
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
   }
 
   @override
@@ -72,7 +69,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                 ),
               )),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: toggleTextFieldVisibility,
           )
         ],
@@ -137,7 +134,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                   color: Colors.grey.withOpacity(0.5),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset: Offset(0, 3),
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                               ),
@@ -160,7 +157,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                         ],
                                       ),
                                     ),
-                                    leading: Container(
+                                    leading: SizedBox(
                                       height: 100,
                                       width: 100,
                                       child: Image.network(
@@ -258,12 +255,20 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                Get.to(AddSubcategoryScreen(isEditMode: false,));
+                                                Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
                                               },
                                               child: const Text('Add SubCategory'),
                                             ),
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                              },
+                                              child: const Text('View SubCategory'),
+                                            ),
                                           ];
-                                        })),
+                                        })
+
+                            ),
                               ),
                             );
 
@@ -272,7 +277,6 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                           child: Text("No User Found"),
                         );
                 }
-                return const CircularProgressIndicator();
               },
             )
           ],
@@ -311,7 +315,6 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
           ));
         }
       } catch (e) {
-        print(e.toString());
         throw Exception(e.toString());
       }
       return resturent;
