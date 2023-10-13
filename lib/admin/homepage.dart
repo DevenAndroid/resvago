@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
@@ -106,7 +107,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                 leading: const Icon(Icons.food_bank),
                 title: const Text('Add Product Category'),
                 onTap: () {
-                  Get.to(const ResturentDataScreen()); // Closes the drawer
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> ResturentDataScreen(collectionReference: FirebaseFirestore.instance.collection("resturent"),key: ValueKey(DateTime.now().millisecondsSinceEpoch),)));
                 },
               ),
               Divider(

@@ -10,76 +10,106 @@ import 'package:image_picker/image_picker.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import '../firebase_service/firebase_service.dart';
 import 'model/resturent_model.dart';
 
-class AddResturentScreen extends StatefulWidget {
-  final bool isEditMode;
-  final String? documentId;
-  final String? name;
-  final String? description;
-  final String? image;
+class AddRestaurentScreen extends StatefulWidget {
+  final CollectionReference collectionReference;
+  final ResturentData? resturentData;
 
-  const AddResturentScreen({
+  const AddRestaurentScreen({
     super.key,
-    required this.isEditMode,
-    this.documentId,
-    this.name,
-    this.description,
-    this.image,
+    required this.collectionReference,
+    this.resturentData,
   });
 
   @override
-  State<AddResturentScreen> createState() => _AddResturentScreenState();
+  State<AddRestaurentScreen> createState() => _AddRestaurentScreenState();
 }
 
-Rx<File> file = File("").obs;
-String imagePath = "";
+class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
+  FirebaseService firebaseService = FirebaseService();
+  ResturentData? get resturentData => widget.resturentData;
 
-class _AddResturentScreenState extends State<AddResturentScreen> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  File categoryFile = File("");
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   Future<void> addresturentToFirestore() async {
-    String name = nameController.text;
-    String description = descriptionController.text;
-    String? imageUrl;
-    DateTime currenttime = DateTime.now();
-    List<String> arrangeNumbers = [];
-    String? userNumber = (name ?? "");
-    arrangeNumbers.clear();
-    for (var i = 0; i < userNumber.length; i++) {
-      arrangeNumbers.add(userNumber.substring(0, i + 1));
+    if(!formKey.currentState!.validate())return;
+    if(categoryFile.path.isEmpty){
+      showToast("Please select category image");
+      return;
     }
-    if (imagePath.isNotEmpty) {
-      UploadTask uploadTask =
-          FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
+
+    List<String> arrangeNumbers = [];
+    String kk = nameController.text.trim();
+
+    arrangeNumbers.clear();
+    for (var i = 0; i < kk.length; i++) {
+      arrangeNumbers.add(kk.substring(0, i + 1));
+    }
+    String imageUrl = categoryFile.path;
+    if (!categoryFile.path.contains("https")) {
+      if (resturentData != null) {
+        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+        await gg.delete();
+      }
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref("categoryImages")
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(categoryFile);
+
+      TaskSnapshot snapshot = await uploadTask;
+      imageUrl = await snapshot.ref.getDownloadURL();
+    } else {
+      if (resturentData != null) {
+        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+        await gg.delete();
+      }
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref("categoryImages")
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(categoryFile);
 
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     }
-    if (name.isNotEmpty && description.isNotEmpty && imageUrl != null) {
-      ResturentData resturent =
-          ResturentData(name: name,
-              description: description,
-              deactivate: false,
-              searchName: arrangeNumbers,
-              image: imageUrl,
-              time: currenttime);
-      if (widget.isEditMode) {
-        FirebaseFirestore.instance.collection('resturent').doc(widget.documentId).update(resturent.toMap());
-      } else {
-        FirebaseFirestore.instance.collection('resturent').add(resturent.toMap());
+      if (resturentData != null) {
+        await firebaseService.manageCategoryProduct(
+          documentReference: widget.collectionReference.doc(resturentData!.docid),
+          deactivate: resturentData!.deactivate,
+          description: descriptionController.text.trim(),
+          docid: resturentData!.docid,
+          image: imageUrl,
+          name: kk,
+          searchName: arrangeNumbers,
+        );
       }
-    }
+      else {
+        await firebaseService.manageCategoryProduct(
+          documentReference: widget.collectionReference.doc(DateTime.now().millisecondsSinceEpoch.toString()),
+          deactivate: null,
+          description: descriptionController.text.trim(),
+          docid: DateTime.now().millisecondsSinceEpoch,
+          image: imageUrl,
+          name: kk,
+          searchName: arrangeNumbers,
+          time: DateTime.now().millisecondsSinceEpoch
+        );
+      }
+      Get.back();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    nameController.text = widget.name ?? "";
-    descriptionController.text = widget.description ?? "";
+    if (resturentData != null) {
+      nameController.text = resturentData!.name ?? "";
+      descriptionController.text = resturentData!.description ?? "";
+      categoryFile = File(resturentData!.image.toString());
+    }
   }
 
   @override
@@ -89,273 +119,258 @@ class _AddResturentScreenState extends State<AddResturentScreen> {
         backgroundColor: const Color(0xff3B5998),
         body: Form(
           key: formKey,
-          child: Obx(() {
-            return SizedBox(
-              height: size.height,
-              width: size.width,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
-                          child: InkWell(
-                            onTap: () {
-                              Get.back();
-                            },
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                              size: 20,
-                            ),
+          child: SizedBox(
+            height: size.height,
+            width: size.width,
+            child: Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
+                        child: InkWell(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
-                        const Text(
-                          "Add Product",
-                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
-                        ),
-                      ],
-                    ),
+                      ),
+                      const Text(
+                        "Add Product",
+                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                      ),
+                    ],
                   ),
-                  Positioned(
-                    top: size.height * .135,
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
-                                  .copyWith(bottom: 0),
-                              child: SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Row(
-                                    children: [
-                                      Stack(
-                                        children: [
-                                          file.value.path == ""
-                                              ? Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .05),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .07,
-                                                    backgroundImage: const NetworkImage(''),
-                                                  ))
-                                              : Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .015),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .05,
-                                                    backgroundImage: FileImage(file.value),
-                                                  ),
-                                                ),
-                                          Positioned(
-                                            top: 03,
-                                            right: 20,
-                                            child: InkWell(
-                                              onTap: () {
-                                                _showActionSheet(context);
-                                              },
+                ),
+                Positioned(
+                  top: size.height * .135,
+                  right: 0,
+                  left: 0,
+                  bottom: 0,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                              BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
+                                .copyWith(bottom: 0),
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(1000),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.orange,
+                                            ),
+                                            width: 100,
+                                            height: 100,
+                                            child: Image.file(categoryFile,
+                                                errorBuilder: (_,__,___)=> Image.network(categoryFile.path,
+                                                    errorBuilder: (_,__,___)=> SizedBox()
+                                                )
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 0,
+                                          bottom: 0,
+                                          right: 0,
+                                          child: InkWell(
+                                            onTap: () {
+                                              _showActionSheet(context);
+                                            },
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration:
+                                              const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
                                               child: Container(
-                                                padding: const EdgeInsets.all(2),
-                                                decoration:
-                                                    const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(5),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle, color: Color(0xff3B5998)),
-                                                  child: Icon(
-                                                    Icons.edit,
-                                                    color: Colors.white,
-                                                    size: size.height * .015,
-                                                  ),
+                                                padding: const EdgeInsets.all(5),
+                                                decoration: const BoxDecoration(
+                                                    shape: BoxShape.circle, color: Color(0xff3B5998)),
+                                                child: Icon(
+                                                  Icons.edit,
+                                                  color: Colors.white,
+                                                  size: size.height * .015,
                                                 ),
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                      const Text(
-                                        "",
-                                        style:
-                                            TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Restaurant Name';
-                                      }
-                                      return null;
-                                    },
-                                    controller: nameController,
-                                    hintText: 'Product Name',
-                                    obscureText: false,
-                                    color: const Color(0xff3B5998),
-                                  ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    const Text(
+                                      "",
+                                      style:
+                                      TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter Restaurant Name';
+                                    }
+                                    return null;
+                                  },
+                                  controller: nameController,
+                                  hintText: 'Product Name',
+                                  obscureText: false,
+                                  color: const Color(0xff3B5998),
+                                ),
 
-                                  const SizedBox(height: 10),
+                                const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Description';
-                                      }
-                                      return null;
-                                    },
-                                    controller: descriptionController,
-                                    hintText: 'Description',
-                                    obscureText: false,
-                                    color: const Color(0xff3B5998),
-                                  ),
-                                  SizedBox(height: size.height * .4,),
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter Description';
+                                    }
+                                    return null;
+                                  },
+                                  controller: descriptionController,
+                                  hintText: 'Description',
+                                  obscureText: false,
+                                  color: const Color(0xff3B5998),
+                                ),
+                                SizedBox(
+                                  height: size.height * .4,
+                                ),
 
-                                  // sign in button
-                                  MyButton(
-                                    color: Colors.white,
-                                    backgroundcolor: const Color(0xff3B5998),
-                                    onTap: () {
-                                      if (formKey.currentState!.validate()) {
-                                        addresturentToFirestore();
-                                        nameController.clear();
-                                        descriptionController.clear();
-                                        Get.back();
-                                      }
-                                    },
-                                    text: widget.isEditMode ? 'Update Product' : 'Add Product',
-                                  ),
+                                // sign in button
+                                MyButton(
+                                  color: Colors.white,
+                                  backgroundcolor: const Color(0xff3B5998),
+                                  onTap: addresturentToFirestore,
+                                  text: resturentData != null ? 'Update Product' : 'Add Product',
+                                ),
 
-                                  const SizedBox(height: 50),
-                                ]),
-                              ),
+                                const SizedBox(height: 50),
+                              ]),
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }),
+                ),
+              ],
+            ),
+          ),
         ));
   }
-}
 
-void _showActionSheet(BuildContext context) {
-  showCupertinoModalPopup<void>(
-    context: context,
-    builder: (BuildContext context) => CupertinoActionSheet(
-      title: const Text(
-        'Select Picture from',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+  void _showActionSheet(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text(
+          'Select Picture from',
+          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Helper.addImagePicker(imageSource: ImageSource.camera, imageQuality: 75).then((value) async {
+                CroppedFile? croppedFile = await ImageCropper().cropImage(
+                  sourcePath: value.path,
+                  aspectRatioPresets: [
+                    CropAspectRatioPreset.square,
+                    CropAspectRatioPreset.ratio3x2,
+                    CropAspectRatioPreset.original,
+                    CropAspectRatioPreset.ratio4x3,
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  uiSettings: [
+                    AndroidUiSettings(
+                        toolbarTitle: 'Cropper',
+                        toolbarColor: Colors.deepOrange,
+                        toolbarWidgetColor: Colors.white,
+                        initAspectRatio: CropAspectRatioPreset.original,
+                        lockAspectRatio: false),
+                    IOSUiSettings(
+                      title: 'Cropper',
+                    ),
+                    WebUiSettings(
+                      context: context,
+                    ),
+                  ],
+                );
+                if (croppedFile != null) {
+                  categoryFile = File(croppedFile.path);
+                  setState(() {});
+                }
+
+                Get.back();
+              });
+            },
+            child: const Text("Camera"),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Helper.addImagePicker(imageSource: ImageSource.gallery, imageQuality: 75).then((value) async {
+                CroppedFile? croppedFile = await ImageCropper().cropImage(
+                  sourcePath: value.path,
+                  aspectRatioPresets: [
+                    CropAspectRatioPreset.square,
+                    CropAspectRatioPreset.ratio3x2,
+                    CropAspectRatioPreset.original,
+                    CropAspectRatioPreset.ratio4x3,
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  uiSettings: [
+                    AndroidUiSettings(
+                        toolbarTitle: 'Cropper',
+                        toolbarColor: Colors.deepOrange,
+                        toolbarWidgetColor: Colors.white,
+                        initAspectRatio: CropAspectRatioPreset.original,
+                        lockAspectRatio: false),
+                    IOSUiSettings(
+                      title: 'Cropper',
+                    ),
+                    WebUiSettings(
+                      context: context,
+                    ),
+                  ],
+                );
+                if (croppedFile != null) {
+                  categoryFile = File(croppedFile.path);
+                  setState(() {});
+                }
+
+                Get.back();
+              });
+            },
+            child: const Text('Gallery'),
+          ),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
-      actions: <CupertinoActionSheetAction>[
-        CupertinoActionSheetAction(
-          onPressed: () {
-            Helper.addImagePicker(imageSource: ImageSource.camera, imageQuality: 75).then((value) async {
-              CroppedFile? croppedFile = await ImageCropper().cropImage(
-                sourcePath: value.path,
-                aspectRatioPresets: [
-                  CropAspectRatioPreset.square,
-                  CropAspectRatioPreset.ratio3x2,
-                  CropAspectRatioPreset.original,
-                  CropAspectRatioPreset.ratio4x3,
-                  CropAspectRatioPreset.ratio16x9
-                ],
-                uiSettings: [
-                  AndroidUiSettings(
-                      toolbarTitle: 'Cropper',
-                      toolbarColor: Colors.deepOrange,
-                      toolbarWidgetColor: Colors.white,
-                      initAspectRatio: CropAspectRatioPreset.original,
-                      lockAspectRatio: false),
-                  IOSUiSettings(
-                    title: 'Cropper',
-                  ),
-                  WebUiSettings(
-                    context: context,
-                  ),
-                ],
-              );
-              if (croppedFile != null) {
-                imagePath = croppedFile.path;
-                file.value = File(croppedFile.path);
-              }
-
-              Get.back();
-            });
-          },
-          child: const Text("Camera"),
-        ),
-        CupertinoActionSheetAction(
-          onPressed: () {
-            Helper.addImagePicker(imageSource: ImageSource.gallery, imageQuality: 75).then((value) async {
-              CroppedFile? croppedFile = await ImageCropper().cropImage(
-                sourcePath: value.path,
-                aspectRatioPresets: [
-                  CropAspectRatioPreset.square,
-                  CropAspectRatioPreset.ratio3x2,
-                  CropAspectRatioPreset.original,
-                  CropAspectRatioPreset.ratio4x3,
-                  CropAspectRatioPreset.ratio16x9
-                ],
-                uiSettings: [
-                  AndroidUiSettings(
-                      toolbarTitle: 'Cropper',
-                      toolbarColor: Colors.deepOrange,
-                      toolbarWidgetColor: Colors.white,
-                      initAspectRatio: CropAspectRatioPreset.original,
-                      lockAspectRatio: false),
-                  IOSUiSettings(
-                    title: 'Cropper',
-                  ),
-                  WebUiSettings(
-                    context: context,
-                  ),
-                ],
-              );
-              if (croppedFile != null) {
-                imagePath = croppedFile.path;
-                file.value = File(croppedFile.path);
-              }
-
-              Get.back();
-            });
-          },
-          child: const Text('Gallery'),
-        ),
-        CupertinoActionSheetAction(
-          isDestructiveAction: true,
-          onPressed: () {
-            Get.back();
-          },
-          child: const Text('Cancel'),
-        ),
-      ],
-    ),
-  );
+    );
+  }
 }

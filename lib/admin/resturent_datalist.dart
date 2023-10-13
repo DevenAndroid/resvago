@@ -7,14 +7,15 @@ import 'add_subcategory.dart';
 import 'model/resturent_model.dart';
 
 class ResturentDataScreen extends StatefulWidget {
-  const ResturentDataScreen({Key? key}) : super(key: key);
+  final CollectionReference collectionReference;
+  final ResturentData? resturentData;
+  const ResturentDataScreen({Key? key, required this.collectionReference, this.resturentData}) : super(key: key);
 
   @override
   State<ResturentDataScreen> createState() => _ResturentDataScreenState();
 }
 
 class _ResturentDataScreenState extends State<ResturentDataScreen> {
-
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -32,12 +33,13 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xff3B5998),
-        title: const Text('Product List',style: TextStyle(color: Colors.white),),
-        leading: GestureDetector(
-            onTap: () {
-              Get.back();
-            },
-            child: const Icon(Icons.arrow_back_ios)),
+        title: Text(
+          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category" :'Category List',
+          style: const TextStyle(color: Colors.white),
+        ),
+        leading: BackButton(
+
+        ),
         actions: [
           GestureDetector(
             onTap: () {
@@ -56,9 +58,12 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(const AddResturentScreen(
-                  isEditMode: false,
-                ));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddRestaurentScreen(
+                              collectionReference: widget.collectionReference,
+                            )));
               },
               child: const Padding(
                 padding: EdgeInsets.only(right: 5),
@@ -127,16 +132,19 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                             // }
                             return Container(
                               height: 90,
-                              margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                               width: Get.width,
-                              decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(11),boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(11),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: ListTile(
@@ -178,13 +186,13 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                Get.to(AddResturentScreen(
-                                                  isEditMode: true,
-                                                  documentId: item.docid,
-                                                  name: item.name,
-                                                  description: item.description,
-                                                  image: item.image,
-                                                ));
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => AddRestaurentScreen(
+                                                              collectionReference: widget.collectionReference,
+                                                              resturentData: item,
+                                                            )));
                                               },
                                               child: const Text("Edit"),
                                             ),
@@ -203,14 +211,15 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors.red, borderRadius: BorderRadius.circular(11)),
+                                                              color: Colors.red,
+                                                              borderRadius: BorderRadius.circular(11)),
                                                           width: 70,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(
-                                                                "Cancel",
-                                                                style: TextStyle(color: Colors.white),
-                                                              )),
+                                                            "Cancel",
+                                                            style: TextStyle(color: Colors.white),
+                                                          )),
                                                         ),
                                                       ),
                                                       TextButton(
@@ -226,14 +235,15 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors.green, borderRadius: BorderRadius.circular(11)),
+                                                              color: Colors.green,
+                                                              borderRadius: BorderRadius.circular(11)),
                                                           width: 70,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(
-                                                                "okay",
-                                                                style: TextStyle(color: Colors.white),
-                                                              )),
+                                                            "okay",
+                                                            style: TextStyle(color: Colors.white),
+                                                          )),
                                                         ),
                                                       ),
                                                     ],
@@ -245,8 +255,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                FirebaseFirestore.instance
-                                                    .collection('resturent')
+                                                widget.collectionReference
                                                     .doc(item.docid)
                                                     .update({"deactivate": true});
                                               },
@@ -255,23 +264,22 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
-                                              },
-                                              child: const Text('Add SubCategory'),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 1,
-                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => ResturentDataScreen(
+                                                              collectionReference: widget.collectionReference.doc(item.docid).collection("sub_category"),
+                                                          resturentData: item,
+                                                    key: ValueKey(DateTime.now().millisecondsSinceEpoch)
+                                                            )));
+                                                // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
                                               },
                                               child: const Text('View SubCategory'),
                                             ),
                                           ];
-                                        })
-
-                            ),
+                                        })),
                               ),
                             );
-
                           })
                       : const Center(
                           child: Text("No User Found"),
@@ -284,6 +292,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
       ),
     );
   }
+
   List<ResturentData> filterUsers(List<ResturentData> users, String query) {
     if (query.isEmpty) {
       return users; // Return all users if the search query is empty
@@ -298,19 +307,19 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
   }
 
   Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-    return FirebaseFirestore.instance
-        .collection('resturent')
+    return widget.collectionReference
         .orderBy('time', descending: isDescendingOrder)
         .snapshots()
         .map((querySnapshot) {
       List<ResturentData> resturent = [];
       try {
         for (var doc in querySnapshot.docs) {
+          var gg = doc.data() as Map;
           resturent.add(ResturentData(
-            name: doc.data()['name'],
-            description: doc.data()['description'],
-            image: doc.data()['image'],
-            deactivate: doc.data()['deactivate'] ?? false,
+            name: gg['name'],
+            description: gg['description'],
+            image: gg['image'],
+            deactivate: gg['deactivate'] ?? false,
             docid: doc.id,
           ));
         }
@@ -321,4 +330,3 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
     });
   }
 }
-
