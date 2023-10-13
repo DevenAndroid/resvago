@@ -107,7 +107,13 @@ class LineChartSample1State extends State<LineChartSample1> {
                 leading: const Icon(Icons.food_bank),
                 title: const Text('Add Product Category'),
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=> ResturentDataScreen(collectionReference: FirebaseFirestore.instance.collection("resturent"),key: ValueKey(DateTime.now().millisecondsSinceEpoch),)));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ResturentDataScreen(
+                                collectionReference: FirebaseFirestore.instance.collection("resturent"),
+                                key: ValueKey(DateTime.now().millisecondsSinceEpoch),
+                              )));
                 },
               ),
               Divider(

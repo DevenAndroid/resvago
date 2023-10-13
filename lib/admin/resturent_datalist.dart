@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addResturent_screen.dart';
-import 'add_subcategory.dart';
 import 'model/resturent_model.dart';
 
 class ResturentDataScreen extends StatefulWidget {
@@ -224,8 +223,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                       ),
                                                       TextButton(
                                                         onPressed: () {
-                                                          FirebaseFirestore.instance
-                                                              .collection("resturent")
+                                                          widget.collectionReference
                                                               .doc(item.docid)
                                                               .delete()
                                                               .then((value) {
