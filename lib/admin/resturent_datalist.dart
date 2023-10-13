@@ -33,12 +33,10 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xff3B5998),
         title: Text(
-          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category" :'Category List',
+          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category" : 'Category List',
           style: const TextStyle(color: Colors.white),
         ),
-        leading: BackButton(
-
-        ),
+        leading: BackButton(),
         actions: [
           GestureDetector(
             onTap: () {
@@ -112,7 +110,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
               stream: getResturentStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(); // Show a loading indicator while data is being fetched
+                  return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
@@ -210,8 +208,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors.red,
-                                                              borderRadius: BorderRadius.circular(11)),
+                                                              color: Colors.red, borderRadius: BorderRadius.circular(11)),
                                                           width: 70,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
@@ -233,8 +230,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors.green,
-                                                              borderRadius: BorderRadius.circular(11)),
+                                                              color: Colors.green, borderRadius: BorderRadius.circular(11)),
                                                           width: 70,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
@@ -253,9 +249,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                widget.collectionReference
-                                                    .doc(item.docid)
-                                                    .update({"deactivate": true});
+                                                widget.collectionReference.doc(item.docid).update({"deactivate": true});
                                               },
                                               child: Text(item.deactivate ? "Activate" : "Deactivate"),
                                             ),
@@ -266,10 +260,11 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                     context,
                                                     MaterialPageRoute(
                                                         builder: (context) => ResturentDataScreen(
-                                                              collectionReference: widget.collectionReference.doc(item.docid).collection("sub_category"),
-                                                          resturentData: item,
-                                                    key: ValueKey(DateTime.now().millisecondsSinceEpoch)
-                                                            )));
+                                                            collectionReference: widget.collectionReference
+                                                                .doc(item.docid)
+                                                                .collection("sub_category"),
+                                                            resturentData: item,
+                                                            key: ValueKey(DateTime.now().millisecondsSinceEpoch))));
                                                 // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
                                               },
                                               child: const Text('View SubCategory'),
@@ -293,7 +288,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
 
   List<ResturentData> filterUsers(List<ResturentData> users, String query) {
     if (query.isEmpty) {
-      return users; // Return all users if the search query is empty
+      return users;
     } else {
       return users.where((user) {
         if (user.name is String) {
@@ -305,10 +300,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
   }
 
   Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-    return widget.collectionReference
-        .orderBy('time', descending: isDescendingOrder)
-        .snapshots()
-        .map((querySnapshot) {
+    return widget.collectionReference.orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
       List<ResturentData> resturent = [];
       try {
         for (var doc in querySnapshot.docs) {

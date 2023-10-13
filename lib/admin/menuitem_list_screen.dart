@@ -6,7 +6,10 @@ import 'package:resvago/admin/addmenuitem_screen.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
 
 class MenuItemListScreen extends StatefulWidget {
-  const MenuItemListScreen({Key? key}) : super(key: key);
+  final CollectionReference collectionReference;
+  final MenuItemData? menuItemData;
+  const MenuItemListScreen({Key? key, required this.collectionReference, this.menuItemData}) : super(key: key);
+
 
   @override
   State<MenuItemListScreen> createState() => _MenuItemListScreenState();
@@ -17,15 +20,11 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
   String searchQuery = '';
   bool isTextFieldVisible = false;
   bool isDescendingOrder = true;
+
   void toggleTextFieldVisibility() {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
     });
-  }
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
   }
 
   @override
@@ -34,7 +33,10 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Color(0xff3B5998),
-        title: const Text('Vendor Category List',style: TextStyle(color: Colors.white),),
+        title: Text(
+          widget.menuItemData != null ? "${widget.menuItemData!.name} Sub Category" : 'Category List',
+          style: const TextStyle(color: Colors.white),
+        ),
         leading: GestureDetector(
             onTap: () {
               Get.back();
@@ -58,9 +60,12 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(const AddMenuItemScreen(
-                  isEditMode: false,
-                ));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddMenuItemScreen(
+                          collectionReference: widget.collectionReference,
+                        )));
               },
               child: const Padding(
                 padding: EdgeInsets.only(right: 0),
@@ -179,13 +184,13 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                                         PopupMenuItem(
                                           value: 1,
                                           onTap: () {
-                                            Get.to(AddMenuItemScreen(
-                                              isEditMode: true,
-                                              documentId: item.docid,
-                                              name: item.name,
-                                              description: item.description,
-                                              image: item.image,
-                                            ));
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => AddMenuItemScreen(
+                                                      collectionReference: widget.collectionReference,
+                                                      menuItemData: item,
+                                                    )));
                                           },
                                           child: const Text("Edit"),
                                         ),
@@ -216,8 +221,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      FirebaseFirestore.instance
-                                                          .collection("menuitem")
+                                                      widget.collectionReference
                                                           .doc(item.docid)
                                                           .delete()
                                                           .then((value) {
@@ -246,12 +250,26 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                                         PopupMenuItem(
                                           value: 1,
                                           onTap: () {
-                                            FirebaseFirestore.instance
-                                                .collection('menuitem')
+                                            widget.collectionReference
                                                 .doc(item.docid)
                                                 .update({"deactivate": true});
                                           },
                                           child: Text(item.deactivate ? "Activate" : "Deactivate"),
+                                        ), PopupMenuItem(
+                                          value: 1,
+                                          onTap: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => MenuItemListScreen(
+                                                        collectionReference: widget.collectionReference
+                                                            .doc(item.docid)
+                                                            .collection("sub_category"),
+                                                        menuItemData: item,
+                                                        key: ValueKey(DateTime.now().millisecondsSinceEpoch))));
+                                            // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
+                                          },
+                                          child: const Text('View SubCategory'),
                                         ),
                                       ];
                                     }))
@@ -285,15 +303,16 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
     }
   }
   Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('menuitem').orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
+    return widget.collectionReference.orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
       List<MenuItemData> itemmenu = [];
       try {
         for (var doc in querySnapshot.docs) {
+          var gg = doc.data() as Map;
           itemmenu.add(MenuItemData(
-            name: doc.data()['name'],
-            description: doc.data()['description'],
-            image: doc.data()['image'],
-            deactivate: doc.data()['deactivate'] ?? false,
+            name: gg['name'],
+            description: gg['description'],
+            image: gg['image'],
+            deactivate: gg['deactivate'] ?? false,
             docid: doc.id,
           ));
         }
