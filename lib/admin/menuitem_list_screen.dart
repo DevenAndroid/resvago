@@ -87,6 +87,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.white),
@@ -210,7 +211,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                                                     child: Container(
                                                       decoration: BoxDecoration(
                                                           color: Colors.red, borderRadius: BorderRadius.circular(11)),
-                                                      width: 70,
+                                                      width: 100,
                                                       padding: const EdgeInsets.all(14),
                                                       child: const Center(
                                                           child: Text(
@@ -232,7 +233,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                                                     child: Container(
                                                       decoration: BoxDecoration(
                                                           color: Colors.green, borderRadius: BorderRadius.circular(11)),
-                                                      width: 70,
+                                                      width: 100,
                                                       padding: const EdgeInsets.all(14),
                                                       child: const Center(
                                                           child: Text(

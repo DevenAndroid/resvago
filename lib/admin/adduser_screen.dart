@@ -7,12 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:resvago/admin/model/user_model.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import 'model/user_model.dart';
+
 
 class AddUsersScreen extends StatefulWidget {
+  final UserData? userData;
   final bool isEditMode;
   final String? documentId;
   final String? name;
@@ -29,22 +31,40 @@ class AddUsersScreen extends StatefulWidget {
     this.phoneNumber,
     this.image,
     this.email,
-    this.password,
+    this.password,  this.userData,
   });
 
   @override
   State<AddUsersScreen> createState() => _AddUsersScreenState();
 }
 
-Rx<File> file = File("").obs;
-String imagePath = "";
-
 class _AddUsersScreenState extends State<AddUsersScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
+  File categoryFile = File("");
+  UserData? get userData => widget.userData;
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  String result = "Email not found";
+  bool isPasswordVisible = false;
+
+  void checkEmailInFirestore() async {
+    final QuerySnapshot result = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: emailController.text)
+        .get();
+
+    if (result.docs.isNotEmpty) {
+      showToast('Email already exits');
+    } else if (phoneNumberController.text.toString().length < 4 ||
+        phoneNumberController.text.toString().length > 16) {
+      showToast('Enter Correct phone-number');
+    } else {
+      addusersToFirestore();
+    }
+  }
 
   Future<void> addusersToFirestore() async {
     String name = nameController.text;
@@ -60,13 +80,29 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     for (var i = 0; i < userNumber.length; i++) {
       arrangeNumbers.add(userNumber.substring(0, i + 1));
     }
-
-    if (imagePath.isNotEmpty) {
-      UploadTask uploadTask =
-          FirebaseStorage.instance.ref("profilePictures").child(widget.name.toString()).putFile(file.value);
+    if (!categoryFile.path.startsWith("gs://") && !categoryFile.path.startsWith("http://")) {
+      if (userData != null) {
+        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+        await gg.delete();
+      }
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref("categoryImages")
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(categoryFile);
 
       TaskSnapshot snapshot = await uploadTask;
+      imageUrl = await snapshot.ref.getDownloadURL();
+    } else {
+      if (userData != null) {
+        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+        await gg.delete();
+      }
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref("categoryImages")
+          .child(DateTime.now().millisecondsSinceEpoch.toString())
+          .putFile(categoryFile);
 
+      TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
@@ -80,9 +116,17 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
           phoneNumber: phoneNumber,
           time: currentTime);
       if (widget.isEditMode) {
-        FirebaseFirestore.instance.collection('users').doc(widget.documentId).update(users.toMap());
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.documentId)
+            .update(users.toMap());
       } else {
         FirebaseFirestore.instance.collection('users').add(users.toMap());
+        Get.back();
+        nameController.clear();
+        emailController.clear();
+        passwordController.clear();
+        phoneNumberController.clear();
       }
     }
   }
@@ -103,19 +147,21 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     return Scaffold(
         backgroundColor: Color(0xff3B5998),
         body: Form(
-          key: formKey,
-          child: Obx(() {
-            return SizedBox(
+            key: formKey,
+            child: SizedBox(
               height: size.height,
               width: size.width,
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: size.width * .06,
+                        vertical: size.height * .06),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 10)
+                              .copyWith(right: 15),
                           child: GestureDetector(
                             onTap: () {
                               Get.back();
@@ -129,7 +175,10 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                         ),
                         const Text(
                           "Add Users",
-                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700),
                         ),
                       ],
                     ),
@@ -145,157 +194,177 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                           child: Container(
                             decoration: const BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(25),
+                                    topLeft: Radius.circular(25))),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
+                              padding: EdgeInsets.symmetric(
+                                      horizontal: size.width * .04,
+                                      vertical: size.height * .01)
                                   .copyWith(bottom: 0),
                               child: SingleChildScrollView(
                                 physics: const AlwaysScrollableScrollPhysics(),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Row(
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Stack(
+                                      Row(
                                         children: [
-                                          file.value.path == ""
-                                              ? Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .05),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .07,
-                                                    backgroundImage: NetworkImage(''),
-                                                  ))
-                                              : Container(
-                                                  padding: const EdgeInsets.all(2),
-                                                  decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.white,
-                                                  ),
-                                                  margin:
-                                                      EdgeInsets.only(right: size.width * .04, left: size.width * .015),
-                                                  child: CircleAvatar(
-                                                    radius: size.height * .05,
-                                                    backgroundImage: FileImage(file.value),
-                                                  ),
-                                                ),
-                                          Positioned(
-                                            top: 03,
-                                            right: 20,
-                                            child: InkWell(
-                                              onTap: () {
-                                                _showActionSheet(context);
-                                              },
-                                              child: Container(
-                                                padding: const EdgeInsets.all(2),
-                                                decoration:
-                                                    const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                                          Stack(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(1000),
                                                 child: Container(
-                                                  padding: const EdgeInsets.all(5),
-                                                  decoration: const BoxDecoration(
-                                                      shape: BoxShape.circle, color: Color(0xff3B5998)),
-                                                  child: Icon(
-                                                    Icons.edit,
-                                                    color: Colors.white,
-                                                    size: size.height * .015,
+                                                  padding:
+                                                      const EdgeInsets.all(2),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: Colors.orange,
                                                   ),
+                                                  width: 100,
+                                                  height: 100,
+                                                  child: Image.file(
+                                                      categoryFile,
+                                                      errorBuilder: (_, __,
+                                                              ___) =>
+                                                          Image.network(
+                                                              categoryFile.path,
+                                                              errorBuilder: (_,
+                                                                      __,
+                                                                      ___) =>
+                                                                  SizedBox())),
                                                 ),
                                               ),
-                                            ),
-                                          )
+                                              Positioned(
+                                                top: 0,
+                                                bottom: 0,
+                                                right: 0,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    _showActionSheet(context);
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(2),
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                            color: Colors.white,
+                                                            shape: BoxShape
+                                                                .circle),
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              5),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: Color(
+                                                                  0xff3B5998)),
+                                                      child: Icon(
+                                                        Icons.edit,
+                                                        color: Colors.white,
+                                                        size:
+                                                            size.height * .015,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                          const Text(
+                                            "",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600),
+                                          ),
                                         ],
                                       ),
-                                      const Text(
-                                        "",
-                                        style:
-                                            TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
+                                      const SizedBox(
+                                        height: 20,
                                       ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 20,
-                                  ),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your name';
-                                      }
-                                    },
-                                    controller: nameController,
-                                    hintText: 'Enter User Name',
-                                    keyboardtype: TextInputType.name,
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter your name';
+                                          }
+                                        },
+                                        controller: nameController,
+                                        hintText: 'Enter User Name',
+                                        keyboardtype: TextInputType.name,
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
 
-                                  const SizedBox(height: 10),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your email';
-                                      }
-                                    },
-                                    controller: emailController,
-                                    hintText: 'Enter Email',
-                                    obscureText: false,
-                                    keyboardtype: TextInputType.emailAddress,
-                                    color: Color(0xff3B5998),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your password';
-                                      }
-                                    },
-                                    controller: passwordController,
-                                    hintText: 'Enter Password',
-                                    obscureText: false,
-                                    keyboardtype: TextInputType.visiblePassword,
-                                    color: Color(0xff3B5998),
-                                  ),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter your email';
+                                          }
+                                        },
+                                        controller: emailController,
+                                        hintText: 'Enter Email',
+                                        obscureText: false,
+                                        keyboardtype:
+                                            TextInputType.emailAddress,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter your password';
+                                          }
+                                        },
+                                        controller: passwordController,
+                                        hintText: 'Enter Password',
+                                        obscureText: !isPasswordVisible,
+                                        keyboardtype:
+                                            TextInputType.visiblePassword,
+                                        color: Color(0xff3B5998),
+                                      ),
 
-                                  const SizedBox(height: 10),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your phone number';
-                                      }
-                                    },
-                                    controller: phoneNumberController,
-                                    hintText: 'Enter Phone Number',
-                                    obscureText: false,
-                                    keyboardtype: TextInputType.phone,
-                                    color: Color(0xff3B5998),
-                                  ),
-                                  // sign in button
-                                  SizedBox(
-                                    height: size.height * .2,
-                                  ),
-                                  MyButton(
-                                    color: Colors.white,
-                                    backgroundcolor: Color(0xff3B5998),
-                                    onTap: () {
-                                      if (formKey.currentState!.validate()) {
-                                        addusersToFirestore();
-                                        nameController.clear();
-                                        emailController.clear();
-                                        passwordController.clear();
-                                        phoneNumberController.clear();
-                                        Get.back();
-                                      }
-                                    },
-                                    text: widget.isEditMode ? 'Update User' : 'Add User',
-                                  ),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter your phone number';
+                                          }
+                                        },
+                                        controller: phoneNumberController,
+                                        hintText: 'Enter Phone Number',
+                                        obscureText: false,
+                                        keyboardtype: TextInputType.phone,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      // sign in button
+                                      SizedBox(
+                                        height: size.height * .2,
+                                      ),
+                                      MyButton(
+                                        color: Colors.white,
+                                        backgroundcolor: Color(0xff3B5998),
+                                        onTap: () {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            checkEmailInFirestore();
+                                            //addusersToFirestore();
+                                            //Get.back();
+                                          }
+                                        },
+                                        text: widget.isEditMode
+                                            ? 'Update User'
+                                            : 'Add User',
+                                      ),
 
-                                  const SizedBox(height: 50),
-                                ]),
+                                      const SizedBox(height: 50),
+                                    ]),
                               ),
                             ),
                           ),
@@ -305,103 +374,106 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                   ),
                 ],
               ),
-            );
-          }),
-        ));
+            )));
   }
-}
 
-void _showActionSheet(BuildContext context) {
-  showCupertinoModalPopup<void>(
-    context: context,
-    builder: (BuildContext context) => CupertinoActionSheet(
-      title: const Text(
-        'Select Picture from',
-        style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+  void _showActionSheet(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text(
+          'Select Picture from',
+          style: TextStyle(
+              color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Helper.addImagePicker(
+                      imageSource: ImageSource.camera, imageQuality: 75)
+                  .then((value) async {
+                CroppedFile? croppedFile = await ImageCropper().cropImage(
+                  sourcePath: value.path,
+                  aspectRatioPresets: [
+                    CropAspectRatioPreset.square,
+                    CropAspectRatioPreset.ratio3x2,
+                    CropAspectRatioPreset.original,
+                    CropAspectRatioPreset.ratio4x3,
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  uiSettings: [
+                    AndroidUiSettings(
+                        toolbarTitle: 'Cropper',
+                        toolbarColor: Colors.deepOrange,
+                        toolbarWidgetColor: Colors.white,
+                        initAspectRatio: CropAspectRatioPreset.original,
+                        lockAspectRatio: false),
+                    IOSUiSettings(
+                      title: 'Cropper',
+                    ),
+                    WebUiSettings(
+                      context: context,
+                    ),
+                  ],
+                );
+                if (croppedFile != null) {
+                  categoryFile = File(croppedFile.path);
+                  setState(() {});
+                }
+
+                Get.back();
+              });
+            },
+            child: const Text("Camera"),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Helper.addImagePicker(
+                      imageSource: ImageSource.gallery, imageQuality: 75)
+                  .then((value) async {
+                CroppedFile? croppedFile = await ImageCropper().cropImage(
+                  sourcePath: value.path,
+                  aspectRatioPresets: [
+                    CropAspectRatioPreset.square,
+                    CropAspectRatioPreset.ratio3x2,
+                    CropAspectRatioPreset.original,
+                    CropAspectRatioPreset.ratio4x3,
+                    CropAspectRatioPreset.ratio16x9
+                  ],
+                  uiSettings: [
+                    AndroidUiSettings(
+                        toolbarTitle: 'Cropper',
+                        toolbarColor: Colors.deepOrange,
+                        toolbarWidgetColor: Colors.white,
+                        initAspectRatio: CropAspectRatioPreset.original,
+                        lockAspectRatio: false),
+                    IOSUiSettings(
+                      title: 'Cropper',
+                    ),
+                    WebUiSettings(
+                      context: context,
+                    ),
+                  ],
+                );
+                if (croppedFile != null) {
+                  categoryFile = File(croppedFile.path);
+                  setState(() {});
+                }
+
+                Get.back();
+              });
+            },
+            child: const Text('Gallery'),
+          ),
+          CupertinoActionSheetAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('Cancel'),
+          ),
+        ],
       ),
-      actions: <CupertinoActionSheetAction>[
-        CupertinoActionSheetAction(
-          onPressed: () {
-            Helper.addImagePicker(imageSource: ImageSource.camera, imageQuality: 75).then((value) async {
-              CroppedFile? croppedFile = await ImageCropper().cropImage(
-                sourcePath: value.path,
-                aspectRatioPresets: [
-                  CropAspectRatioPreset.square,
-                  CropAspectRatioPreset.ratio3x2,
-                  CropAspectRatioPreset.original,
-                  CropAspectRatioPreset.ratio4x3,
-                  CropAspectRatioPreset.ratio16x9
-                ],
-                uiSettings: [
-                  AndroidUiSettings(
-                      toolbarTitle: 'Cropper',
-                      toolbarColor: Colors.deepOrange,
-                      toolbarWidgetColor: Colors.white,
-                      initAspectRatio: CropAspectRatioPreset.original,
-                      lockAspectRatio: false),
-                  IOSUiSettings(
-                    title: 'Cropper',
-                  ),
-                  WebUiSettings(
-                    context: context,
-                  ),
-                ],
-              );
-              if (croppedFile != null) {
-                imagePath = croppedFile.path;
-                file.value = File(croppedFile.path);
-              }
-
-              Get.back();
-            });
-          },
-          child: const Text("Camera"),
-        ),
-        CupertinoActionSheetAction(
-          onPressed: () {
-            Helper.addImagePicker(imageSource: ImageSource.gallery, imageQuality: 75).then((value) async {
-              CroppedFile? croppedFile = await ImageCropper().cropImage(
-                sourcePath: value.path,
-                aspectRatioPresets: [
-                  CropAspectRatioPreset.square,
-                  CropAspectRatioPreset.ratio3x2,
-                  CropAspectRatioPreset.original,
-                  CropAspectRatioPreset.ratio4x3,
-                  CropAspectRatioPreset.ratio16x9
-                ],
-                uiSettings: [
-                  AndroidUiSettings(
-                      toolbarTitle: 'Cropper',
-                      toolbarColor: Colors.deepOrange,
-                      toolbarWidgetColor: Colors.white,
-                      initAspectRatio: CropAspectRatioPreset.original,
-                      lockAspectRatio: false),
-                  IOSUiSettings(
-                    title: 'Cropper',
-                  ),
-                  WebUiSettings(
-                    context: context,
-                  ),
-                ],
-              );
-              if (croppedFile != null) {
-                imagePath = croppedFile.path;
-                file.value = File(croppedFile.path);
-              }
-
-              Get.back();
-            });
-          },
-          child: const Text('Gallery'),
-        ),
-        CupertinoActionSheetAction(
-          isDestructiveAction: true,
-          onPressed: () {
-            Get.back();
-          },
-          child: const Text('Cancel'),
-        ),
-      ],
-    ),
-  );
+    );
+  }
 }

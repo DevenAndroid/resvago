@@ -63,7 +63,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(const AddUsersScreen(
+                Get.to( AddUsersScreen(
                   isEditMode: false,
                 ));
               },
@@ -87,6 +87,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.white),
@@ -220,7 +221,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                             decoration: BoxDecoration(
                                                                 color: Colors.red,
                                                                 borderRadius: BorderRadius.circular(11)),
-                                                            width: 70,
+                                                            width: 100,
                                                             padding: const EdgeInsets.all(14),
                                                             child: const Center(
                                                                 child: Text(
@@ -244,7 +245,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                             decoration: BoxDecoration(
                                                                 color: Colors.green,
                                                                 borderRadius: BorderRadius.circular(11)),
-                                                            width: 70,
+                                                            width: 100,
                                                             padding: const EdgeInsets.all(14),
                                                             child: const Center(
                                                                 child: Text(

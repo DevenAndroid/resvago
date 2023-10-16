@@ -83,6 +83,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.white),
@@ -107,25 +108,25 @@ class _PagesListScreenState extends State<PagesListScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            FutureBuilder(
-              future: getPagesFromFirestore(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<PagesData>> snapshot) {
-                if (snapshot.hasData) {
-                  log(snapshot.data.toString());
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: Text("No Pages Found"),
-                    );
-                  }
-                  List<PagesData> coupon = snapshot.data ?? [];
-                  final filteredUsers = filterUsers(coupon, searchQuery);
-                  return filteredUsers.isNotEmpty
+            StreamBuilder<List<PagesData>>(
+              stream: getPagesStream(),
+              builder: (BuildContext context, AsyncSnapshot<List<PagesData>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No Pages Found"));
+                } else {
+                  List<PagesData>? pages = snapshot.data;
+                  final filteredPages = filterUsers(pages!, searchQuery);
+
+                  return filteredPages.isNotEmpty
                       ? ListView.builder(
-                      itemCount: filteredUsers.length,
+                      itemCount: filteredPages.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        final item = filteredUsers[index];
+                        final item = filteredPages[index];
                         // if (item.deactivate) {
                         //   return SizedBox.shrink();
                         // }
@@ -198,7 +199,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                     },
                                                     child: Container(
                                                       decoration: BoxDecoration(color: Colors.red,borderRadius: BorderRadius.circular(11)),
-                                                      width: 70,
+                                                      width: 100,
 
                                                       padding:
                                                       const EdgeInsets.all(
@@ -225,7 +226,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                     },
                                                     child: Container(
                                                       decoration: BoxDecoration(color: Colors.green,borderRadius: BorderRadius.circular(11)),
-                                                      width: 70,
+                                                      width: 100,
                                                       padding:
                                                       const EdgeInsets.all(
                                                           14),
@@ -285,26 +286,18 @@ class _PagesListScreenState extends State<PagesListScreen> {
       }).toList();
     }
   }
-  Future<List<PagesData>> getPagesFromFirestore() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-    await FirebaseFirestore.instance.collection('Pages').orderBy('time', descending: isDescendingOrder).get();
-
-    List<PagesData> pages = [];
-    try {
-      for (var doc in querySnapshot.docs) {
-        log(doc.data().toString());
-        pages.add(PagesData(
-            title: doc.data()['title'],
-            longdescription: doc.data()['longdescription'],
-            deactivate: doc.data()['deactivate'] ?? false,
-            docid: doc.id));
-      }
-    } catch (e) {
-      log(e.toString());
-      throw Exception();
-    }
-    log(querySnapshot.docs.map((e) => e.data().toString()).toString());
-    return pages;
+  Stream<List<PagesData>> getPagesStream() {
+    return FirebaseFirestore.instance
+        .collection('Pages')
+        .orderBy('time', descending: isDescendingOrder)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => PagesData(
+        title: doc.data()['title'],
+        longdescription: doc.data()['longdescription'],
+        deactivate: doc.data()['deactivate'] ?? false,
+        docid: doc.id))
+        .toList());
   }
 }
 

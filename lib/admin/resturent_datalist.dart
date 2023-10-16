@@ -82,6 +82,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.white),
@@ -209,7 +210,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         child: Container(
                                                           decoration: BoxDecoration(
                                                               color: Colors.red, borderRadius: BorderRadius.circular(11)),
-                                                          width: 70,
+                                                          width: 100,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(
@@ -231,7 +232,7 @@ class _ResturentDataScreenState extends State<ResturentDataScreen> {
                                                         child: Container(
                                                           decoration: BoxDecoration(
                                                               color: Colors.green, borderRadius: BorderRadius.circular(11)),
-                                                          width: 70,
+                                                          width: 100,
                                                           padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(

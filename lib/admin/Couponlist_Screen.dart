@@ -86,6 +86,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                style: const TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.white),
@@ -110,22 +111,23 @@ class _CouponListScreenState extends State<CouponListScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            FutureBuilder(
-              future: getCouponFromFirestore(),
+            StreamBuilder<List<CouponData>>(
+              stream: getCouponStream(),
               builder: (BuildContext context, AsyncSnapshot<List<CouponData>> snapshot) {
-                if (snapshot.hasData) {
-                  log(snapshot.data.toString());
-                  if (snapshot.data == null) {
-                    return const Center(
-                      child: Text("No Coupon Found"),
-                    );
-                  }
-                  List<CouponData> users = snapshot.data ?? [];
-                  final filteredUsers = filterUsers(users, searchQuery);
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No Coupon Found"));
+                } else {
+                  List<CouponData>? users = snapshot.data;
+                  final filteredUsers = filterUsers(users!, searchQuery);
+
                   return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                          itemCount: filteredUsers.length,
-                          shrinkWrap: true,
+                      itemCount: filteredUsers.length,
+                      shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = filteredUsers[index];
                             // if (item.deactivate) {
@@ -209,7 +211,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                                             decoration: BoxDecoration(
                                                                 color: Colors.red,
                                                                 borderRadius: BorderRadius.circular(11)),
-                                                            width: 70,
+                                                            width: 100,
                                                             padding: const EdgeInsets.all(14),
                                                             child: const Center(
                                                                 child: Text(
@@ -233,7 +235,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                                             decoration: BoxDecoration(
                                                                 color: Colors.green,
                                                                 borderRadius: BorderRadius.circular(11)),
-                                                            width: 70,
+                                                            width: 100,
                                                             padding: const EdgeInsets.all(14),
                                                             child: const Center(
                                                                 child: Text(
@@ -287,29 +289,21 @@ class _CouponListScreenState extends State<CouponListScreen> {
       }).toList();
     }
   }
-  Future<List<CouponData>> getCouponFromFirestore() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot = await FirebaseFirestore.instance
-        .collection('coupon').orderBy('time', descending: isDescendingOrder).get();
-
-    List<CouponData> coupon = [];
-    try {
-      for (var doc in querySnapshot.docs) {
-        log(doc.data().toString());
-        coupon.add(CouponData(
-            title: doc.data()['title'],
-            description: doc.data()['description'],
-            code: doc.data()['code'],
-            discount: doc.data()['discount'],
-            validtilldate: doc.data()['validtilldate'],
-            deactivate: doc.data()['deactivate'] ?? false,
-            docid: doc.id));
-      }
-    } catch (e) {
-      log(e.toString());
-      throw Exception();
-    }
-    log(querySnapshot.docs.map((e) => e.data().toString()).toString());
-    return coupon;
+  Stream<List<CouponData>> getCouponStream() {
+    return FirebaseFirestore.instance
+        .collection('coupon')
+        .orderBy('time', descending: isDescendingOrder)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => CouponData(
+        title: doc.data()['title'],
+        description: doc.data()['description'],
+        code: doc.data()['code'],
+        discount: doc.data()['discount'],
+        validtilldate: doc.data()['validtilldate'],
+        deactivate: doc.data()['deactivate'] ?? false,
+        docid: doc.id))
+        .toList());
   }
 }
 
