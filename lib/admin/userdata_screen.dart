@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/adduser_screen.dart';
 
@@ -35,16 +36,16 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor:Colors.white,
         title: const Text(
           'Users List',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Color(0xFF423E5E),fontSize: 20),
         ),
-        leading: GestureDetector(
-            onTap: () {
-              Get.back();
-            },
-            child: const Icon(Icons.arrow_back_ios)),
+        leading:Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Image
+              .asset("assets/images/back.png",height: 20,width: 20,),
+        ),
         actions: [
           InkWell(
             onTap: () {
@@ -56,8 +57,8 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
               padding: EdgeInsets.only(right: 10),
               child: Icon(
                 Icons.filter_list,
-                size: 30,
-                color: Colors.white,
+                size: 20,
+                color: Colors.black,
               ),
             ),
           ),
@@ -71,13 +72,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                 padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
-                  size: 30,
-                  color: Colors.white,
+                  size: 20,
+                  color: Colors.black,
                 ),
               )),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search,size: 20,),
             onPressed: toggleTextFieldVisibility,
+            color: Colors.black,
           )
         ],
         bottom: PreferredSize(
