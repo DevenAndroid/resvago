@@ -1,29 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:resvago/admin/model/coupen_model.dart';
+import 'package:resvago/admin/model/vendor_register_model.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import 'Couponlist_Screen.dart';
 
 class AddCouponScreen extends StatefulWidget {
   final bool isEditMode;
   final String? documentId;
-  final String? title;
+  final String? promocode;
   final String? description;
   final String? code;
   final String? discount;
-  final String? validtilldate;
+  final String? startdate;
+  final String? enddate;
 
   const AddCouponScreen({
     super.key,
     required this.isEditMode,
     this.documentId,
-    this.title,
+    this.promocode,
     this.description,
     this.discount,
     this.code,
-    this.validtilldate,
+    this.startdate,
+    this.enddate,
   });
 
   @override
@@ -35,54 +41,80 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController codeController = TextEditingController();
   TextEditingController discountController = TextEditingController();
-  TextEditingController validtilldateController = TextEditingController();
+  TextEditingController startdateController = TextEditingController();
+  TextEditingController enddateController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void addCouponToFirestore() {
-    String title = titleController.text;
+    String promocodename = titleController.text;
     String description = descriptionController.text;
     String code = codeController.text;
     String discount = discountController.text;
-    String validtilldate = validtilldateController.text;
-
-    Timestamp currenttime = Timestamp.now();
+    String startdate = startdateController.text;
+    String enddate = enddateController.text;
+    Timestamp currentTime = Timestamp.now();
 
     List<String> arrangeNumbers = [];
-    String? userNumber = (title ?? "");
+    String? userNumber = (promocodename ?? "");
     arrangeNumbers.clear();
     for (var i = 0; i < userNumber.length; i++) {
       arrangeNumbers.add(userNumber.substring(0, i + 1));
     }
-    if (title.isNotEmpty && description.isNotEmpty) {
-      CouponData user = CouponData(
-          title: title,
-          description: description,
-          code: code,
-          discount: discount,
-          searchName: arrangeNumbers,
-          validtilldate: validtilldate,
-          time: currenttime,
-          deactivate: false);
-      if (widget.isEditMode) {
-        FirebaseFirestore.instance
-            .collection('coupon')
-            .doc(widget.documentId)
-            .update(user.toMap());
-      } else {
-        FirebaseFirestore.instance.collection('coupon').add(user.toMap());
-      }
+
+    CouponData user = CouponData(
+        promoCodeName: promocodename,
+        code: code,
+        discount: discount,
+        startDate: startdate,
+        userID: userValue!.userID.toString(),
+        userName: userValue!.restaurantName.toString(),
+        endDate: enddate,
+        time: currentTime,
+        deactivate: false);
+    print("object");
+    if (widget.isEditMode) {
+      FirebaseFirestore.instance
+          .collection('Coupon_data')
+          .doc(widget.documentId)
+          .update(user.toMap());
+    } else {
+      FirebaseFirestore.instance
+          .collection('Coupon_data')
+          .doc()
+          .set(user.toMap())
+          .then((value) => Get.to(CouponListScreen(
+                username: userValue!.restaurantName.toString(),
+              )));
     }
+  }
+
+  bool isDescendingOrder = true;
+
+  List<RegisterData>? userList;
+  RegisterData? userValue;
+  getVendorCategories() {
+    FirebaseFirestore.instance.collection("vendor_users").get().then((value) {
+      print(value.docs);
+      for (var element in value.docs) {
+        var gg = element.data();
+        print(gg);
+        userList ??= [];
+        userList!.add(RegisterData.fromMap(gg));
+      }
+      setState(() {});
+    });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    titleController.text = widget.title ?? "";
+    titleController.text = widget.promocode ?? "";
     descriptionController.text = widget.description ?? "";
     codeController.text = widget.code ?? "";
     discountController.text = widget.discount ?? "";
-    validtilldateController.text = widget.validtilldate ?? "";
+    startdateController.text = widget.startdate ?? "";
+    enddateController.text = widget.enddate ?? "";
+    getVendorCategories();
   }
 
   @override
@@ -98,11 +130,14 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
               child: Stack(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: size.width * .06, vertical: size.height * .06),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: size.width * .06,
+                        vertical: size.height * .06),
                     child: Row(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10).copyWith(right: 15),
+                          padding: const EdgeInsets.symmetric(horizontal: 10)
+                              .copyWith(right: 15),
                           child: GestureDetector(
                             onTap: () {
                               Get.back();
@@ -115,8 +150,11 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                           ),
                         ),
                         const Text(
-                          "Add Users",
-                          style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                          "Add Coupons",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.w700),
                         ),
                       ],
                     ),
@@ -132,100 +170,206 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                           child: Container(
                             decoration: const BoxDecoration(
                                 color: Colors.white,
-                                borderRadius:
-                                BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25))),
+                                borderRadius: BorderRadius.only(
+                                    topRight: Radius.circular(25),
+                                    topLeft: Radius.circular(25))),
                             child: Padding(
-                              padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
+                              padding: EdgeInsets.symmetric(
+                                      horizontal: size.width * .04,
+                                      vertical: size.height * .01)
                                   .copyWith(bottom: 0),
                               child: SingleChildScrollView(
                                 physics: const AlwaysScrollableScrollPhysics(),
-                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  SizedBox(height: 50,),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Title';
-                                      }
-                                    },
-                                    controller: titleController,
-                                    hintText: 'Title',
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
+                                child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 50,
+                                      ),
+                                      if (userList != null)
+                                        DropdownButtonFormField<dynamic>(
+                                          focusColor: Colors.white,
+                                          isExpanded: true,
+                                          iconEnabledColor:
+                                              const Color(0xff97949A),
+                                          icon: const Icon(Icons
+                                              .keyboard_arrow_down_rounded),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          hint: Text(
+                                            "Select Restaurant Name".tr,
+                                            style: const TextStyle(
+                                                color: Color(0xff2A3B40),
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w300),
+                                            textAlign: TextAlign.justify,
+                                          ),
+                                          decoration: InputDecoration(
+                                            focusColor: const Color(0xFF384953),
+                                            hintStyle: GoogleFonts.poppins(
+                                              color: const Color(0xFF384953),
+                                              textStyle: GoogleFonts.poppins(
+                                                color: const Color(0xFF384953),
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                              fontSize: 14,
+                                              // fontFamily: 'poppins',
+                                              fontWeight: FontWeight.w300,
+                                            ),
+                                            filled: true,
+                                            fillColor:
+                                                Colors.white.withOpacity(.10),
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    horizontal: 15,
+                                                    vertical: 15),
+                                            // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: const Color(0xFF384953)
+                                                      .withOpacity(.24)),
+                                              borderRadius:
+                                                  BorderRadius.circular(6.0),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color:
+                                                        const Color(0xFF384953)
+                                                            .withOpacity(.24)),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(6.0))),
+                                            errorBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.red.shade800),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(6.0))),
+                                            border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color:
+                                                        const Color(0xFF384953)
+                                                            .withOpacity(.24),
+                                                    width: 3.0),
+                                                borderRadius:
+                                                    BorderRadius.circular(6.0)),
+                                          ),
+                                          value: userValue,
+                                          items: userList!.map((items) {
+                                            return DropdownMenuItem(
+                                              value: items,
+                                              child: Text(
+                                                items.restaurantName.toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 15),
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (newValue) {
+                                            userValue = newValue;
+                                            setState(() {});
+                                          },
+                                          validator: (value) {
+                                            if (userValue == null) {
+                                              return 'Please select category';
+                                            }
+                                            return null;
+                                          },
+                                        )
+                                      else
+                                        const Center(
+                                          child: Text("No Category Available"),
+                                        ),
+                                      const SizedBox(height: 10),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter promocode';
+                                          }
+                                        },
+                                        controller: titleController,
+                                        hintText: 'PromoCode Name',
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
 
-                                  const SizedBox(height: 10),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Description';
-                                      }
-                                    },
-                                    controller: descriptionController,
-                                    hintText: 'Description',
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
-                                  const SizedBox(height: 10),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter Code';
+                                          }
+                                        },
+                                        controller: codeController,
+                                        hintText: 'Code',
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Code';
-                                      }
-                                    },
-                                    controller: codeController,
-                                    hintText: 'Code',
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
-                                  const SizedBox(height: 10),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter Discount';
+                                          }
+                                        },
+                                        controller: discountController,
+                                        hintText: 'Discount',
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Discount';
-                                      }
-                                    },
-                                    controller: discountController,
-                                    hintText: 'Discount',
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
-                                  const SizedBox(height: 10),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter start date';
+                                          }
+                                        },
+                                        controller: startdateController,
+                                        hintText: 'Start Date',
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      const SizedBox(height: 10),
 
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Valid date';
-                                      }
-                                    },
-                                    controller: validtilldateController,
-                                    hintText: 'Valid Date',
-                                    obscureText: false,
-                                    color: Color(0xff3B5998),
-                                  ),
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter end date';
+                                          }
+                                        },
+                                        controller: enddateController,
+                                        hintText: 'End Date',
+                                        obscureText: false,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      SizedBox(height: size.height * .1),
 
-                                   SizedBox(height: size.height * .18),
-
-                                  // sign in button
-                                  MyButton(
-                                    color: Colors.white,
-                                    backgroundcolor: Color(0xff3B5998),
-                                    onTap: () {
-                                      if (formKey.currentState!.validate()) {
-                                        addCouponToFirestore();
-                                        titleController.clear();
-                                        descriptionController.clear();
-                                        codeController.clear();
-                                        discountController.clear();
-                                        Get.back();
-                                      }
-                                    },
-                                    text: widget.isEditMode ? 'Update Coupon' : 'Add Coupon',
-                                  ),
-
-                                ]),
+                                      // sign in button
+                                      MyButton(
+                                        color: Colors.white,
+                                        backgroundcolor: Color(0xff3B5998),
+                                        onTap: () {
+                                          if (formKey.currentState!
+                                              .validate()) {
+                                            addCouponToFirestore();
+                                            titleController.clear();
+                                            codeController.clear();
+                                            discountController.clear();
+                                            enddateController.clear();
+                                            startdateController.clear();
+                                          }
+                                        },
+                                        text: widget.isEditMode
+                                            ? 'Update Coupon'
+                                            : 'Add Coupon',
+                                      ),
+                                    ]),
                               ),
                             ),
                           ),
@@ -235,9 +379,6 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                   ),
                 ],
               ),
-            )
-
-        ));
-
+            )));
   }
 }

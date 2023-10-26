@@ -7,13 +7,15 @@ class MyTextField extends StatelessWidget {
   final Color color;
   final String? Function(String?)? validator;
   final TextInputType? keyboardtype;
+  final int? maxLines;
+  final int? minLines;
 
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
-    required this.obscureText, required this.color, this.validator, this.keyboardtype,
+    required this.obscureText, required this.color, this.validator, this.keyboardtype, this.maxLines, this.minLines,
   });
 
   @override
@@ -25,6 +27,8 @@ class MyTextField extends StatelessWidget {
         style: const TextStyle(color: Colors.white),
         controller: controller,
         validator: validator,
+        maxLines: maxLines,
+        minLines: minLines,
         keyboardType: keyboardtype,
         obscureText: obscureText,
         cursorColor: Colors.white,

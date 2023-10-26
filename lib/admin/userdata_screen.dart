@@ -35,16 +35,21 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 10,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor:Colors.white,
+        surfaceTintColor: Colors.white,
         title: const Text(
-          'Users List',
-          style: TextStyle(color: Color(0xFF423E5E),fontSize: 20),
+          'Vendor Users List',
+          style: TextStyle(color: Color(0xFF423E5E),fontSize: 20,fontWeight: FontWeight.bold),
         ),
-        leading:Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Image
-              .asset("assets/images/back.png",height: 20,width: 20,),
+        leading: Padding(
+          padding: const EdgeInsets.all(15),
+          child: GestureDetector(
+            onTap: (){
+              Get.back();
+            },
+              child: SvgPicture.asset('assets/images/arrowback.svg')),
         ),
         actions: [
           InkWell(
@@ -57,14 +62,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
               padding: EdgeInsets.only(right: 10),
               child: Icon(
                 Icons.filter_list,
-                size: 20,
-                color: Colors.black,
+                size: 30,
+                color: Color(0xff3B5998),
               ),
             ),
           ),
           GestureDetector(
               onTap: () {
-                Get.to( AddUsersScreen(
+                Get.to( const AddUsersScreen(
                   isEditMode: false,
                 ));
               },
@@ -72,14 +77,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                 padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
-                  size: 20,
-                  color: Colors.black,
+                  size: 30,
+                  color: Color(0xff3B5998),
                 ),
               )),
           IconButton(
-            icon: Icon(Icons.search,size: 20,),
+            icon: const Icon(Icons.search,size: 30,),
             onPressed: toggleTextFieldVisibility,
-            color: Colors.black,
+            color: Color(0xff3B5998),
           )
         ],
         bottom: PreferredSize(
@@ -89,16 +94,16 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
                   ),
                 ),
                 onChanged: (value) {
@@ -165,115 +170,126 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                         text: TextSpan(
                                           text: item.name.toString(),
                                           style: DefaultTextStyle.of(context).style,
-                                          children: <TextSpan>[
-                                            TextSpan(
-                                                text: item.deactivate ? "Deactivate" : "",
-                                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                                          ],
                                         ),
                                       ),
                                       leading: Container(
-                                        height: 100,
-                                        width: 100,
-                                        child: Image.network(
-                                          item.image.toString(),
-                                          fit: BoxFit.fill,
-                                          errorBuilder: (_, __, ___) => const Icon(Icons.shopping_cart),
-                                        ),
+                                        height: 80,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              image: NetworkImage(item.image.toString()),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(5)),
                                       ),
                                       subtitle: Text(item.email),
-                                      trailing: PopupMenuButton<int>(
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: Colors.black,
-                                          ),
-                                          color: Colors.white,
-                                          itemBuilder: (context) {
-                                            return [
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  Get.to(AddUsersScreen(
-                                                    isEditMode: true,
-                                                    documentId: item.docid,
-                                                    name: item.name,
-                                                    email: item.email,
-                                                    password: item.password,
-                                                    phoneNumber: item.phoneNumber,
-                                                    image: item.image,
-                                                  ));
-                                                },
-                                                child: const Text("Edit"),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          item.deactivate
+                                              ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                              : const SizedBox(),
+                                          PopupMenuButton<int>(
+                                              padding: EdgeInsets.zero,
+                                              icon: const Icon(
+                                                Icons.more_vert,
+                                                color: Colors.black,
                                               ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (ctx) => AlertDialog(
-                                                      title: const Text("Delete user"),
-                                                      content: const Text("Are you sure you want to delete this user"),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(ctx).pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors.red,
-                                                                borderRadius: BorderRadius.circular(11)),
-                                                            width: 100,
-                                                            padding: const EdgeInsets.all(14),
-                                                            child: const Center(
-                                                                child: Text(
-                                                              "Cancel",
-                                                              style: TextStyle(color: Colors.white),
-                                                            )),
-                                                          ),
+                                              color: Colors.white,
+                                              itemBuilder: (context) {
+                                                return [
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      Get.to(AddUsersScreen(
+                                                        isEditMode: true,
+                                                        documentId: item.docid,
+                                                        name: item.name,
+                                                        email: item.email,
+                                                        category: item.category,
+                                                        phoneNumber: item.phoneNumber,
+                                                        image: item.image,
+                                                        address: item.address
+                                                      ));
+                                                    },
+                                                    child: const Text("Edit"),
+                                                  ),
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (ctx) => AlertDialog(
+                                                          title: const Text("Delete user"),
+                                                          content: const Text("Are you sure you want to delete this user"),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(ctx).pop();
+                                                              },
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors.red,
+                                                                    borderRadius: BorderRadius.circular(11)),
+                                                                width: 100,
+                                                                padding: const EdgeInsets.all(14),
+                                                                child: const Center(
+                                                                    child: Text(
+                                                                  "Cancel",
+                                                                  style: TextStyle(color: Colors.white),
+                                                                )),
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                FirebaseFirestore.instance
+                                                                    .collection("users")
+                                                                    .doc(item.docid)
+                                                                    .delete()
+                                                                    .then((value) {
+                                                                  setState(() {});
+                                                                });
+                                                                Navigator.of(ctx).pop();
+                                                              },
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors.green,
+                                                                    borderRadius: BorderRadius.circular(11)),
+                                                                width: 100,
+                                                                padding: const EdgeInsets.all(14),
+                                                                child: const Center(
+                                                                    child: Text(
+                                                                  "okay",
+                                                                  style: TextStyle(color: Colors.white),
+                                                                )),
+                                                              ),
+                                                            ),
+                                                          ],
                                                         ),
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            FirebaseFirestore.instance
-                                                                .collection("users")
-                                                                .doc(item.docid)
-                                                                .delete()
-                                                                .then((value) {
-                                                              setState(() {});
-                                                            });
-                                                            Navigator.of(ctx).pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors.green,
-                                                                borderRadius: BorderRadius.circular(11)),
-                                                            width: 100,
-                                                            padding: const EdgeInsets.all(14),
-                                                            child: const Center(
-                                                                child: Text(
-                                                              "okay",
-                                                              style: TextStyle(color: Colors.white),
-                                                            )),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text("Delete"),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  FirebaseFirestore.instance
-                                                      .collection('users')
-                                                      .doc(item.docid)
-                                                      .update({"deactivate": true});
-                                                },
-                                                child: Text(item.deactivate ? "Activate" : "Deactivate"),
-                                              ),
-                                            ];
-                                          }))),
+                                                      );
+                                                    },
+                                                    child: const Text("Delete"),
+                                                  ),
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      item.deactivate ?  FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .doc(item.docid)
+                                                          .update({"deactivate": false}) :
+                                                      FirebaseFirestore.instance
+                                                          .collection('users')
+                                                          .doc(item.docid)
+                                                          .update({"deactivate": true});
+                                                      setState(() {});
+                                                    },
+                                                    child: Text(item.deactivate ? "Activate" : "Deactivate"),
+                                                  ),
+                                                ];
+                                              }),
+                                        ],
+                                      ))),
                             );
                           })
                       : const Center(
@@ -316,8 +332,9 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
             name: doc.data()['name'],
             email: doc.data()['email'],
             image: doc.data()['image'],
-            password: doc.data()['password'],
+            category: doc.data()['category'],
             phoneNumber: doc.data()['phoneNumber'],
+            address: doc.data()['address'],
             deactivate: doc.data()['deactivate'] ?? false,
             docid: doc.id,
           ));

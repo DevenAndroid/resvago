@@ -1,41 +1,59 @@
 class CouponData {
-  final dynamic? docid;
-  final dynamic title;
-  final dynamic description;
-  final dynamic searchName;
+  final dynamic promoCodeName;
   final dynamic code;
   final dynamic discount;
-  final dynamic validtilldate;
+  final dynamic startDate;
+  final dynamic endDate;
+  final dynamic? docid;
   final bool deactivate;
+  final dynamic userID;
+  final dynamic userName;
   final dynamic time;
+  final dynamic userValue;
 
-  CouponData({required this.deactivate, this.docid, this.time,this.searchName, required this.title, required this.description,required this.code, required this.discount,required this.validtilldate});
+
+  CouponData(
+      {required this.promoCodeName,
+        this.code,
+        this.discount,
+        this.userID,
+        this.userValue,
+        this.startDate,
+        required this.deactivate,
+         this.userName,
+        this.endDate,
+        this.time,
+        this.docid});
 
   Map<String, dynamic> toMap() {
     return {
-      'title': title,
-      'description': description,
+      'promoCodeName': promoCodeName,
       'code': code,
       'discount': discount,
+      'startDate': startDate,
+      'userID': userID,
+      'userName': userName,
+      'endDate': endDate,
       'docid': docid,
-      'deactivate': deactivate,
-      'validtilldate': validtilldate,
       'time': time,
-      'searchName': searchName,
+      'deactivate': deactivate,
+      'userValue': userValue,
     };
   }
 
   factory CouponData.fromMap(Map<String, dynamic> map) {
     return CouponData(
-      title: map['title'],
-      description: map['description'],
+      promoCodeName: map['promoCodeName'],
+      deactivate: map['deactivate'],
       code: map['code'],
       discount: map['discount'],
-      deactivate: map['deactivate'],
-       docid: map['docid'],
-      validtilldate: map['validtilldate'],
+      userID: map['userID'],
+      userName: map['userName'],
+      startDate: map['startDate'],
+      endDate: map['endDate'],
+      docid: map['docid'],
       time: map['time'],
-      searchName: map['searchName'],
+      userValue: map['userValue'],
     );
   }
 }

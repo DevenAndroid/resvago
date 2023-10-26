@@ -1,42 +1,44 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:resvago/admin/model/menuitem_model.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import '../firebase_service/firebase_service.dart';
-import 'model/resturent_model.dart';
 
-class AddRestaurentScreen extends StatefulWidget {
+class AddProductScreen extends StatefulWidget {
   final CollectionReference collectionReference;
-  final ResturentData? resturentData;
+  final MenuItemData? menuItemData;
 
-  const AddRestaurentScreen({
+  const AddProductScreen({
     super.key,
     required this.collectionReference,
-    this.resturentData,
+    this.menuItemData,
   });
 
   @override
-  State<AddRestaurentScreen> createState() => _AddRestaurentScreenState();
+  State<AddProductScreen> createState() => _AddProductScreenState();
 }
 
-class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
+class _AddProductScreenState extends State<AddProductScreen> {
   FirebaseService firebaseService = FirebaseService();
-  ResturentData? get resturentData => widget.resturentData;
+  MenuItemData? get menuItemData => widget.menuItemData;
 
   TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
   File categoryFile = File("");
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  Future<void> addresturentToFirestore() async {
+  bool showValidation = false;
+  bool showValidationImg = false;
+  Future<void> addVendorToFirestore() async {
     if(!formKey.currentState!.validate())return;
     if(categoryFile.path.isEmpty){
       showToast("Please select category image");
@@ -52,7 +54,7 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
     }
     String imageUrl = categoryFile.path;
     if (!categoryFile.path.contains("https")) {
-      if (resturentData != null) {
+      if (menuItemData != null) {
         Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
         await gg.delete();
       }
@@ -64,7 +66,7 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     } else {
-      if (resturentData != null) {
+      if (menuItemData != null) {
         Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
         await gg.delete();
       }
@@ -76,19 +78,19 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     }
-      if (resturentData != null) {
-        await firebaseService.manageCategoryProduct(
-          documentReference: widget.collectionReference.doc(resturentData!.docid),
-          deactivate: resturentData!.deactivate,
-          description: descriptionController.text.trim(),
-          docid: resturentData!.docid,
-          image: imageUrl,
-          name: kk,
-          searchName: arrangeNumbers,
-        );
-      }
-      else {
-        await firebaseService.manageCategoryProduct(
+    if (menuItemData != null) {
+      await firebaseService.manageCategoryProduct(
+        documentReference: widget.collectionReference.doc(menuItemData!.docid),
+        deactivate: menuItemData!.deactivate,
+        description: descriptionController.text.trim(),
+        docid: menuItemData!.docid,
+        image: imageUrl,
+        name: kk,
+        searchName: arrangeNumbers,
+      );
+    }
+    else {
+      await firebaseService.manageVendorCategory(
           documentReference: widget.collectionReference.doc(DateTime.now().millisecondsSinceEpoch.toString()),
           deactivate: null,
           description: descriptionController.text.trim(),
@@ -97,18 +99,18 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
           name: kk,
           searchName: arrangeNumbers,
           time: DateTime.now().millisecondsSinceEpoch
-        );
-      }
-      Get.back();
+      );
+    }
+    Get.back();
   }
 
   @override
   void initState() {
     super.initState();
-    if (resturentData != null) {
-      nameController.text = resturentData!.name ?? "";
-      descriptionController.text = resturentData!.description ?? "";
-      categoryFile = File(resturentData!.image.toString());
+    if (menuItemData != null) {
+      nameController.text = menuItemData!.name ?? "";
+      descriptionController.text = menuItemData!.description ?? "";
+      categoryFile = File(menuItemData!.image.toString());
     }
   }
 
@@ -116,7 +118,7 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: const Color(0xff3B5998),
+        backgroundColor: Color(0xff3B5998),
         body: Form(
           key: formKey,
           child: SizedBox(
@@ -142,8 +144,9 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
                         ),
                       ),
                       const Text(
-                        "Add Product",
-                        style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
+                        "Add Product Category",
+                        style:
+                        TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -167,64 +170,7 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
                             child: SingleChildScrollView(
                               physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(1000),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(2),
-                                            decoration: const BoxDecoration(
-                                              color: Colors.orange,
-                                            ),
-                                            width: 100,
-                                            height: 100,
-                                            child: Image.file(categoryFile,
-                                                errorBuilder: (_,__,___)=> Image.network(categoryFile.path,
-                                                    errorBuilder: (_,__,___)=> SizedBox()
-                                                )
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 0,
-                                          bottom: 0,
-                                          right: 0,
-                                          child: InkWell(
-                                            onTap: () {
-                                              _showActionSheet(context);
-                                            },
-                                            child: Container(
-                                              padding: const EdgeInsets.all(2),
-                                              decoration:
-                                              const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                                              child: Container(
-                                                padding: const EdgeInsets.all(5),
-                                                decoration: const BoxDecoration(
-                                                    shape: BoxShape.circle, color: Color(0xff3B5998)),
-                                                child: Icon(
-                                                  Icons.edit,
-                                                  color: Colors.white,
-                                                  size: size.height * .015,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const Text(
-                                      "",
-                                      style:
-                                      TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
+                                const SizedBox(height: 20),
                                 MyTextField(
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -233,12 +179,12 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
                                     return null;
                                   },
                                   controller: nameController,
-                                  hintText: 'Product Name',
+                                  hintText: 'Title',
                                   obscureText: false,
                                   color: const Color(0xff3B5998),
                                 ),
 
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 20),
 
                                 MyTextField(
                                   validator: (value) {
@@ -250,18 +196,101 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
                                   controller: descriptionController,
                                   hintText: 'Description',
                                   obscureText: false,
+                                  minLines: 5,
+                                  maxLines: 5,
                                   color: const Color(0xff3B5998),
                                 ),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                                  child: DottedBorder(
+                                    borderType: BorderType.RRect,
+                                    radius: const Radius.circular(20),
+                                    padding: const EdgeInsets.only(
+                                        left: 40, right: 40, bottom: 10),
+                                    color: showValidationImg == false
+                                        ? const Color(0xFFFAAF40)
+                                        : Colors.red,
+                                    dashPattern: const [6],
+                                    strokeWidth: 1,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _showActionSheet(context);
+                                      },
+                                      child: categoryFile.path != ""
+                                          ? Stack(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.white,
+                                              image: DecorationImage(
+                                                  image: FileImage(categoryFile),
+                                                  fit: BoxFit.fill),
+                                            ),
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 10),
+                                            width: double.maxFinite,
+                                            height: 180,
+                                            alignment: Alignment.center,
+                                            child: Image.file(categoryFile,
+                                                errorBuilder: (_, __, ___) =>
+                                                    Image.network(categoryFile.path,
+                                                        errorBuilder: (_, __, ___) =>
+                                                            SizedBox())),
+                                          ),
+                                        ],
+                                      )
+                                          : Container(
+                                        padding: const EdgeInsets.only(top: 8),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 8, horizontal: 8),
+                                        width: double.maxFinite,
+                                        height: 130,
+                                        alignment: Alignment.center,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/gallery.png',
+                                              height: 60,
+                                              width: 50,
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            const Text(
+                                              'Accepted file types: JPEG, Doc, PDF, PNG',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black54),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(
+                                              height: 11,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(
+                                  height: 10,
+                                ),
                                 SizedBox(
-                                  height: size.height * .4,
+                                  height: size.height * .1,
                                 ),
 
                                 // sign in button
                                 MyButton(
                                   color: Colors.white,
                                   backgroundcolor: const Color(0xff3B5998),
-                                  onTap: addresturentToFirestore,
-                                  text: resturentData != null ? 'Update Product' : 'Add Product',
+                                  onTap: addVendorToFirestore,
+                                  text: menuItemData != null ? 'Update Product' : 'Add Product',
                                 ),
 
                                 const SizedBox(height: 50),
@@ -275,10 +304,9 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
                 ),
               ],
             ),
-          ),
+          )
         ));
   }
-
   void _showActionSheet(BuildContext context) {
     showCupertinoModalPopup<void>(
       context: context,
@@ -374,3 +402,5 @@ class _AddRestaurentScreenState extends State<AddRestaurentScreen> {
     );
   }
 }
+
+

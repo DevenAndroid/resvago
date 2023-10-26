@@ -82,7 +82,7 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
                           ),
                         ),
                         const Text(
-                          "Add Users",
+                          "Add Pages",
                           style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                         ),
                       ],
@@ -131,10 +131,12 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
                                     controller: longdescriptionController,
                                     hintText: 'Long Description',
                                     obscureText: false,
+                                    maxLines: 5,
+                                    minLines: 5,
                                     color: Color(0xff3B5998),
                                   ),
 
-                                  SizedBox(height: size.height * .45,),
+                                  SizedBox(height: size.height * .35,),
 
                                   // sign in button
                                   MyButton(

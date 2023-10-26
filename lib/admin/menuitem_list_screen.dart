@@ -1,21 +1,23 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:resvago/admin/addmenuitem_screen.dart';
+import 'package:resvago/admin/addproduct_screen.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
 
-class MenuItemListScreen extends StatefulWidget {
+class ProductCategoryScreen extends StatefulWidget {
   final CollectionReference collectionReference;
   final MenuItemData? menuItemData;
-  const MenuItemListScreen({Key? key, required this.collectionReference, this.menuItemData}) : super(key: key);
-
+  const ProductCategoryScreen(
+      {Key? key, required this.collectionReference, this.menuItemData})
+      : super(key: key);
 
   @override
-  State<MenuItemListScreen> createState() => _MenuItemListScreenState();
+  State<ProductCategoryScreen> createState() => _ProductCategoryScreenState();
 }
 
-class _MenuItemListScreenState extends State<MenuItemListScreen> {
+class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -31,17 +33,24 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 10,
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         title: Text(
-          widget.menuItemData != null ? "${widget.menuItemData!.name} Sub Category" : 'Category List',
-          style: const TextStyle(color: Colors.white),
+          widget.menuItemData != null
+              ? "${widget.menuItemData!.name} Sub Category"
+              : 'Product Category',
+          style: const TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
         ),
-        leading: GestureDetector(
-            onTap: () {
-              Get.back();
-            },
-            child: const Icon(Icons.arrow_back_ios)),
+        leading: Padding(
+          padding: const EdgeInsets.all(15),
+          child: GestureDetector(
+              onTap: (){
+                Get.back();
+              },
+              child: SvgPicture.asset('assets/images/arrowback.svg')),
+        ),
         actions: [
           InkWell(
             onTap: () {
@@ -54,7 +63,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
               child: Icon(
                 Icons.filter_list,
                 size: 30,
-                color: Colors.white,
+                color: Color(0xff3B5998),
               ),
             ),
           ),
@@ -63,20 +72,23 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => AddMenuItemScreen(
-                          collectionReference: widget.collectionReference,
-                        )));
+                        builder: (context) => AddProductScreen(
+                              collectionReference: widget.collectionReference,
+                            )));
               },
               child: const Padding(
                 padding: EdgeInsets.only(right: 0),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
-                  color: Colors.white,
+                  color: Color(0xff3B5998),
                 ),
               )),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(
+              Icons.search,
+              color: Color(0xff3B5998),
+            ),
             onPressed: toggleTextFieldVisibility,
           )
         ],
@@ -87,16 +99,20 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.black),
                 decoration: const InputDecoration(
                   hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.white),
-                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
+                  hintStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black)),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Change the outline border color
+                    borderSide: BorderSide(
+                        color: Colors.black), // Change the outline border color
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white), // Change the outline border color when focused
+                    borderSide: BorderSide(
+                        color: Colors
+                            .black), // Change the outline border color when focused
                   ),
                 ),
                 onChanged: (value) {
@@ -124,163 +140,222 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
                   final filteredUsers = filterUsers(users, searchQuery); //
                   return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                      itemCount: filteredUsers.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final item = filteredUsers[index];
-                        log(item.image.toString());
-                        // if (item.deactivate) {
-                        //   return SizedBox.shrink();
-                        // }
-                        return  Container(
-                          height: 90,
-                          margin: const EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                          width: Get.width,
-                          decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(11),boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                          ),
-                          child: Center(
-                            child:  ListTile(
-                                title: RichText(
-                                  overflow: TextOverflow.clip,
-                                  textAlign: TextAlign.end,
-                                  textDirection: TextDirection.rtl,
-                                  softWrap: true,
-                                  maxLines: 1,
-                                  textScaleFactor: 1,
-                                  text: TextSpan(
-                                    text: item.name.toString(),
-                                    style: DefaultTextStyle.of(context).style,
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: item.deactivate ? "Deactivate" : "",
-                                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
-                                    ],
+                          itemCount: filteredUsers.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = filteredUsers[index];
+                            log(item.image.toString());
+                            // if (item.deactivate) {
+                            //   return SizedBox.shrink();
+                            // }
+                            return Container(
+                              height: 90,
+                              margin: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
+                              width: Get.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(11),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 5,
+                                    blurRadius: 7,
+                                    offset: Offset(0, 3),
                                   ),
-                                ),
-                                leading: Container(
-                                  height: 100,
-                                  width: 100,
-                                  child: Image.network(
-                                    item.image.toString(),
-                                    fit: BoxFit.fill,
-                                    errorBuilder: (_, __, ___) => const Icon(Icons.shopping_cart),
-                                  ),
-                                ),
-                                subtitle: Text(item.description),
-                                trailing: PopupMenuButton<int>(
-                                    icon: const Icon(
-                                      Icons.more_vert,
-                                      color: Colors.black,
-                                    ),
-                                    color: Colors.white,
-                                    itemBuilder: (context) {
-                                      return [
-                                        PopupMenuItem(
-                                          value: 1,
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => AddMenuItemScreen(
-                                                      collectionReference: widget.collectionReference,
-                                                      menuItemData: item,
-                                                    )));
-                                          },
-                                          child: const Text("Edit"),
-                                        ),
-                                        PopupMenuItem(
-                                          value: 1,
-                                          onTap: () {
-                                            showDialog(
-                                              context: context,
-                                              builder: (ctx) => AlertDialog(
-                                                title: const Text("Delete user"),
-                                                content: const Text("Are you sure you want to delete this user"),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(ctx).pop();
+                                ],
+                              ),
+                              child: Center(
+                                  child: ListTile(
+                                      contentPadding:
+                                          EdgeInsets.only(left: 15, right: 5),
+                                      title: Text(
+                                        item.name.toString(),
+                                        style: const TextStyle(
+                                            color: Color(0xff384953),
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      leading: Container(
+                                        height: 80,
+                                        width: 80,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              image: NetworkImage(
+                                                  item.image.toString()),
+                                              fit: BoxFit.cover,
+                                            ),
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                      ),
+                                      subtitle: Text(item.description),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          item.deactivate
+                                              ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                              : const SizedBox(),
+                                          PopupMenuButton<int>(
+                                              icon: const Icon(
+                                                Icons.more_vert,
+                                                color: Colors.black,
+                                              ),
+                                              color: Colors.white,
+                                              itemBuilder: (context) {
+                                                return [
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  AddProductScreen(
+                                                                    collectionReference:
+                                                                        widget
+                                                                            .collectionReference,
+                                                                    menuItemData:
+                                                                        item,
+                                                                  )));
                                                     },
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          color: Colors.red, borderRadius: BorderRadius.circular(11)),
-                                                      width: 100,
-                                                      padding: const EdgeInsets.all(14),
-                                                      child: const Center(
-                                                          child: Text(
-                                                            "Cancel",
-                                                            style: TextStyle(color: Colors.white),
-                                                          )),
-                                                    ),
+                                                    child: const Text("Edit"),
                                                   ),
-                                                  TextButton(
-                                                    onPressed: () {
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (ctx) =>
+                                                            AlertDialog(
+                                                          title: const Text(
+                                                              "Delete user"),
+                                                          content: const Text(
+                                                              "Are you sure you want to delete this user"),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        ctx)
+                                                                    .pop();
+                                                              },
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .red,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            11)),
+                                                                width: 100,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        14),
+                                                                child:
+                                                                    const Center(
+                                                                        child:
+                                                                            Text(
+                                                                  "Cancel",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                )),
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                widget
+                                                                    .collectionReference
+                                                                    .doc(item
+                                                                        .docid)
+                                                                    .delete()
+                                                                    .then(
+                                                                        (value) {
+                                                                  setState(
+                                                                      () {});
+                                                                });
+                                                                Navigator.of(
+                                                                        ctx)
+                                                                    .pop();
+                                                              },
+                                                              child: Container(
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            11)),
+                                                                width: 100,
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        14),
+                                                                child:
+                                                                    const Center(
+                                                                        child:
+                                                                            Text(
+                                                                  "okay",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white),
+                                                                )),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: const Text("Delete"),
+                                                  ),
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      item.deactivate ? widget.collectionReference
+                                                          .doc(item.docid)
+                                                          .update({
+                                                        "deactivate": false
+                                                      }) :
                                                       widget.collectionReference
                                                           .doc(item.docid)
-                                                          .delete()
-                                                          .then((value) {
-                                                        setState(() {});
+                                                          .update({
+                                                        "deactivate": true
                                                       });
-                                                      Navigator.of(ctx).pop();
                                                     },
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                          color: Colors.green, borderRadius: BorderRadius.circular(11)),
-                                                      width: 100,
-                                                      padding: const EdgeInsets.all(14),
-                                                      child: const Center(
-                                                          child: Text(
-                                                            "okay",
-                                                            style: TextStyle(color: Colors.white),
-                                                          )),
-                                                    ),
+                                                    child: Text(item.deactivate
+                                                        ? "Activate"
+                                                        : "Deactivate"),
                                                   ),
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          child: const Text("Delete"),
-                                        ),
-                                        PopupMenuItem(
-                                          value: 1,
-                                          onTap: () {
-                                            widget.collectionReference
-                                                .doc(item.docid)
-                                                .update({"deactivate": true});
-                                          },
-                                          child: Text(item.deactivate ? "Activate" : "Deactivate"),
-                                        ), PopupMenuItem(
-                                          value: 1,
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => MenuItemListScreen(
-                                                        collectionReference: widget.collectionReference
-                                                            .doc(item.docid)
-                                                            .collection("sub_category"),
-                                                        menuItemData: item,
-                                                        key: ValueKey(DateTime.now().millisecondsSinceEpoch))));
-                                            // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
-                                          },
-                                          child: const Text('View SubCategory'),
-                                        ),
-                                      ];
-                                    }))
-                          ),
-                        );
-
-                      })
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) => AddProductScreen(
+                                                                  collectionReference: widget
+                                                                      .collectionReference
+                                                                      .doc(item
+                                                                          .docid)
+                                                                      .collection(
+                                                                          "sub_category"),
+                                                                  menuItemData:
+                                                                      item,
+                                                                  key: ValueKey(
+                                                                      DateTime.now()
+                                                                          .millisecondsSinceEpoch))));
+                                                      // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
+                                                    },
+                                                    child: const Text(
+                                                        'View SubCategory'),
+                                                  ),
+                                                ];
+                                              }),
+                                        ],
+                                      ))),
+                            );
+                          })
                       : const Center(
-                    child: Text("No User Found"),
-                  );
+                          child: Text("No User Found"),
+                        );
                 }
                 return const CircularProgressIndicator();
               },
@@ -290,6 +365,7 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
       ),
     );
   }
+
   List<MenuItemData> filterUsers(List<MenuItemData> users, String query) {
     if (query.isEmpty) {
       return users; // Return all users if the search query is empty
@@ -303,8 +379,12 @@ class _MenuItemListScreenState extends State<MenuItemListScreen> {
       }).toList();
     }
   }
+
   Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
-    return widget.collectionReference.orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
+    return widget.collectionReference
+        .orderBy('time', descending: isDescendingOrder)
+        .snapshots()
+        .map((querySnapshot) {
       List<MenuItemData> itemmenu = [];
       try {
         for (var doc in querySnapshot.docs) {

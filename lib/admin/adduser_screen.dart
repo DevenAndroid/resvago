@@ -1,17 +1,20 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:resvago/admin/model/user_model.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-
+import 'model/resturent_model.dart';
 
 class AddUsersScreen extends StatefulWidget {
   final UserData? userData;
@@ -19,9 +22,11 @@ class AddUsersScreen extends StatefulWidget {
   final String? documentId;
   final String? name;
   final String? email;
-  final String? password;
+  final String? category;
   final String? phoneNumber;
   final String? image;
+  final String? address;
+
 
   const AddUsersScreen({
     super.key,
@@ -31,7 +36,9 @@ class AddUsersScreen extends StatefulWidget {
     this.phoneNumber,
     this.image,
     this.email,
-    this.password,  this.userData,
+    this.address,
+    this.category,
+    this.userData,
   });
 
   @override
@@ -41,15 +48,32 @@ class AddUsersScreen extends StatefulWidget {
 class _AddUsersScreenState extends State<AddUsersScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   File categoryFile = File("");
   UserData? get userData => widget.userData;
-
+  List<ResturentData>? categoryList;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   String result = "Email not found";
   bool isPasswordVisible = false;
+  bool showValidation = false;
+  bool showValidationImg = false;
+  String? categoryValue;
+  bool isDescendingOrder = true;
 
+  getVendorCategories() {
+    FirebaseFirestore.instance
+        .collection("resturent")
+        .orderBy('time', descending: isDescendingOrder).get().then((value) {
+      for (var element in value.docs) {
+        var gg = element.data();
+        categoryList ??= [];
+        categoryList!.add(ResturentData.fromMap(gg));
+      }
+      setState(() {});
+    });
+  }
   void checkEmailInFirestore() async {
     final QuerySnapshot result = await FirebaseFirestore.instance
         .collection('users')
@@ -69,8 +93,9 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   Future<void> addusersToFirestore() async {
     String name = nameController.text;
     String email = emailController.text;
-    String password = passwordController.text;
+    String category = categoryValue!;
     String phoneNumber = phoneNumberController.text;
+    String address = addressController.text;
     String? imageUrl;
     Timestamp currentTime = Timestamp.now();
 
@@ -80,7 +105,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     for (var i = 0; i < userNumber.length; i++) {
       arrangeNumbers.add(userNumber.substring(0, i + 1));
     }
-    if (!categoryFile.path.startsWith("gs://") && !categoryFile.path.startsWith("http://")) {
+    if (!categoryFile.path.startsWith("gs://") &&
+        !categoryFile.path.startsWith("http://")) {
       if (userData != null) {
         Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
         await gg.delete();
@@ -112,8 +138,9 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
           email: email,
           deactivate: false,
           image: imageUrl,
-          password: password,
+          category: category,
           phoneNumber: phoneNumber,
+          address: address,
           time: currentTime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance
@@ -125,8 +152,9 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
         Get.back();
         nameController.clear();
         emailController.clear();
-        passwordController.clear();
+        categoryController.clear();
         phoneNumberController.clear();
+        addressController.clear();
       }
     }
   }
@@ -137,8 +165,11 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     super.initState();
     nameController.text = widget.name ?? "";
     emailController.text = widget.email ?? "";
-    passwordController.text = widget.password ?? "";
+    categoryValue = widget.category ?? "";
     phoneNumberController.text = widget.phoneNumber ?? "";
+    addressController.text = widget.address ?? "";
+    categoryFile = File(widget.image ?? "");
+    getVendorCategories();
   }
 
   @override
@@ -208,92 +239,17 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Stack(
-                                            children: [
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(1000),
-                                                child: Container(
-                                                  padding:
-                                                      const EdgeInsets.all(2),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.orange,
-                                                  ),
-                                                  width: 100,
-                                                  height: 100,
-                                                  child: Image.file(
-                                                      categoryFile,
-                                                      errorBuilder: (_, __,
-                                                              ___) =>
-                                                          Image.network(
-                                                              categoryFile.path,
-                                                              errorBuilder: (_,
-                                                                      __,
-                                                                      ___) =>
-                                                                  SizedBox())),
-                                                ),
-                                              ),
-                                              Positioned(
-                                                top: 0,
-                                                bottom: 0,
-                                                right: 0,
-                                                child: InkWell(
-                                                  onTap: () {
-                                                    _showActionSheet(context);
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(2),
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                            color: Colors.white,
-                                                            shape: BoxShape
-                                                                .circle),
-                                                    child: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              5),
-                                                      decoration:
-                                                          const BoxDecoration(
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                              color: Color(
-                                                                  0xff3B5998)),
-                                                      child: Icon(
-                                                        Icons.edit,
-                                                        color: Colors.white,
-                                                        size:
-                                                            size.height * .015,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          const Text(
-                                            "",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600),
-                                          ),
-                                        ],
-                                      ),
                                       const SizedBox(
                                         height: 20,
                                       ),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return 'Please enter your name';
+                                            return 'Please enter Restaurant name';
                                           }
                                         },
                                         controller: nameController,
-                                        hintText: 'Enter User Name',
+                                        hintText: 'Enter Restaurant Name',
                                         keyboardtype: TextInputType.name,
                                         obscureText: false,
                                         color: Color(0xff3B5998),
@@ -315,20 +271,95 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                         color: Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
-                                      MyTextField(
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter your password';
-                                          }
-                                        },
-                                        controller: passwordController,
-                                        hintText: 'Enter Password',
-                                        obscureText: !isPasswordVisible,
-                                        keyboardtype:
-                                            TextInputType.visiblePassword,
-                                        color: Color(0xff3B5998),
-                                      ),
-
+                                      if (categoryList != null)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                                          child: DropdownButtonFormField<dynamic>(
+                                            dropdownColor: Color(0xff3B5998),
+                                            focusColor: Color(0xff3B5998),
+                                            isExpanded: true,
+                                            iconEnabledColor: const Color(0xff97949A),
+                                            icon: const Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white,),
+                                            borderRadius: BorderRadius.circular(10),
+                                            hint: Text(
+                                              "Select category".tr,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500),
+                                              textAlign: TextAlign.justify,
+                                            ),
+                                            decoration: InputDecoration(
+                                              focusColor: const Color(0xFF384953),
+                                              hintStyle: GoogleFonts.poppins(
+                                                color: const Color(0xFF384953),
+                                                textStyle: GoogleFonts.poppins(
+                                                  color: const Color(0xFF384953),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w300,
+                                                ),
+                                                fontSize: 14,
+                                                // fontFamily: 'poppins',
+                                                fontWeight: FontWeight.w300,
+                                              ),
+                                              filled: true,
+                                              fillColor: Color(0xff3B5998),
+                                              contentPadding: const EdgeInsets.symmetric(
+                                                  horizontal: 15, vertical: 15),
+                                              // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
+                                              focusedBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color:
+                                                    const Color(0xFF384953).withOpacity(.24)),
+                                                borderRadius: BorderRadius.circular(6.0),
+                                              ),
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: const Color(0xFF384953)
+                                                          .withOpacity(.24)),
+                                                  borderRadius: const BorderRadius.all(
+                                                      Radius.circular(6.0))),
+                                              errorBorder: OutlineInputBorder(
+                                                  borderSide:
+                                                  BorderSide(color: Colors.red.shade800),
+                                                  borderRadius: const BorderRadius.all(
+                                                      Radius.circular(6.0))),
+                                              border: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: const Color(0xFF384953)
+                                                          .withOpacity(.24),
+                                                      width: 3.0),
+                                                  borderRadius: BorderRadius.circular(6.0)),
+                                            ),
+                                            value: categoryValue,
+                                            items: categoryList!.map((items) {
+                                              return DropdownMenuItem(
+                                                value: items.name.toString(),
+                                                child: Text(
+                                                  items.name.toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            onChanged: (newValue) {
+                                              categoryValue = newValue.toString();
+                                              log(categoryValue.toString());
+                                              setState(() {});
+                                            },
+                                            validator: (value) {
+                                              if (categoryValue == null) {
+                                                return 'Please select category';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                        )
+                                      else
+                                        const Center(
+                                          child: Text("No Category Available"),
+                                        ),
                                       const SizedBox(height: 10),
 
                                       MyTextField(
@@ -343,9 +374,122 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                         keyboardtype: TextInputType.phone,
                                         color: Color(0xff3B5998),
                                       ),
+                                      const SizedBox(height: 10),
+
+                                      MyTextField(
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter your Address';
+                                          }
+                                        },
+                                        controller: addressController,
+                                        hintText: 'Enter Address',
+                                        obscureText: false,
+                                        keyboardtype: TextInputType.text,
+                                        color: Color(0xff3B5998),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 30),
+                                        child: DottedBorder(
+                                          borderType: BorderType.RRect,
+                                          radius: const Radius.circular(20),
+                                          padding: const EdgeInsets.only(
+                                              left: 40, right: 40, bottom: 10),
+                                          color: showValidationImg == false
+                                              ? const Color(0xFFFAAF40)
+                                              : Colors.red,
+                                          dashPattern: const [6],
+                                          strokeWidth: 1,
+                                          child: InkWell(
+                                            onTap: () {
+                                              _showActionSheet(context);
+                                            },
+                                            child: categoryFile.path != ""
+                                                ? Stack(
+                                                    children: [
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          color: Colors.white,
+                                                          image:
+                                                              DecorationImage(
+                                                            image: FileImage(
+                                                                categoryFile),
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                        ),
+                                                        margin: const EdgeInsets
+                                                            .symmetric(
+                                                            vertical: 10,
+                                                            horizontal: 10),
+                                                        width: double.maxFinite,
+                                                        height: 180,
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Image.file(
+                                                            categoryFile,
+                                                            errorBuilder: (_,
+                                                                    __, ___) =>
+                                                                Image.network(
+                                                                    categoryFile
+                                                                        .path,
+                                                                    errorBuilder: (_,
+                                                                            __,
+                                                                            ___) =>
+                                                                        SizedBox())),
+                                                      ),
+                                                    ],
+                                                  )
+                                                : Container(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 8),
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 8,
+                                                        horizontal: 8),
+                                                    width: double.maxFinite,
+                                                    height: 130,
+                                                    alignment: Alignment.center,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Image.asset(
+                                                          'assets/images/gallery.png',
+                                                          height: 60,
+                                                          width: 50,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 5,
+                                                        ),
+                                                        const Text(
+                                                          'Accepted file types: JPEG, Doc, PDF, PNG',
+                                                          style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors
+                                                                  .black54),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        const SizedBox(
+                                                          height: 11,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                          ),
+                                        ),
+                                      ),
                                       // sign in button
-                                      SizedBox(
-                                        height: size.height * .2,
+                                      const SizedBox(
+                                        height: 20,
                                       ),
                                       MyButton(
                                         color: Colors.white,

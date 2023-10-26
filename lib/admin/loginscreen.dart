@@ -5,6 +5,7 @@ import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
+import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 
@@ -90,6 +91,7 @@ class _LogInScreenState extends State<LogInScreen> {
                   controller: passwordController,
                   hintText: 'Password',
                   obscureText: true,
+                    maxLines: 1,
                     color: Colors.transparent
 
                 ),
@@ -98,12 +100,16 @@ class _LogInScreenState extends State<LogInScreen> {
                   color: Color(0xff3B5998),
                   backgroundcolor: Colors.white,
                   onTap: () {
+                    OverlayEntry loader = Helper.overlayLoader(context);
+                    Overlay.of(context).insert(loader);
                     FirebaseAuth.instance
                         .signInWithEmailAndPassword(
                             email: emailController.text.trim(), password: passwordController.text.trim())
                         .then((userCredential) {
                       Get.to(const LineChartSample1());
+                      Helper.hideLoader(loader);
                     }).catchError((error) {
+                      Helper.hideLoader(loader);
                       Fluttertoast.showToast(msg: 'Failed to login up: $error');
                     });
                   },
