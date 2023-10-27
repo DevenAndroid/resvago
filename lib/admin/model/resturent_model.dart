@@ -3,7 +3,7 @@ class ResturentData {
   final dynamic name;
   final dynamic description;
   final dynamic image;
-  final bool deactivate;
+  final dynamic deactivate;
   final dynamic time;
   final dynamic searchName;
 

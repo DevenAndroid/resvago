@@ -27,7 +27,6 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -132,7 +131,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
 
                   return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemCount: filteredUsers.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
@@ -168,7 +167,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                         maxLines: 1,
                                         textScaleFactor: 1,
                                         text: TextSpan(
-                                          text: item.name.toString(),
+                                          text: item.restaurantName.toString(),
                                           style: DefaultTextStyle.of(context).style,
                                         ),
                                       ),
@@ -187,7 +186,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          item.deactivate
+                                          item.deactivate == true
                                               ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
                                               : const SizedBox(),
                                           PopupMenuButton<int>(
@@ -205,10 +204,10 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                       Get.to(AddUsersScreen(
                                                         isEditMode: true,
                                                         documentId: item.docid,
-                                                        name: item.name,
+                                                          restaurantNamename: item.restaurantName,
                                                         email: item.email,
                                                         category: item.category,
-                                                        phoneNumber: item.phoneNumber,
+                                                        phoneNumber: item.mobileNumber,
                                                         image: item.image,
                                                         address: item.address
                                                       ));
@@ -244,7 +243,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                             TextButton(
                                                               onPressed: () {
                                                                 FirebaseFirestore.instance
-                                                                    .collection("users")
+                                                                    .collection("vendor_users")
                                                                     .doc(item.docid)
                                                                     .delete()
                                                                     .then((value) {
@@ -274,17 +273,26 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      item.deactivate ?  FirebaseFirestore.instance
-                                                          .collection('users')
-                                                          .doc(item.docid)
-                                                          .update({"deactivate": false}) :
-                                                      FirebaseFirestore.instance
-                                                          .collection('users')
-                                                          .doc(item.docid)
-                                                          .update({"deactivate": true});
-                                                      setState(() {});
+                                                      if(item.deactivate == true) {
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                            'vendor_users')
+                                                            .doc(item.docid)
+                                                            .update({
+                                                          "deactivate": false
+                                                        });
+                                                    } else {
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection('vendor_users')
+                                                            .doc(item.docid)
+                                                            .update({
+                                                          "deactivate": true
+                                                        });
+                                                      }
                                                     },
-                                                    child: Text(item.deactivate ? "Activate" : "Deactivate"),
+                                                    child: Text(item.deactivate == true ? "Activate" : "Deactivate"),
                                                   ),
                                                 ];
                                               }),
@@ -307,12 +315,11 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
 
   List<UserData> filterUsers(List<UserData> users, String query) {
     if (query.isEmpty) {
-      return users; // Return all users if the search query is empty
+      return users;
     } else {
-      // Filter the users based on the search query
       return users.where((user) {
-        if (user.name is String) {
-          return user.name.toLowerCase().contains(query.toLowerCase());
+        if (user.restaurantName is String) {
+          return user.restaurantName.toLowerCase().contains(query.toLowerCase());
         }
         return false;
       }).toList();
@@ -321,23 +328,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
 
   Stream<List<UserData>> getUsersStreamFromFirestore() {
     return FirebaseFirestore.instance
-        .collection('users')
+        .collection('vendor_users')
         .orderBy('time', descending: isDescendingOrder)
         .snapshots()
         .map((querySnapshot) {
       List<UserData> users = [];
       try {
         for (var doc in querySnapshot.docs) {
-          users.add(UserData(
-            name: doc.data()['name'],
-            email: doc.data()['email'],
-            image: doc.data()['image'],
-            category: doc.data()['category'],
-            phoneNumber: doc.data()['phoneNumber'],
-            address: doc.data()['address'],
-            deactivate: doc.data()['deactivate'] ?? false,
-            docid: doc.id,
-          ));
+          users.add(UserData.fromMap(doc.data(),doc.id));
         }
       } catch (e) {
         print(e.toString());

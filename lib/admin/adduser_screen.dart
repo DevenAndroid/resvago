@@ -6,11 +6,15 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
 import 'package:get/get.dart';
+import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:resvago/admin/model/user_model.dart';
+import 'package:resvago/admin/userdata_screen.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -20,19 +24,18 @@ class AddUsersScreen extends StatefulWidget {
   final UserData? userData;
   final bool isEditMode;
   final String? documentId;
-  final String? name;
+  final String? restaurantNamename;
   final String? email;
   final String? category;
   final String? phoneNumber;
   final String? image;
   final String? address;
 
-
   const AddUsersScreen({
     super.key,
     required this.isEditMode,
     this.documentId,
-    this.name,
+    this.restaurantNamename,
     this.phoneNumber,
     this.image,
     this.email,
@@ -61,11 +64,24 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   bool showValidationImg = false;
   String? categoryValue;
   bool isDescendingOrder = true;
+  String googleApikey = "AIzaSyDDl-_JOy_bj4MyQhYbKbGkZ0sfpbTZDNU";
+  String? _address = "";
+  RxBool showValidation1 = false.obs;
+
+  bool checkValidation(bool bool1, bool2) {
+    if (bool1 == true && bool2 == true) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   getVendorCategories() {
     FirebaseFirestore.instance
         .collection("resturent")
-        .orderBy('time', descending: isDescendingOrder).get().then((value) {
+        .orderBy('time', descending: isDescendingOrder)
+        .get()
+        .then((value) {
       for (var element in value.docs) {
         var gg = element.data();
         categoryList ??= [];
@@ -74,29 +90,32 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
       setState(() {});
     });
   }
+
   void checkEmailInFirestore() async {
+    if(widget.isEditMode){
+      addusersToFirestore();
+      return;
+    }
     final QuerySnapshot result = await FirebaseFirestore.instance
-        .collection('users')
+        .collection('vendor_users')
         .where('email', isEqualTo: emailController.text)
         .get();
 
     if (result.docs.isNotEmpty) {
       showToast('Email already exits');
-    } else if (phoneNumberController.text.toString().length < 4 ||
-        phoneNumberController.text.toString().length > 16) {
-      showToast('Enter Correct phone-number');
     } else {
       addusersToFirestore();
     }
   }
 
   Future<void> addusersToFirestore() async {
+    print("kkkkkksfsfskfjskfjkdfjskfjs");
     String name = nameController.text;
     String email = emailController.text;
     String category = categoryValue!;
     String phoneNumber = phoneNumberController.text;
-    String address = addressController.text;
-    String? imageUrl;
+    String? address = _address;
+    String imageUrl = categoryFile.path;
     Timestamp currentTime = Timestamp.now();
 
     List<String> arrangeNumbers = [];
@@ -105,24 +124,10 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     for (var i = 0; i < userNumber.length; i++) {
       arrangeNumbers.add(userNumber.substring(0, i + 1));
     }
-    if (!categoryFile.path.startsWith("gs://") &&
-        !categoryFile.path.startsWith("http://")) {
-      if (userData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
-      UploadTask uploadTask = FirebaseStorage.instance
-          .ref("categoryImages")
-          .child(DateTime.now().millisecondsSinceEpoch.toString())
-          .putFile(categoryFile);
 
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
-    } else {
-      if (userData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
+    print("kkkkkksfsfskfjskfjkdfjskfjs");
+
+    if (!categoryFile.path.contains("https")) {
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -131,31 +136,38 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     }
-    if (name.isNotEmpty && email.isNotEmpty && imageUrl != null) {
+    if (name.isNotEmpty && email.isNotEmpty) {
       UserData users = UserData(
-          name: name,
+          restaurantName: name,
           searchName: arrangeNumbers,
           email: email,
           deactivate: false,
           image: imageUrl,
           category: category,
-          phoneNumber: phoneNumber,
+          mobileNumber: phoneNumber,
           address: address,
+          docid: "+91$phoneNumber",
           time: currentTime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance
-            .collection('users')
+            .collection('vendor_users')
             .doc(widget.documentId)
             .update(users.toMap());
       } else {
-        FirebaseFirestore.instance.collection('users').add(users.toMap());
-        Get.back();
-        nameController.clear();
-        emailController.clear();
-        categoryController.clear();
-        phoneNumberController.clear();
-        addressController.clear();
+        FirebaseFirestore.instance
+            .collection('vendor_users')
+            .doc("+91$phoneNumber")
+            .set(users.toMap())
+            .then((value) => () {
+
+                  nameController.clear();
+                  emailController.clear();
+                  categoryController.clear();
+                  phoneNumberController.clear();
+                  addressController.clear();
+                });
       }
+      Get.back();
     }
   }
 
@@ -163,12 +175,15 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    nameController.text = widget.name ?? "";
-    emailController.text = widget.email ?? "";
-    categoryValue = widget.category ?? "";
-    phoneNumberController.text = widget.phoneNumber ?? "";
-    addressController.text = widget.address ?? "";
-    categoryFile = File(widget.image ?? "");
+    if (widget.isEditMode == true) {
+      nameController.text = widget.restaurantNamename ?? "";
+      emailController.text = widget.email ?? "";
+      categoryValue = widget.category ?? "";
+      phoneNumberController.text = widget.phoneNumber ?? "";
+      _address = widget.address ?? "";
+      categoryFile = File(widget.image ?? "");
+      log(categoryValue.toString());
+    }
     getVendorCategories();
   }
 
@@ -176,7 +191,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor: const Color(0xff3B5998),
         body: Form(
             key: formKey,
             child: SizedBox(
@@ -242,6 +257,11 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       const SizedBox(
                                         height: 20,
                                       ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Restaurant Name",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -252,35 +272,52 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                         hintText: 'Enter Restaurant Name',
                                         keyboardtype: TextInputType.name,
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
 
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Email",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
                                             return 'Please enter your email';
                                           }
                                         },
+                                        realonly: widget.isEditMode,
                                         controller: emailController,
                                         hintText: 'Enter Email',
                                         obscureText: false,
                                         keyboardtype:
                                             TextInputType.emailAddress,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Select Category",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       if (categoryList != null)
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                                          child: DropdownButtonFormField<dynamic>(
-                                            dropdownColor: Color(0xff3B5998),
-                                            focusColor: Color(0xff3B5998),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 25.0),
+                                          child:
+                                              DropdownButtonFormField<dynamic>(
+                                            dropdownColor: const Color(0xff3B5998),
+                                            focusColor: const Color(0xff3B5998),
                                             isExpanded: true,
-                                            iconEnabledColor: const Color(0xff97949A),
-                                            icon: const Icon(Icons.keyboard_arrow_down_rounded,color: Colors.white,),
-                                            borderRadius: BorderRadius.circular(10),
+                                            iconEnabledColor:
+                                                const Color(0xff97949A),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: Colors.white,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                             hint: Text(
                                               "Select category".tr,
                                               style: const TextStyle(
@@ -290,11 +327,13 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                               textAlign: TextAlign.justify,
                                             ),
                                             decoration: InputDecoration(
-                                              focusColor: const Color(0xFF384953),
+                                              focusColor:
+                                                  const Color(0xFF384953),
                                               hintStyle: GoogleFonts.poppins(
                                                 color: const Color(0xFF384953),
                                                 textStyle: GoogleFonts.poppins(
-                                                  color: const Color(0xFF384953),
+                                                  color:
+                                                      const Color(0xFF384953),
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w300,
                                                 ),
@@ -303,33 +342,46 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                                 fontWeight: FontWeight.w300,
                                               ),
                                               filled: true,
-                                              fillColor: Color(0xff3B5998),
-                                              contentPadding: const EdgeInsets.symmetric(
-                                                  horizontal: 15, vertical: 15),
+                                              fillColor: const Color(0xff3B5998),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 15),
                                               // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
                                               focusedBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color:
-                                                    const Color(0xFF384953).withOpacity(.24)),
-                                                borderRadius: BorderRadius.circular(6.0),
+                                                        const Color(0xFF384953)
+                                                            .withOpacity(.24)),
+                                                borderRadius:
+                                                    BorderRadius.circular(6.0),
                                               ),
                                               enabledBorder: OutlineInputBorder(
                                                   borderSide: BorderSide(
-                                                      color: const Color(0xFF384953)
+                                                      color: const Color(
+                                                              0xFF384953)
                                                           .withOpacity(.24)),
-                                                  borderRadius: const BorderRadius.all(
-                                                      Radius.circular(6.0))),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(
+                                                              6.0))),
                                               errorBorder: OutlineInputBorder(
-                                                  borderSide:
-                                                  BorderSide(color: Colors.red.shade800),
-                                                  borderRadius: const BorderRadius.all(
-                                                      Radius.circular(6.0))),
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          Colors.red.shade800),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(
+                                                              6.0))),
                                               border: OutlineInputBorder(
                                                   borderSide: BorderSide(
-                                                      color: const Color(0xFF384953)
+                                                      color: const Color(
+                                                              0xFF384953)
                                                           .withOpacity(.24),
                                                       width: 3.0),
-                                                  borderRadius: BorderRadius.circular(6.0)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6.0)),
                                             ),
                                             value: categoryValue,
                                             items: categoryList!.map((items) {
@@ -344,7 +396,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                               );
                                             }).toList(),
                                             onChanged: (newValue) {
-                                              categoryValue = newValue.toString();
+                                              categoryValue =
+                                                  newValue.toString();
                                               log(categoryValue.toString());
                                               setState(() {});
                                             },
@@ -361,32 +414,135 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                           child: Text("No Category Available"),
                                         ),
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Phone Number",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
                                             return 'Please enter your phone number';
                                           }
                                         },
+                                        realonly: widget.isEditMode,
                                         controller: phoneNumberController,
+                                        length: 10,
                                         hintText: 'Enter Phone Number',
                                         obscureText: false,
                                         keyboardtype: TextInputType.phone,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
-
-                                      MyTextField(
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter your Address';
-                                          }
-                                        },
-                                        controller: addressController,
-                                        hintText: 'Enter Address',
-                                        obscureText: false,
-                                        keyboardtype: TextInputType.text,
-                                        color: Color(0xff3B5998),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Address",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 25, right: 25),
+                                        child: InkWell(
+                                            onTap: () async {
+                                              var place =
+                                                  await PlacesAutocomplete.show(
+                                                      hint: "Location",
+                                                      context: context,
+                                                      apiKey: googleApikey,
+                                                      mode: Mode.overlay,
+                                                      types: [],
+                                                      strictbounds: false,
+                                                      onError: (err) {
+                                                        log("error.....   ${err.errorMessage}");
+                                                      });
+                                              if (place != null) {
+                                                setState(() {
+                                                  _address =
+                                                      (place.description ??
+                                                              "Location")
+                                                          .toString();
+                                                });
+                                                final plist = GoogleMapsPlaces(
+                                                  apiKey: googleApikey,
+                                                  apiHeaders:
+                                                      await const GoogleApiHeaders()
+                                                          .getHeaders(),
+                                                );
+                                                print(plist);
+                                                String placeid =
+                                                    place.placeId ?? "0";
+                                                final detail = await plist
+                                                    .getDetailsByPlaceId(
+                                                        placeid);
+                                                final geometry =
+                                                    detail.result.geometry!;
+                                                final lat =
+                                                    geometry.location.lat;
+                                                final lang =
+                                                    geometry.location.lng;
+                                                setState(() {
+                                                  _address =
+                                                      (place.description ??
+                                                              "Location")
+                                                          .toString();
+                                                  print(
+                                                      "Address iss...$_address");
+                                                });
+                                              }
+                                            },
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                    height: 55,
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: !checkValidation(
+                                                                    showValidation1
+                                                                        .value,
+                                                                    _address ==
+                                                                        "")
+                                                                ? Colors.grey
+                                                                    .shade300
+                                                                : Colors.red),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(5.0),
+                                                        color: Colors.white),
+                                                    // width: MediaQuery.of(context).size.width - 40,
+                                                    child: ListTile(
+                                                      leading: const Icon(
+                                                          Icons.location_on),
+                                                      title: Text(
+                                                        _address ??
+                                                            "Location"
+                                                                .toString(),
+                                                        style: const TextStyle(
+                                                            fontSize: 10),
+                                                      ),
+                                                      trailing: const Icon(
+                                                          Icons.search),
+                                                      dense: true,
+                                                    )),
+                                                checkValidation(
+                                                        showValidation1.value,
+                                                        _address == "")
+                                                    ? Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(top: 5),
+                                                        child: Text(
+                                                          "      Location is required",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .red.shade700,
+                                                              fontSize: 12),
+                                                        ),
+                                                      )
+                                                    : const SizedBox()
+                                              ],
+                                            )),
                                       ),
                                       const SizedBox(height: 10),
                                       Container(
@@ -441,7 +597,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                                                     errorBuilder: (_,
                                                                             __,
                                                                             ___) =>
-                                                                        SizedBox())),
+                                                                        const SizedBox())),
                                                       ),
                                                     ],
                                                   )
@@ -493,13 +649,11 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       ),
                                       MyButton(
                                         color: Colors.white,
-                                        backgroundcolor: Color(0xff3B5998),
+                                        backgroundcolor: const Color(0xff3B5998),
                                         onTap: () {
                                           if (formKey.currentState!
                                               .validate()) {
                                             checkEmailInFirestore();
-                                            //addusersToFirestore();
-                                            //Get.back();
                                           }
                                         },
                                         text: widget.isEditMode

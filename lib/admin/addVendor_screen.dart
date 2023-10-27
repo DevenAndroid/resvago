@@ -54,10 +54,10 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     }
     String imageUrl = categoryFile.path;
     if (!categoryFile.path.contains("https")) {
-      if (resturentData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
+      // if (resturentData != null) {
+      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+      //   await gg.delete();
+      // }
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -66,17 +66,17 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     } else {
-      if (resturentData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
-      UploadTask uploadTask = FirebaseStorage.instance
-          .ref("categoryImages")
-          .child(DateTime.now().millisecondsSinceEpoch.toString())
-          .putFile(categoryFile);
-
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
+      // if (resturentData != null) {
+      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+      //   await gg.delete();
+      // }
+      // UploadTask uploadTask = FirebaseStorage.instance
+      //     .ref("categoryImages")
+      //     .child(DateTime.now().millisecondsSinceEpoch.toString())
+      //     .putFile(categoryFile);
+      //
+      // TaskSnapshot snapshot = await uploadTask;
+      // imageUrl = await snapshot.ref.getDownloadURL();
     }
       if (resturentData != null) {
         await firebaseService.manageCategoryProduct(
@@ -88,6 +88,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           name: kk,
           searchName: arrangeNumbers,
         );
+        showToast("Category Updated");
       }
       else {
         await firebaseService.manageCategoryProduct(
@@ -100,6 +101,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           searchName: arrangeNumbers,
           time: DateTime.now().millisecondsSinceEpoch
         );
+        showToast("Category Added");
       }
       Get.back();
   }
@@ -144,7 +146,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                         ),
                       ),
                       const Text(
-                        "Add Vendor",
+                        "Add Vendor Category",
                         style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
                       ),
                     ],
@@ -172,6 +174,11 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                 const SizedBox(
                                   height: 20,
                                 ),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text("Vendor Category Name",style: TextStyle(color: Colors.black),),
+                                ),
+                                const SizedBox(height: 5),
                                 MyTextField(
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -180,13 +187,17 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                     return null;
                                   },
                                   controller: nameController,
-                                  hintText: 'Product Name',
+                                  hintText: 'Vendor Category Name',
                                   obscureText: false,
                                   color: const Color(0xff3B5998),
                                 ),
 
                                 const SizedBox(height: 20),
-
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text("Description",style: TextStyle(color: Colors.black),),
+                                ),
+                                const SizedBox(height: 5),
                                 MyTextField(
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -288,7 +299,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                   color: Colors.white,
                                   backgroundcolor: const Color(0xff3B5998),
                                   onTap: addresturentToFirestore,
-                                  text: resturentData != null ? 'Update Product' : 'Add Product',
+                                  text: resturentData != null ? 'Update' : 'Add',
                                 ),
 
                                 const SizedBox(height: 50),

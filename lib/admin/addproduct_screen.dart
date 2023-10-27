@@ -53,11 +53,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
       arrangeNumbers.add(kk.substring(0, i + 1));
     }
     String imageUrl = categoryFile.path;
+    print("manish${categoryFile.path}");
     if (!categoryFile.path.contains("https")) {
-      if (menuItemData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
+      // if (menuItemData != null && menuItemData!.image != null) {
+      //   Reference gg = FirebaseStorage.instance.refFromURL(menuItemData!.image);
+      //   await gg.delete();
+      // }
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -66,17 +67,17 @@ class _AddProductScreenState extends State<AddProductScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     } else {
-      if (menuItemData != null) {
-        Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-        await gg.delete();
-      }
-      UploadTask uploadTask = FirebaseStorage.instance
-          .ref("categoryImages")
-          .child(DateTime.now().millisecondsSinceEpoch.toString())
-          .putFile(categoryFile);
+      // if (menuItemData != null) {
+      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
+      //   await gg.delete();
+      // }
+      // UploadTask uploadTask = FirebaseStorage.instance
+      //     .ref("categoryImages")
+      //     .child(DateTime.now().millisecondsSinceEpoch.toString())
+      //     .putFile(categoryFile);
 
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
+      // TaskSnapshot snapshot = await uploadTask;
+      // imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (menuItemData != null) {
       await firebaseService.manageCategoryProduct(
@@ -88,6 +89,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         name: kk,
         searchName: arrangeNumbers,
       );
+      showToast("Category Updated");
     }
     else {
       await firebaseService.manageVendorCategory(
@@ -100,6 +102,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           searchName: arrangeNumbers,
           time: DateTime.now().millisecondsSinceEpoch
       );
+      showToast("Category Added");
     }
     Get.back();
   }
@@ -171,6 +174,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                               physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 const SizedBox(height: 20),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text("Title",style: TextStyle(color: Colors.black),),
+                                ),
+                                const SizedBox(height: 5),
                                 MyTextField(
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -185,7 +193,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 ),
 
                                 const SizedBox(height: 20),
-
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text("Description",style: TextStyle(color: Colors.black),),
+                                ),
+                                const SizedBox(height: 5),
                                 MyTextField(
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -290,7 +302,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   color: Colors.white,
                                   backgroundcolor: const Color(0xff3B5998),
                                   onTap: addVendorToFirestore,
-                                  text: menuItemData != null ? 'Update Product' : 'Add Product',
+                                  text: menuItemData != null ? 'Update' : 'Add',
                                 ),
 
                                 const SizedBox(height: 50),

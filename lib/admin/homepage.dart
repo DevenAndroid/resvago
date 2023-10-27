@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
+import 'package:resvago/admin/loginscreen.dart';
 import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
@@ -33,9 +34,6 @@ class LineChartSample1State extends State<LineChartSample1> {
   void initState() {
     super.initState();
     isShowingMainData = true;
-  }
-  Future<void> signOut() async {
-    await FirebaseAuth.instance.signOut();
   }
   @override
   Widget build(BuildContext context) {
@@ -227,8 +225,9 @@ class LineChartSample1State extends State<LineChartSample1> {
               ListTile(
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
-                onTap: () {
-                  signOut();
+                onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Get.offAll(const LogInScreen());
                 },
               ),
             ],

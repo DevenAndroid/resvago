@@ -227,9 +227,9 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                       builder: (ctx) =>
                                                           AlertDialog(
                                                         title: const Text(
-                                                            "Delete user"),
+                                                            "Delete Vendor Category"),
                                                         content: const Text(
-                                                            "Are you sure you want to delete this user"),
+                                                            "Are you sure you want to delete this Vendor Category"),
                                                         actions: <Widget>[
                                                           TextButton(
                                                             onPressed: () {
@@ -339,7 +339,6 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                                 key: ValueKey(
                                                                     DateTime.now()
                                                                         .millisecondsSinceEpoch))));
-                                                    // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
                                                   },
                                                   child: const Text(
                                                       'View SubCategory'),
@@ -352,7 +351,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                             );
                           })
                       : const Center(
-                          child: Text("No User Found"),
+                          child: Text("No SubCategory Found"),
                         );
                 }
               },

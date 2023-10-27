@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
 
 class MyTextField extends StatelessWidget {
   final controller;
   final String hintText;
   final bool obscureText;
+  final String? lableText;
   final Color color;
   final String? Function(String?)? validator;
   final TextInputType? keyboardtype;
   final int? maxLines;
   final int? minLines;
+  final Callback? ontap;
+  final bool? realonly;
+  final length;
 
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
+    this.lableText,
+    this.ontap,
+    this.realonly = false,
+    this.length,
     required this.obscureText, required this.color, this.validator, this.keyboardtype, this.maxLines, this.minLines,
   });
 
@@ -29,9 +39,14 @@ class MyTextField extends StatelessWidget {
         validator: validator,
         maxLines: maxLines,
         minLines: minLines,
+        onTap: ontap,
+        readOnly: realonly!,
         keyboardType: keyboardtype,
         obscureText: obscureText,
         cursorColor: Colors.white,
+        inputFormatters: [
+          LengthLimitingTextInputFormatter(length),
+        ],
         decoration: InputDecoration(
           border: InputBorder.none,
           errorStyle: const TextStyle(color: Colors.red),
@@ -44,6 +59,8 @@ class MyTextField extends StatelessWidget {
             fillColor: color,
             filled: true,
             hintText: hintText,
+            labelText: lableText,
+            labelStyle: const TextStyle(color: Colors.white),
             hintStyle: const TextStyle(color: Colors.white)),
       ),
     );

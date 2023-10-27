@@ -193,10 +193,13 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                     MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                       height: 100,
                                       width: 100,
-                                      child: const Icon(Icons.person)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(15.0),
+                                        child: Image.asset('assets/images/couponimage.png'),
+                                      )),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -242,17 +245,18 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                                 isEditMode: true,
                                                 documentId: item.docid,
                                                 promocode: item.promoCodeName,
-                                                description: item.code,
                                                 discount: item.discount,
                                                 code: item.code,
                                                 startdate: item.startDate,
+                                                maxDiscount: item.maxDiscount,
                                                 enddate: item.endDate,
+                                                resturentName: item.userName,
                                               ));
                                             },
                                             child: const Text("Edit"),
                                           ),
                                           PopupMenuItem(
-                                            value: 1,
+                                            value: 2,
                                             onTap: () {
                                               showDialog(
                                                 context: context,
@@ -326,7 +330,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                             child: const Text("Delete"),
                                           ),
                                           PopupMenuItem(
-                                            value: 1,
+                                            value: 3,
                                             onTap: () {
 
                                              item.deactivate ?  FirebaseFirestore.instance
@@ -392,6 +396,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                   deactivate: doc.data()['deactivate'],
                   promoCodeName: doc.data()['promoCodeName'],
                   startDate: doc.data()['startDate'],
+                  maxDiscount: doc.data()['maxDiscount'],
                   endDate: doc.data()['endDate'],
                 ))
             .toList());

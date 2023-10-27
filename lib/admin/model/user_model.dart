@@ -1,23 +1,33 @@
 class UserData {
-  final dynamic? docid;
-  final dynamic name;
+  final dynamic docid;
+  final dynamic restaurantName;
   final dynamic searchName;
   final dynamic email;
   final dynamic category;
-  final dynamic phoneNumber;
+  final dynamic mobileNumber;
   final dynamic address;
   final dynamic image;
   final dynamic time;
-  final bool deactivate;
+  bool? deactivate;
 
-  UserData( {required this.image,this.address, required this.deactivate, this.docid, this.time,this.searchName, required this.category, required this.phoneNumber,required this.name, required this.email});
+  UserData(
+      {required this.image,
+      this.address,
+      required this.deactivate,
+      required this.docid,
+      this.time,
+      this.searchName,
+      required this.category,
+      required this.mobileNumber,
+      required this.restaurantName,
+      required this.email});
 
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'restaurantName': restaurantName,
       'email': email,
       'category': category,
-      'phoneNumber': phoneNumber,
+      'mobileNumber': mobileNumber,
       'docid': docid,
       'deactivate': deactivate,
       'address': address,
@@ -27,17 +37,17 @@ class UserData {
     };
   }
 
-  factory UserData.fromMap(Map<String, dynamic> map) {
+  factory UserData.fromMap(Map<String, dynamic> map, String docId) {
     return UserData(
-      name: map['name'],
+      restaurantName: map['restaurantName'],
       email: map['email'],
       category: map['category'],
-      phoneNumber: map['phoneNumber'],
+      mobileNumber: map['mobileNumber'],
       deactivate: map['deactivate'],
       address: map['address'],
       image: map['image'],
-       docid: map['docid'],
-       time: map['time'],
+      docid: docId,
+      time: map['time'],
       searchName: map['searchName'],
     );
   }

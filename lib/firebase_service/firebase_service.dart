@@ -24,6 +24,8 @@ class FirebaseService {
           "deactivate": null,
           "time": time,
           "searchName": searchName,
+        }).then((value) => (){
+          showToast('Category Added');
         });
       } else {
         await documentReference.update({
@@ -32,10 +34,12 @@ class FirebaseService {
           "description": description,
           "docid": docid,
           "searchName": searchName,
+        }).then((value) => (){
+          showToast('Category updated');
         });
       }
 
-      showToast("Category Updated");
+
     } catch (e) {
       throw Exception(e);
     }
@@ -71,8 +75,6 @@ class FirebaseService {
           "searchName": searchName,
         });
       }
-
-      showToast("Category Updated");
     } catch (e) {
       throw Exception(e);
     }

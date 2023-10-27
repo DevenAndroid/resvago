@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -46,6 +48,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
       CustomerRegisterData customeruser = CustomerRegisterData(
           userName: userName,
           searchName: arrangeNumbers,
+          mobileNumber: mobileNumber,
           email: email,
           deactivate: false,
           time: currenttime);
@@ -65,11 +68,11 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     userNameController.text = widget.userName ?? "";
     emailController.text = widget.email ?? "";
     mobileNumberController.text = widget.phonenumber ?? "";
+    log(widget.phonenumber.toString());
   }
 
   @override
@@ -140,8 +143,13 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       const SizedBox(
-                                        height: 50,
+                                        height: 40,
                                       ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("userName",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -155,7 +163,11 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                       ),
 
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Email",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -168,6 +180,11 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                         color: Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Mobile Number",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -176,6 +193,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                         },
                                         controller: mobileNumberController,
                                         keyboardtype: TextInputType.number,
+                                        length: 10,
                                         hintText: 'Mobile Number',
                                         obscureText: false,
                                         color: Color(0xff3B5998),
@@ -184,7 +202,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                       const SizedBox(height: 10),
 
                                       SizedBox(
-                                        height: size.height * .35,
+                                        height: size.height * .3,
                                       ),
 
                                       // sign in button

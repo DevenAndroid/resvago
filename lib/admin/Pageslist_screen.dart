@@ -175,7 +175,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                             fontWeight: FontWeight.bold),
                                       ),
                                       subtitle:
-                                          Text(item.longdescription.toString()),
+                                          Text(item.longdescription.toString(),overflow: TextOverflow.ellipsis,),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -211,9 +211,9 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                         builder: (ctx) =>
                                                             AlertDialog(
                                                           title: const Text(
-                                                              "Delete user"),
+                                                              "Delete Page"),
                                                           content: const Text(
-                                                              "Are you sure you want to delete this user"),
+                                                              "Are you sure you want to delete this Page"),
                                                           actions: <Widget>[
                                                             TextButton(
                                                               onPressed: () {

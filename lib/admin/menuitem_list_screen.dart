@@ -228,9 +228,9 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                         builder: (ctx) =>
                                                             AlertDialog(
                                                           title: const Text(
-                                                              "Delete user"),
+                                                              "Delete Product Category"),
                                                           content: const Text(
-                                                              "Are you sure you want to delete this user"),
+                                                              "Are you sure you want to delete this Product Categor"),
                                                           actions: <Widget>[
                                                             TextButton(
                                                               onPressed: () {
@@ -330,7 +330,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder: (context) => AddProductScreen(
+                                                              builder: (context) => ProductCategoryScreen(
                                                                   collectionReference: widget
                                                                       .collectionReference
                                                                       .doc(item
@@ -342,7 +342,6 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                                   key: ValueKey(
                                                                       DateTime.now()
                                                                           .millisecondsSinceEpoch))));
-                                                      // Get.to(AddSubcategoryScreen(isEditMode: false,documentId: item.docid,));
                                                     },
                                                     child: const Text(
                                                         'View SubCategory'),
@@ -354,7 +353,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                             );
                           })
                       : const Center(
-                          child: Text("No User Found"),
+                          child: Text("No SubCategory Found"),
                         );
                 }
                 return const CircularProgressIndicator();

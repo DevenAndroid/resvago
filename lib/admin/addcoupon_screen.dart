@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:resvago/admin/model/coupen_model.dart';
 import 'package:resvago/admin/model/vendor_register_model.dart';
 import '../components/my_button.dart';
@@ -19,6 +18,8 @@ class AddCouponScreen extends StatefulWidget {
   final String? discount;
   final String? startdate;
   final String? enddate;
+  final String? maxDiscount;
+  final String? resturentName;
 
   const AddCouponScreen({
     super.key,
@@ -30,6 +31,8 @@ class AddCouponScreen extends StatefulWidget {
     this.code,
     this.startdate,
     this.enddate,
+    this.maxDiscount,
+    this.resturentName,
   });
 
   @override
@@ -38,17 +41,36 @@ class AddCouponScreen extends StatefulWidget {
 
 class _AddCouponScreenState extends State<AddCouponScreen> {
   TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
   TextEditingController codeController = TextEditingController();
   TextEditingController discountController = TextEditingController();
   TextEditingController startdateController = TextEditingController();
   TextEditingController enddateController = TextEditingController();
+  TextEditingController maxDiscountController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  DateTime? selectedStartDateTime;
+  DateTime? selectedEndDateTIme;
+  final DateFormat selectedDateFormat = DateFormat("dd-MMM-yyyy");
+  pickDate(
+      {required Function(DateTime gg) onPick,
+      DateTime? initialDate,
+      DateTime? firstDate,
+      DateTime? lastDate}) async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: initialDate ?? DateTime.now(),
+        firstDate: firstDate ?? DateTime.now(),
+        lastDate: lastDate ?? DateTime(2101),
+        initialEntryMode: DatePickerEntryMode.calendarOnly);
+    if (pickedDate == null) return;
+    onPick(pickedDate);
+    // updateValues();
+  }
 
   void addCouponToFirestore() {
     String promocodename = titleController.text;
-    String description = descriptionController.text;
     String code = codeController.text;
+    String maxDiscount = maxDiscountController.text;
     String discount = discountController.text;
     String startdate = startdateController.text;
     String enddate = enddateController.text;
@@ -66,17 +88,19 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
         code: code,
         discount: discount,
         startDate: startdate,
+        maxDiscount: maxDiscount,
         userID: userValue!.userID.toString(),
         userName: userValue!.restaurantName.toString(),
         endDate: enddate,
         time: currentTime,
         deactivate: false);
-    print("object");
     if (widget.isEditMode) {
       FirebaseFirestore.instance
           .collection('Coupon_data')
           .doc(widget.documentId)
-          .update(user.toMap());
+          .update(user.toMap()).then((value) => Get.to(CouponListScreen(
+        username: userValue!.restaurantName.toString(),
+      )));
     } else {
       FirebaseFirestore.instance
           .collection('Coupon_data')
@@ -94,12 +118,15 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   RegisterData? userValue;
   getVendorCategories() {
     FirebaseFirestore.instance.collection("vendor_users").get().then((value) {
-      print(value.docs);
       for (var element in value.docs) {
         var gg = element.data();
-        print(gg);
         userList ??= [];
         userList!.add(RegisterData.fromMap(gg));
+      }
+      for (var element in userList!) {
+        if(element.restaurantName == widget.resturentName){
+          userValue = element;
+        }
       }
       setState(() {});
     });
@@ -109,11 +136,11 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   void initState() {
     super.initState();
     titleController.text = widget.promocode ?? "";
-    descriptionController.text = widget.description ?? "";
     codeController.text = widget.code ?? "";
     discountController.text = widget.discount ?? "";
     startdateController.text = widget.startdate ?? "";
     enddateController.text = widget.enddate ?? "";
+    maxDiscountController.text = widget.maxDiscount ?? "";
     getVendorCategories();
   }
 
@@ -121,7 +148,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Color(0xff3B5998),
+        backgroundColor: const Color(0xff3B5998),
         body: Form(
             key: formKey,
             child: SizedBox(
@@ -187,103 +214,126 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                       const SizedBox(
                                         height: 50,
                                       ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Restaurant Name",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       if (userList != null)
-                                        DropdownButtonFormField<dynamic>(
-                                          focusColor: Colors.white,
-                                          isExpanded: true,
-                                          iconEnabledColor:
-                                              const Color(0xff97949A),
-                                          icon: const Icon(Icons
-                                              .keyboard_arrow_down_rounded),
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          hint: Text(
-                                            "Select Restaurant Name".tr,
-                                            style: const TextStyle(
-                                                color: Color(0xff2A3B40),
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w300),
-                                            textAlign: TextAlign.justify,
-                                          ),
-                                          decoration: InputDecoration(
-                                            focusColor: const Color(0xFF384953),
-                                            hintStyle: GoogleFonts.poppins(
-                                              color: const Color(0xFF384953),
-                                              textStyle: GoogleFonts.poppins(
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 25, right: 25),
+                                          child:
+                                              DropdownButtonFormField<dynamic>(
+                                            focusColor: Colors.white,
+                                            isExpanded: true,
+                                            iconEnabledColor:
+                                                const Color(0xff97949A),
+                                            icon: const Icon(Icons
+                                                .keyboard_arrow_down_rounded),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            hint: Text(
+                                              "Select Restaurant Name".tr,
+                                              style: const TextStyle(
+                                                  color: Color(0xff2A3B40),
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w300),
+                                              textAlign: TextAlign.justify,
+                                            ),
+                                            decoration: InputDecoration(
+                                              focusColor:
+                                                  const Color(0xFF384953),
+                                              hintStyle: GoogleFonts.poppins(
                                                 color: const Color(0xFF384953),
+                                                textStyle: GoogleFonts.poppins(
+                                                  color:
+                                                      const Color(0xFF384953),
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w300,
+                                                ),
                                                 fontSize: 14,
+                                                // fontFamily: 'poppins',
                                                 fontWeight: FontWeight.w300,
                                               ),
-                                              fontSize: 14,
-                                              // fontFamily: 'poppins',
-                                              fontWeight: FontWeight.w300,
-                                            ),
-                                            filled: true,
-                                            fillColor:
-                                                Colors.white.withOpacity(.10),
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 15,
-                                                    vertical: 15),
-                                            // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
-                                            focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: const Color(0xFF384953)
-                                                      .withOpacity(.24)),
-                                              borderRadius:
-                                                  BorderRadius.circular(6.0),
-                                            ),
-                                            enabledBorder: OutlineInputBorder(
+                                              filled: true,
+                                              fillColor:
+                                                  Colors.white.withOpacity(.10),
+                                              contentPadding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 15,
+                                                      vertical: 15),
+                                              // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
+                                              focusedBorder: OutlineInputBorder(
                                                 borderSide: BorderSide(
                                                     color:
                                                         const Color(0xFF384953)
                                                             .withOpacity(.24)),
                                                 borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(6.0))),
-                                            errorBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.red.shade800),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(6.0))),
-                                            border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color:
-                                                        const Color(0xFF384953)
-                                                            .withOpacity(.24),
-                                                    width: 3.0),
-                                                borderRadius:
-                                                    BorderRadius.circular(6.0)),
-                                          ),
-                                          value: userValue,
-                                          items: userList!.map((items) {
-                                            return DropdownMenuItem(
-                                              value: items,
-                                              child: Text(
-                                                items.restaurantName.toString(),
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 15),
+                                                    BorderRadius.circular(6.0),
                                               ),
-                                            );
-                                          }).toList(),
-                                          onChanged: (newValue) {
-                                            userValue = newValue;
-                                            setState(() {});
-                                          },
-                                          validator: (value) {
-                                            if (userValue == null) {
-                                              return 'Please select category';
-                                            }
-                                            return null;
-                                          },
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: const Color(
+                                                              0xFF384953)
+                                                          .withOpacity(.24)),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(
+                                                              6.0))),
+                                              errorBorder: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color:
+                                                          Colors.red.shade800),
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(
+                                                              6.0))),
+                                              border: OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: const Color(
+                                                              0xFF384953)
+                                                          .withOpacity(.24),
+                                                      width: 3.0),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          6.0)),
+                                            ),
+                                            value: userValue,
+                                            items: userList!.map((items) {
+                                              return DropdownMenuItem(
+                                                value: items,
+                                                child: Text(
+                                                  items.restaurantName
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 15),
+                                                ),
+                                              );
+                                            }).toList(),
+                                            onChanged: (newValue) {
+                                              userValue = newValue;
+                                              setState(() {});
+                                            },
+                                            validator: (value) {
+                                              if (userValue == null) {
+                                                return 'Please select category';
+                                              }
+                                              return null;
+                                            },
+                                          ),
                                         )
                                       else
                                         const Center(
                                           child: Text("No Category Available"),
                                         ),
                                       const SizedBox(height: 10),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("PromoCode Name",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -293,11 +343,15 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                         controller: titleController,
                                         hintText: 'PromoCode Name',
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
 
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Code",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -307,10 +361,14 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                         controller: codeController,
                                         hintText: 'Code',
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Discount",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
@@ -318,42 +376,102 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                           }
                                         },
                                         controller: discountController,
+                                        keyboardtype: TextInputType.number,
                                         hintText: 'Discount',
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Max Discount",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
                                         validator: (value) {
                                           if (value!.isEmpty) {
-                                            return 'Please enter start date';
+                                            return 'Please enter Max Discount';
                                           }
                                         },
-                                        controller: startdateController,
-                                        hintText: 'Start Date',
+                                        controller: maxDiscountController,
+                                        hintText: 'Max Discount',
+                                        keyboardtype: TextInputType.number,
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
                                       const SizedBox(height: 10),
-
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("Start Date",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
                                       MyTextField(
+                                        realonly: true,
+                                        controller: startdateController,
+                                        ontap: () {
+                                          pickDate(
+                                              onPick: (DateTime gg) {
+                                                startdateController.text =
+                                                    selectedDateFormat
+                                                        .format(gg);
+                                                selectedStartDateTime = gg;
+                                              },
+                                              initialDate:
+                                                  selectedStartDateTime,
+                                              lastDate: selectedEndDateTIme);
+                                        },
                                         validator: (value) {
                                           if (value!.isEmpty) {
                                             return 'Please enter end date';
                                           }
                                         },
-                                        controller: enddateController,
-                                        hintText: 'End Date',
+                                        hintText:
+                                            startdateController.text.isEmpty
+                                                ? 'Select Start Date'
+                                                : startdateController.text,
                                         obscureText: false,
-                                        color: Color(0xff3B5998),
+                                        color: const Color(0xff3B5998),
                                       ),
+                                      const SizedBox(height: 10),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 25),
+                                        child: Text("End Date",style: TextStyle(color: Colors.black),),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      MyTextField(
+                                        realonly: true,
+                                        controller: enddateController,
+                                        ontap: () {
+                                          pickDate(
+                                              onPick: (DateTime gg) {
+                                                enddateController.text =
+                                                    selectedDateFormat
+                                                        .format(gg);
+                                                selectedEndDateTIme = gg;
+                                              },
+                                              initialDate:
+                                                  selectedEndDateTIme ??
+                                                      selectedStartDateTime,
+                                              firstDate: selectedStartDateTime);
+                                        },
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Please enter end date';
+                                          }
+                                        },
+                                        hintText: enddateController.text.isEmpty
+                                            ? 'Select end Date'
+                                            : enddateController.text,
+                                        obscureText: false,
+                                        color: const Color(0xff3B5998),
+                                      ),
+
                                       SizedBox(height: size.height * .1),
 
                                       // sign in button
                                       MyButton(
                                         color: Colors.white,
-                                        backgroundcolor: Color(0xff3B5998),
+                                        backgroundcolor: const Color(0xff3B5998),
                                         onTap: () {
                                           if (formKey.currentState!
                                               .validate()) {
@@ -363,6 +481,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                             discountController.clear();
                                             enddateController.clear();
                                             startdateController.clear();
+                                            maxDiscountController.clear();
                                           }
                                         },
                                         text: widget.isEditMode
