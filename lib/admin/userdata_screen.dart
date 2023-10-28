@@ -329,7 +329,6 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
   Stream<List<UserData>> getUsersStreamFromFirestore() {
     return FirebaseFirestore.instance
         .collection('vendor_users')
-        .orderBy('time', descending: isDescendingOrder)
         .snapshots()
         .map((querySnapshot) {
       List<UserData> users = [];
