@@ -383,7 +383,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                       children: [
                         Container(
                           height: 100,
-                          width: 120,
+                          width: 110,
                           margin: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 10),
                           decoration: BoxDecoration(
@@ -464,7 +464,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                       children: [
                         Container(
                           height: 100,
-                          width: 120,
+                          width: 110,
                           margin: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 10),
                           decoration: BoxDecoration(
