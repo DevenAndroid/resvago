@@ -178,7 +178,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                       MaterialPageRoute(
                           builder: (context) => ProductCategoryScreen(
                                 collectionReference: FirebaseFirestore.instance
-                                    .collection("vendorCategory"),
+                                    .collection("menuItemsList"),
                                 key: ValueKey(
                                     DateTime.now().millisecondsSinceEpoch),
                               )));
