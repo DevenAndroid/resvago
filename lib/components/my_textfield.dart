@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_typedefs/rx_typedefs.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'addsize.dart';
+import 'appassets.dart';
+import 'apptheme.dart';
 
 class MyTextField extends StatelessWidget {
   final controller;
@@ -48,8 +54,8 @@ class MyTextField extends StatelessWidget {
           LengthLimitingTextInputFormatter(length),
         ],
         decoration: InputDecoration(
-          border: InputBorder.none,
-          errorStyle: const TextStyle(color: Colors.red),
+            border: InputBorder.none,
+            errorStyle: const TextStyle(color: Colors.red),
             enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
@@ -65,5 +71,43 @@ class MyTextField extends StatelessWidget {
       ),
     );
   }
-}
 
+
+}
+AppBar backAppBar({required title,
+  required BuildContext context,
+  String dispose = "",
+  Color? backgroundColor = AppTheme.backgroundcolor,
+  Color? textColor = Colors.black,
+  Widget? icon,
+  Widget? icon2,
+  disposeController}) {
+  return AppBar(
+    toolbarHeight: 60,
+    elevation: 0,
+    leadingWidth: AddSize.size22 * 1.6,
+    backgroundColor: backgroundColor,
+    surfaceTintColor: AppTheme.backgroundcolor,
+    title: Text(
+      title,
+      style: GoogleFonts.poppins(color: Color(0xFF423E5E),
+          fontWeight: FontWeight.w600,
+          fontSize: 17),
+    ),
+    actions: [
+      icon2 ?? SizedBox.shrink()
+    ],
+    leading: Padding(
+      padding: EdgeInsets.only(left: AddSize.padding10),
+      child: GestureDetector(
+          onTap: () {
+            Get.back();
+          },
+          child: icon ??
+              Image.asset(
+                AppAssets.back,
+                height: AddSize.size15,
+              )),
+    ),
+  );
+}

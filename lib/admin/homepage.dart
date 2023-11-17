@@ -7,6 +7,7 @@ import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/admin/loginscreen.dart';
+import 'package:resvago/admin/order_list_screen.dart';
 import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
@@ -195,6 +196,38 @@ class LineChartSample1State extends State<LineChartSample1> {
                   Get.to(const PagesListScreen()); // Closes the drawer
                 },
               ),
+              Divider(
+                thickness: 1,
+                color: Colors.grey.shade300,
+              ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Orders'),
+                trailing: const Icon(Icons.arrow_drop_down,size: 30,),
+                onTap: () {
+                  toggleDropdown();
+                },
+              ),
+              if (isDropdownOpen)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: <Widget>[
+                      ListTile(
+                        title: const Text('Delivery'),
+                        onTap: () {
+                          Get.to(const OrderListScreen());
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Dining'),
+                        onTap: () {
+                          Get.to(const UsersDataScreen());
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               Divider(
                 thickness: 1,
                 color: Colors.grey.shade300,
