@@ -315,7 +315,6 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
   Stream<List<CustomerRegisterData>> getUsersStreamFromFirestore() {
     return FirebaseFirestore.instance
         .collection('customer_users')
-        .orderBy('time', descending: isDescendingOrder)
         .snapshots()
         .map((querySnapshot) {
       List<CustomerRegisterData> users = [];

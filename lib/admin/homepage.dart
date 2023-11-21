@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
@@ -13,6 +14,9 @@ import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'customeruser_list.dart';
 import 'menuitem_list_screen.dart';
+import 'model/deliveryOrder_details_screen.dart';
+import 'model/delivery_order_details_modal.dart';
+import 'model/dining_order_model.dart';
 
 class LineChartSample1 extends StatefulWidget {
   const LineChartSample1({super.key});
@@ -86,8 +90,8 @@ class LineChartSample1State extends State<LineChartSample1> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                        minRadius: 40,
-                        maxRadius: 45,
+                        minRadius: 35,
+                        maxRadius: 40,
                         backgroundImage: AssetImage(
                           'assets/images/girl.jpg',
                         )),
@@ -387,179 +391,274 @@ class LineChartSample1State extends State<LineChartSample1> {
                 indicatorWeight: 4,
                 tabs: [
                   Tab(
-                    text: "Dining Orders",
+                    text: "Dining",
                   ),
                   Tab(
-                    text: "Delivery Orders",
+                    text: "Delivery",
                   ),
+
                 ]),
             Expanded(
               child: TabBarView(children: [
-                ListView.builder(itemBuilder: (context, index) {
-                  return Container(
-                    height: 120,
-                    width: Get.width,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(11)),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 100,
-                          width: 110,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image: AssetImage("assets/images/girl.jpg"),
-                                fit: BoxFit.cover,
+                StreamBuilder<List<MyDiningOrderModel>>(
+                  stream: getOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyDiningOrderModel> diningOrders = snapshot.data ?? [];
+
+                      return diningOrders.isNotEmpty
+                          ? ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: diningOrders.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = diningOrders[index];
+                            return GestureDetector(
+                              onTap: (){
+                                //Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                              },
+                              child: Container(
+                                height: 120,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(11)),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 110,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.restaurantInfo!.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(25)),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          item.orderId,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                              color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 3,),
+                                        Text(
+                                          item.orderType,
+                                          style: const TextStyle(
+                                              fontSize: 14, color: Color(0xff1A2E33)),
+                                        ),
+                                        const SizedBox(height: 3,),
+                                        Text(
+                                          item.restaurantInfo!.restaurantName,
+                                          style:
+                                          const TextStyle(fontSize: 12, color: Colors.grey),
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(width: 5,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(DateFormat("dd-mm-yy").format(
+                                            DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 12,
+                                              color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 10,),
+                                        Text(
+                                          '\$${item.total}',
+                                          style: const TextStyle(
+                                              fontSize: 17, color: Color(0xff1A2E33)),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25)),
-                        ),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '#1234',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(height: 3,),
-                            Text(
-                              'New Masala Pasta',
-                              style: TextStyle(
-                                  fontSize: 14, color: Color(0xff1A2E33)),
-                            ),
-                            SizedBox(height: 3,),
-                            Text(
-                              'McDonald’s Restaurant',
-                              style:
-                                  TextStyle(fontSize: 14, color: Colors.grey),
-                            )
-                          ],
-                        ),
-                        const SizedBox(width: 5,),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '20 Oct 2023',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 12,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(height: 10,),
-                            Text(
-                              '\$${10.00}',
-                              style: TextStyle(
-                                  fontSize: 17, color: Color(0xff1A2E33)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                ListView.builder(itemBuilder: (context, index) {
-                  return Container(
-                    height: 120,
-                    width: Get.width,
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(11)),
-                    margin: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 100,
-                          width: 110,
-                          margin: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          decoration: BoxDecoration(
-                              image: const DecorationImage(
-                                image: AssetImage("assets/images/girl.jpg"),
-                                fit: BoxFit.cover,
+                            );
+                          })
+                          : const Center(
+                        child: Text("No User Found"),
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
+
+                StreamBuilder<List<MyOrderModel>>(
+                  stream: getDeliveryOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyOrderModel> users = snapshot.data ?? [];
+
+                      return users.isNotEmpty
+                          ? ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = users[index];
+                            return GestureDetector(
+                              onTap: (){
+                                Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                              },
+                              child: Container(
+                                height: 120,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 5,
+                                        blurRadius: 7,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
+                                    borderRadius: BorderRadius.circular(11)),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 110,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          image:  DecorationImage(
+                                            image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(25)),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          item.orderId,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 14,
+                                              color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 3,),
+                                        Text(
+                                          item.orderType,
+                                          style: const TextStyle(
+                                              fontSize: 14, color: Color(0xff1A2E33)),
+                                        ),
+                                        const SizedBox(height: 3,),
+                                        Text(
+                                          item.orderDetails!.restaurantInfo!.restaurantName,
+                                          style:
+                                          const TextStyle(fontSize: 12, color: Colors.grey),
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(width: 5,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(DateFormat("dd-mm-yy").format(
+                                            DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 12,
+                                              color: Colors.grey),
+                                        ),
+                                        const SizedBox(height: 10,),
+                                        Text(
+                                          '\$${item.total}',
+                                          style: const TextStyle(
+                                              fontSize: 17, color: Color(0xff1A2E33)),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25)),
-                        ),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '#1234',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 14,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(height: 3,),
-                            Text(
-                              'New Masala Pasta',
-                              style: TextStyle(
-                                  fontSize: 14, color: Color(0xff1A2E33)),
-                            ),
-                            SizedBox(height: 3,),
-                            Text(
-                              'McDonald’s Restaurant',
-                              style:
-                              TextStyle(fontSize: 14, color: Colors.grey),
-                            )
-                          ],
-                        ),
-                        const SizedBox(width: 5,),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '20 Oct 2023',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.normal,
-                                  fontSize: 12,
-                                  color: Colors.grey),
-                            ),
-                            SizedBox(height: 10,),
-                            Text(
-                              '\$${10.00}',
-                              style: TextStyle(
-                                  fontSize: 17, color: Color(0xff1A2E33)),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                            );
+                          })
+                          : const Center(
+                        child: Text("No User Found"),
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
+
               ]),
             )
           ]),
         ));
+  }
+  Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {
+    return FirebaseFirestore.instance
+        .collection('dining_order')
+        .snapshots()
+        .map((querySnapshot) {
+      List<MyDiningOrderModel> diningorders = [];
+      print(diningorders);
+      try {
+        for (var doc in querySnapshot.docs) {
+          diningorders.add(MyDiningOrderModel.fromJson(doc.data(),doc.id));
+        }
+      } catch (e) {
+        print(e.toString());
+        throw Exception(e.toString());
+      }
+      return diningorders;
+    });
+  }
+  Stream<List<MyOrderModel>> getDeliveryOrdersStreamFromFirestore() {
+    return FirebaseFirestore.instance
+        .collection('order')
+        .snapshots()
+        .map((querySnapshot) {
+      List<MyOrderModel> orders = [];
+      print(orders);
+      try {
+        for (var doc in querySnapshot.docs) {
+          orders.add(MyOrderModel.fromJson(doc.data(),doc.id));
+        }
+      } catch (e) {
+        print(e.toString());
+        throw Exception(e.toString());
+      }
+      return orders;
+    });
   }
 }
