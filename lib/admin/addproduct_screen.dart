@@ -259,7 +259,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           MyButton(
                             color: Colors.white,
                             backgroundcolor:  Colors.black,
-                            onTap: addVendorToFirestore,
+                            onTap: (){
+                              if (formKey.currentState!.validate()) {
+                                addVendorToFirestore();
+                              } else {
+                                showToast('Please add data');
+                              }
+                            },
                             text: menuItemData != null ? 'Update' : 'Add',
                           ),
 

@@ -41,34 +41,39 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
   Future<void> addresturentToFirestore() async {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
-    if(!formKey.currentState!.validate())return;
-    if(categoryFile.path.isEmpty){
-      showToast("Please select category image");
-      return;
-    }
+    try {
+      if (!formKey.currentState!.validate()) return;
+      if (categoryFile.path.isEmpty) {
+        showToast("Please select category image");
 
-    List<String> arrangeNumbers = [];
-    String kk = nameController.text.trim();
+        Helper.hideLoader(loader);
+        return;
+      }
 
-    arrangeNumbers.clear();
-    for (var i = 0; i < kk.length; i++) {
-      arrangeNumbers.add(kk.substring(0, i + 1));
-    }
-    String imageUrl = categoryFile.path;
-    if (!categoryFile.path.contains("https")) {
-      UploadTask uploadTask = FirebaseStorage.instance
-          .ref("categoryImages")
-          .child(DateTime.now().millisecondsSinceEpoch.toString())
-          .putFile(categoryFile);
+      List<String> arrangeNumbers = [];
+      String kk = nameController.text.trim();
 
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
-    } else {
-    }
+      arrangeNumbers.clear();
+      for (var i = 0; i < kk.length; i++) {
+        arrangeNumbers.add(kk.substring(0, i + 1));
+      }
+      String imageUrl = categoryFile.path;
+      if (!categoryFile.path.contains("https")) {
+        UploadTask uploadTask = FirebaseStorage.instance
+            .ref("categoryImages")
+            .child(DateTime
+            .now()
+            .millisecondsSinceEpoch
+            .toString())
+            .putFile(categoryFile);
+
+        TaskSnapshot snapshot = await uploadTask;
+        imageUrl = await snapshot.ref.getDownloadURL();
+      } else {}
       if (resturentData != null) {
-
         await firebaseService.manageCategoryProduct(
-          documentReference: widget.collectionReference.doc(resturentData!.docid),
+          documentReference: widget.collectionReference.doc(
+              resturentData!.docid),
           deactivate: resturentData!.deactivate,
           description: descriptionController.text.trim(),
           docid: resturentData!.docid,
@@ -81,20 +86,33 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       }
       else {
         await firebaseService.manageCategoryProduct(
-          documentReference: widget.collectionReference.doc(DateTime.now().millisecondsSinceEpoch.toString()),
-          deactivate: false,
-          description: descriptionController.text.trim(),
-          docid: DateTime.now().millisecondsSinceEpoch,
-          image: imageUrl,
-          name: kk,
-          searchName: arrangeNumbers,
-          time: DateTime.now().millisecondsSinceEpoch
+            documentReference: widget.collectionReference.doc(DateTime
+                .now()
+                .millisecondsSinceEpoch
+                .toString()),
+            deactivate: false,
+            description: descriptionController.text.trim(),
+            docid: DateTime
+                .now()
+                .millisecondsSinceEpoch,
+            image: imageUrl,
+            name: kk,
+            searchName: arrangeNumbers,
+            time: DateTime
+                .now()
+                .millisecondsSinceEpoch
         );
         showToast("Category Added");
         Helper.hideLoader(loader);
       }
-    Helper.hideLoader(loader);
-    Get.back();
+      Get.back();
+      Helper.hideLoader(loader);
+    }catch(e){
+      Helper.hideLoader(loader);
+      throw Exception(e);
+
+    }
+
   }
 
   @override
@@ -258,7 +276,13 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                           MyButton(
                             color: Colors.white,
                             backgroundcolor: Colors.black,
-                            onTap: addresturentToFirestore,
+                            onTap: (){
+                              if (formKey.currentState!.validate()) {
+                                addresturentToFirestore();
+                              } else {
+                               showToast('Please add data');
+                              }
+                            },
                             text: resturentData != null ? 'Update' : 'Add',
                           ),
 

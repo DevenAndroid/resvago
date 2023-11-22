@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:resvago/components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -26,13 +25,14 @@ class _settingScreenState extends State<settingScreen> {
   TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  Future<void> addsettingToFirestore() async {
-     FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).update({
-       'email' : emailController.text
-     }).then((value) => (){
-       emailController.clear();
-       showToast('Setting Updated');
-     });
+  Future<void> addSettingToFirestore() async {
+    FirebaseFirestore.instance
+        .collection('admin_login')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .update({'email': emailController.text}).then((value) => () {
+              emailController.clear();
+              showToast('Setting Updated');
+            });
   }
 
   @override
@@ -91,7 +91,9 @@ class _settingScreenState extends State<settingScreen> {
                                   color: Colors.white,
                                 ),
 
-                                const SizedBox(height: 30,),
+                                const SizedBox(
+                                  height: 30,
+                                ),
 
                                 // sign in button
                                 MyButton(
@@ -99,7 +101,7 @@ class _settingScreenState extends State<settingScreen> {
                                   backgroundcolor: Colors.black,
                                   onTap: () {
                                     if (formKey.currentState!.validate()) {
-                                      addsettingToFirestore();
+                                      addSettingToFirestore();
                                     }
                                   },
                                   text: widget.isEditMode
