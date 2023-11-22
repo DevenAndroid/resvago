@@ -3,11 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-
 import 'model/deliveryOrder_details_screen.dart';
-import 'model/delivery_order_details_modal.dart';
 import 'model/dining_order_model.dart';
 
 class DiningorderListScreen extends StatefulWidget {
@@ -124,37 +121,39 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 10),
                                       decoration: BoxDecoration(
-                                          image: const DecorationImage(
-                                            image: AssetImage("assets/images/girl.jpg"),
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.restaurantInfo!.image),
                                             fit: BoxFit.cover,
                                           ),
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(25)),
                                     ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          item.orderId,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: Colors.grey),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderType,
-                                          style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(width: 5,),
                                     Column(
@@ -176,6 +175,8 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(width: 10,)
+
                                   ],
                                 ),
                               ),
@@ -234,37 +235,39 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 10),
                                       decoration: BoxDecoration(
-                                          image: const DecorationImage(
-                                            image: AssetImage("assets/images/girl.jpg"),
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.restaurantInfo!.image),
                                             fit: BoxFit.cover,
                                           ),
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(25)),
                                     ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          item.orderId,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: Colors.grey),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderType,
-                                          style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(width: 5,),
                                     Column(
@@ -286,6 +289,8 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(width: 10,)
+
                                   ],
                                 ),
                               ),
@@ -344,37 +349,39 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 10),
                                       decoration: BoxDecoration(
-                                          image: const DecorationImage(
-                                            image: AssetImage("assets/images/girl.jpg"),
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.restaurantInfo!.image),
                                             fit: BoxFit.cover,
                                           ),
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(25)),
                                     ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          item.orderId,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: Colors.grey),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderType,
-                                          style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(width: 5,),
                                     Column(
@@ -396,6 +403,8 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(width: 10,)
+
                                   ],
                                 ),
                               ),
@@ -454,37 +463,39 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                       margin: const EdgeInsets.symmetric(
                                           vertical: 10, horizontal: 10),
                                       decoration: BoxDecoration(
-                                          image: const DecorationImage(
-                                            image: AssetImage("assets/images/girl.jpg"),
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.restaurantInfo!.image),
                                             fit: BoxFit.cover,
                                           ),
                                           color: Colors.white,
                                           borderRadius: BorderRadius.circular(25)),
                                     ),
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          item.orderId,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.normal,
-                                              fontSize: 14,
-                                              color: Colors.grey),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderType,
-                                          style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
-                                        ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
-                                      ],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                     const SizedBox(width: 5,),
                                     Column(
@@ -506,6 +517,8 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                                         ),
                                       ],
                                     ),
+                                    SizedBox(width: 10,)
+
                                   ],
                                 ),
                               ),

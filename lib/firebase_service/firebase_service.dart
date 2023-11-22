@@ -22,7 +22,7 @@ class FirebaseService {
           "image": image,
           "description": description,
           "docid": docid,
-          "deactivate": null,
+          "deactivate": deactivate,
           "time": time,
           "searchName": searchName,
         }).then((value) => (){
@@ -63,7 +63,7 @@ class FirebaseService {
           "image": image,
           "description": description,
           "docid": docid,
-          "deactivate": null,
+          "deactivate": deactivate,
           "time": time,
           "searchName": searchName,
         });

@@ -80,158 +80,113 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         backgroundColor: Color(0xff3B5998),
+        appBar: backAppBar(title: 'Add new Customer', context: context),
         body: Form(
             key: formKey,
-            child: SizedBox(
-              height: size.height,
-              width: size.width,
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: size.width * .06,
-                        vertical: size.height * .06),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10)
-                              .copyWith(right: 15),
-                          child: GestureDetector(
-                            onTap: () {
-                              Get.back();
-                            },
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                        const Text(
-                          "Add Users",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ],
+            child: Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.white,
                     ),
-                  ),
-                  Positioned(
-                    top: size.height * .135,
-                    right: 0,
-                    left: 0,
-                    bottom: 0,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(25),
-                                    topLeft: Radius.circular(25))),
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                      horizontal: size.width * .04,
-                                      vertical: size.height * .01)
-                                  .copyWith(bottom: 0),
-                              child: SingleChildScrollView(
-                                physics: const AlwaysScrollableScrollPhysics(),
-                                child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(
-                                        height: 40,
-                                      ),
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 25),
-                                        child: Text("userName",style: TextStyle(color: Colors.black),),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      MyTextField(
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter your userName';
-                                          }
-                                        },
-                                        controller: userNameController,
-                                        hintText: 'userName',
-                                        obscureText: false,
-                                        color: Color(0xff3B5998),
-                                      ),
-
-                                      const SizedBox(height: 10),
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 25),
-                                        child: Text("Email",style: TextStyle(color: Colors.black),),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      MyTextField(
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter email';
-                                          }
-                                        },
-                                        controller: emailController,
-                                        hintText: 'Email',
-                                        obscureText: false,
-                                        color: Color(0xff3B5998),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      const Padding(
-                                        padding: EdgeInsets.only(left: 25),
-                                        child: Text("Mobile Number",style: TextStyle(color: Colors.black),),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      MyTextField(
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Please enter your mobile number';
-                                          }
-                                        },
-                                        controller: mobileNumberController,
-                                        keyboardtype: TextInputType.number,
-                                        length: 10,
-                                        hintText: 'Mobile Number',
-                                        obscureText: false,
-                                        color: Color(0xff3B5998),
-                                      ),
-
-                                      const SizedBox(height: 10),
-
-                                      SizedBox(
-                                        height: size.height * .3,
-                                      ),
-
-                                      // sign in button
-                                      MyButton(
-                                        color: Colors.white,
-                                        backgroundcolor: Color(0xff3B5998),
-                                        onTap: () {
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            addUserToFirestore();
-                                            userNameController.clear();
-                                            emailController.clear();
-                                            Get.back();
-                                          }
-                                        },
-                                        text: widget.isEditMode
-                                            ? 'Update User'
-                                            : 'Add User',
-                                      ),
-                                    ]),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                              horizontal: size.width * .04,
+                              vertical: size.height * .01)
+                          .copyWith(bottom: 0),
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(
+                                height: 10,
                               ),
-                            ),
-                          ),
-                        ),
-                      ],
+                              const Padding(
+                                padding: EdgeInsets.only(left: 25),
+                                child: Text("userName",style: TextStyle(color: Colors.black),),
+                              ),
+                              const SizedBox(height: 5),
+                              MyTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter your userName';
+                                  }
+                                },
+                                controller: userNameController,
+                                hintText: 'userName',
+                                obscureText: false,
+                                color: Colors.white,
+                              ),
+
+                              const SizedBox(height: 10),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 25),
+                                child: Text("Email",style: TextStyle(color: Colors.black),),
+                              ),
+                              const SizedBox(height: 5),
+                              MyTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter email';
+                                  }
+                                },
+                                controller: emailController,
+                                hintText: 'Email',
+                                obscureText: false,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(height: 10),
+                              const Padding(
+                                padding: EdgeInsets.only(left: 25),
+                                child: Text("Mobile Number",style: TextStyle(color: Colors.black),),
+                              ),
+                              const SizedBox(height: 5),
+                              MyTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter your mobile number';
+                                  }
+                                },
+                                controller: mobileNumberController,
+                                keyboardtype: TextInputType.number,
+                                length: 10,
+                                hintText: 'Mobile Number',
+                                obscureText: false,
+                                color: Colors.white,
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              const SizedBox(
+                                height: 30
+                              ),
+
+                              // sign in button
+                              MyButton(
+                                color: Colors.white,
+                                backgroundcolor: Colors.black,
+                                onTap: () {
+                                  if (formKey.currentState!
+                                      .validate()) {
+                                    addUserToFirestore();
+                                    userNameController.clear();
+                                    emailController.clear();
+                                    Get.back();
+                                  }
+                                },
+                                text: widget.isEditMode
+                                    ? 'Update User'
+                                    : 'Add User',
+                              ),
+                            ]),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             )));
   }
 }

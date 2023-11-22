@@ -22,7 +22,6 @@ class MyTextField extends StatelessWidget {
   final bool? realonly;
   final length;
 
-
   const MyTextField({
     super.key,
     required this.controller,
@@ -31,16 +30,20 @@ class MyTextField extends StatelessWidget {
     this.ontap,
     this.realonly = false,
     this.length,
-    required this.obscureText, required this.color, this.validator, this.keyboardtype, this.maxLines, this.minLines,
+    required this.obscureText,
+    required this.color,
+    this.validator,
+    this.keyboardtype,
+    this.maxLines,
+    this.minLines,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: TextFormField(
-
-        style: const TextStyle(color: Colors.white),
+        style: const TextStyle(color: Colors.black),
         controller: controller,
         validator: validator,
         maxLines: maxLines,
@@ -57,46 +60,43 @@ class MyTextField extends StatelessWidget {
             border: InputBorder.none,
             errorStyle: const TextStyle(color: Colors.red),
             enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: BorderSide(color: Colors.black),
             ),
             focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.white),
+              borderSide: BorderSide(color: Colors.black),
             ),
             fillColor: color,
             filled: true,
             hintText: hintText,
             labelText: lableText,
-            labelStyle: const TextStyle(color: Colors.white),
-            hintStyle: const TextStyle(color: Colors.white)),
+            labelStyle: const TextStyle(color: Colors.black),
+            hintStyle: const TextStyle(color: Colors.black)),
       ),
     );
   }
-
-
 }
-AppBar backAppBar({required title,
-  required BuildContext context,
-  String dispose = "",
-  Color? backgroundColor = AppTheme.backgroundcolor,
-  Color? textColor = Colors.black,
-  Widget? icon,
-  Widget? icon2,
-  disposeController}) {
+
+AppBar backAppBar(
+    {required title,
+    required BuildContext context,
+    String dispose = "",
+    Color? backgroundColor = AppTheme.backgroundcolor,
+    Color? textColor = Colors.black,
+    Widget? icon,
+    Widget? icon2,
+    disposeController}) {
   return AppBar(
     toolbarHeight: 60,
-    elevation: 0,
+    elevation: 5,
     leadingWidth: AddSize.size22 * 1.6,
     backgroundColor: backgroundColor,
     surfaceTintColor: AppTheme.backgroundcolor,
     title: Text(
       title,
-      style: GoogleFonts.poppins(color: Color(0xFF423E5E),
-          fontWeight: FontWeight.w600,
-          fontSize: 17),
+      style: GoogleFonts.poppins(
+          color: Color(0xFF423E5E), fontWeight: FontWeight.w600, fontSize: 17),
     ),
-    actions: [
-      icon2 ?? SizedBox.shrink()
-    ],
+    actions: [icon2 ?? SizedBox.shrink()],
     leading: Padding(
       padding: EdgeInsets.only(left: AddSize.padding10),
       child: GestureDetector(
