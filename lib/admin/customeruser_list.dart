@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
-import 'package:resvago/admin/adduser_screen.dart';
 
 import 'model/customer_register_model.dart';
-import 'model/user_model.dart';
 
 class CustomeruserListScreen extends StatefulWidget {
   const CustomeruserListScreen({Key? key}) : super(key: key);
@@ -151,10 +149,10 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                             borderRadius: BorderRadius.circular(11),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 5,
-                                blurRadius: 7,
-                                offset: Offset(0, 3),
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 2,
+                                offset: Offset(0, 1),
                               ),
                             ],
                           ),

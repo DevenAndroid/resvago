@@ -98,7 +98,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
       FirebaseFirestore.instance
           .collection('Coupon_data')
           .doc(widget.documentId)
-          .update(user.toMap()).then((value) => Get.to(CouponListScreen(
+          .update(user.toMap()).then((value) => Get.off(CouponListScreen(
         username: userValue!.restaurantName.toString(),
       )));
     } else {
@@ -106,7 +106,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
           .collection('Coupon_data')
           .doc()
           .set(user.toMap())
-          .then((value) => Get.to(CouponListScreen(
+          .then((value) => Get.off(CouponListScreen(
                 username: userValue!.restaurantName.toString(),
               )));
     }

@@ -9,6 +9,8 @@ class UserData {
   final dynamic image;
   final dynamic time;
   bool? deactivate;
+  dynamic latitude;
+  dynamic longitude;
 
   UserData(
       {required this.image,
@@ -20,6 +22,8 @@ class UserData {
       required this.category,
       required this.mobileNumber,
       required this.restaurantName,
+        this.latitude,
+        this.longitude,
       required this.email});
 
   Map<String, dynamic> toMap() {
@@ -33,6 +37,8 @@ class UserData {
       'address': address,
       'image': image,
       'time': time,
+      'longitude': longitude,
+      'latitude': latitude,
       'searchName': searchName,
     };
   }
@@ -49,6 +55,8 @@ class UserData {
       docid: docId,
       time: map['time'],
       searchName: map['searchName'],
+      latitude: map['latitude'],
+      longitude: map['longitude'],
     );
   }
 }

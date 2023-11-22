@@ -67,7 +67,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   String googleApikey = "AIzaSyDDl-_JOy_bj4MyQhYbKbGkZ0sfpbTZDNU";
   String? _address = "";
   RxBool showValidation1 = false.obs;
-
+  dynamic latitude = "";
+  dynamic longitude = "";
   bool checkValidation(bool bool1, bool2) {
     if (bool1 == true && bool2 == true) {
       return true;
@@ -109,6 +110,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   }
 
   Future<void> addusersToFirestore() async {
+    OverlayEntry loader = Helper.overlayLoader(context);
+    Overlay.of(context).insert(loader);
     String name = nameController.text;
     String email = emailController.text;
     String category = categoryValue!;
@@ -145,12 +148,16 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
           mobileNumber: phoneNumber,
           address: address,
           docid: "+91$phoneNumber",
+          latitude: latitude.toString(),
+          longitude: longitude.toString(),
           time: currentTime);
       if (widget.isEditMode) {
         FirebaseFirestore.instance
             .collection('vendor_users')
             .doc(widget.documentId)
             .update(users.toMap());
+        Helper.hideLoader(loader);
+
       } else {
         FirebaseFirestore.instance
             .collection('vendor_users')
@@ -164,6 +171,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                   phoneNumberController.clear();
                   addressController.clear();
                 });
+        Helper.hideLoader(loader);
+
       }
       Get.back();
     }
@@ -308,7 +317,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                                 vertical: 15),
                                         // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
                                         focusedBorder: OutlineInputBorder(
-                                          borderSide: BorderSide(
+                                          borderSide: const BorderSide(
                                               color:
                                               Colors.black,),
                                           borderRadius:
@@ -331,7 +340,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                                     Radius.circular(
                                                         6.0))),
                                         border: OutlineInputBorder(
-                                            borderSide: BorderSide(
+                                            borderSide: const BorderSide(
                                                 color: Colors.black,
                                                 width: 3.0),
                                             borderRadius:
@@ -345,7 +354,7 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                           child: Text(
                                             items.name.toString(),
                                             style: const TextStyle(
-                                                color: Colors.white,
+                                                color: Colors.black,
                                                 fontSize: 14),
                                           ),
                                         );
@@ -399,49 +408,35 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       left: 15, right: 15),
                                   child: InkWell(
                                       onTap: () async {
-                                        var place =
-                                            await PlacesAutocomplete.show(
-                                                hint: "Location",
-                                                context: context,
-                                                apiKey: googleApikey,
-                                                mode: Mode.overlay,
-                                                types: [],
-                                                strictbounds: false,
-                                                onError: (err) {
-                                                  log("error.....   ${err.errorMessage}");
-                                                });
+                                        var place = await PlacesAutocomplete.show(
+                                            hint: "Location",
+                                            context: context,
+                                            apiKey: googleApikey,
+                                            mode: Mode.overlay,
+                                            types: [],
+                                            strictbounds: false,
+                                            onError: (err) {
+                                              log("error.....   ${err.errorMessage}");
+                                            });
                                         if (place != null) {
                                           setState(() {
-                                            _address =
-                                                (place.description ??
-                                                        "Location")
-                                                    .toString();
+                                            _address = (place.description ?? "Location").toString();
                                           });
                                           final plist = GoogleMapsPlaces(
                                             apiKey: googleApikey,
-                                            apiHeaders:
-                                                await const GoogleApiHeaders()
-                                                    .getHeaders(),
+                                            apiHeaders: await const GoogleApiHeaders().getHeaders(),
                                           );
                                           print(plist);
-                                          String placeid =
-                                              place.placeId ?? "0";
-                                          final detail = await plist
-                                              .getDetailsByPlaceId(
-                                                  placeid);
-                                          final geometry =
-                                              detail.result.geometry!;
-                                          final lat =
-                                              geometry.location.lat;
-                                          final lang =
-                                              geometry.location.lng;
+                                          String placeid = place.placeId ?? "0";
+                                          final detail = await plist.getDetailsByPlaceId(placeid);
+                                          final geometry = detail.result.geometry!;
+                                          final lat = geometry.location.lat;
+                                          final lang = geometry.location.lng;
                                           setState(() {
-                                            _address =
-                                                (place.description ??
-                                                        "Location")
-                                                    .toString();
-                                            print(
-                                                "Address iss...$_address");
+                                            _address = (place.description ?? "Location").toString();
+                                            latitude = lat;
+                                            longitude = lang;
+                                            print("Address iss...$_address");
                                           });
                                         }
                                       },

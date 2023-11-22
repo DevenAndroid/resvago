@@ -149,10 +149,10 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                 borderRadius: BorderRadius.circular(11),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 5,
-                                    blurRadius: 7,
-                                    offset: Offset(0, 3),
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 2,
+                                    offset: Offset(0, 1),
                                   ),
                                 ],
                               ),

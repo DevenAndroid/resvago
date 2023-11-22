@@ -10,6 +10,7 @@ import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/admin/dining_order_list.dart';
 import 'package:resvago/admin/loginscreen.dart';
 import 'package:resvago/admin/order_list_screen.dart';
+import 'package:resvago/admin/setting_screen.dart';
 import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
@@ -42,27 +43,31 @@ class LineChartSample1State extends State<LineChartSample1> {
     super.initState();
     isShowingMainData = true;
   }
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
-          leading: const Padding(
-            padding: EdgeInsets.only(left: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hi Demo Admin..',
-                  style: TextStyle(color: Colors.black, fontSize: 20),
-                ),
-                Text(
-                  'admin@gmail.com',
-                  style: TextStyle(color: Colors.black, fontSize: 12),
-                ),
-              ],
-            ),
+          leading: GestureDetector(
+            onTap: (){
+               scaffoldKey.currentState!.openDrawer();
+            },
+              child: Icon(Icons.menu)),
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hi Demo Admin..',
+                style: TextStyle(color: Colors.black, fontSize: 20),
+              ),
+              Text(
+                'admin@gmail.com',
+                style: TextStyle(color: Colors.black, fontSize: 12),
+              ),
+            ],
           ),
           actions: const [
             Padding(
@@ -73,11 +78,7 @@ class LineChartSample1State extends State<LineChartSample1> {
               ),
             )
           ],
-          leadingWidth: 200,
-          title: const Text(
-            '',
-            style: TextStyle(color: Colors.black),
-          ),
+
           backgroundColor: Colors.white,
         ),
         drawer: Drawer(
@@ -249,7 +250,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),
                 onTap: () {
-                  Navigator.pop(context); // Closes the drawer
+                  Get.to(const settingScreen(isEditMode: false,));
                 },
               ),
               Divider(

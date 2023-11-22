@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import 'model/customer_register_model.dart';
@@ -33,6 +34,8 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   void addUserToFirestore() {
+    OverlayEntry loader = Helper.overlayLoader(context);
+    Overlay.of(context).insert(loader);
     String userName = userNameController.text;
     String email = emailController.text;
     String mobileNumber = mobileNumberController.text;
@@ -57,11 +60,13 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
             .collection('customer_users')
             .doc(widget.documentId)
             .update(customeruser.toMap());
+        Helper.hideLoader(loader);
       } else {
         FirebaseFirestore.instance
             .collection('customer_users')
             .doc("+91$mobileNumber")
             .set(customeruser.toMap());
+        Helper.hideLoader(loader);
       }
     }
   }

@@ -178,10 +178,10 @@ class _CouponListScreenState extends State<CouponListScreen> {
                           borderRadius: BorderRadius.circular(11),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 5,
-                              blurRadius: 7,
-                              offset: const Offset(0, 3),
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
                             ),
                           ],
                         ),
@@ -197,32 +197,33 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                   padding: const EdgeInsets.all(15.0),
                                   child: Image.asset('assets/images/couponimage.png'),
                                 )),
-                            Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  item.promoCodeName.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 12, color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  item.code,
-                                  style: const TextStyle(
-                                      fontSize: 17, color: Colors.black,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  item.userName.toString(),
-                                  style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal),
-                                ),
-                              ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    item.promoCodeName.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    item.code,
+                                    style: const TextStyle(
+                                        fontSize: 17, color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "${item.discount.toString()}%",
+                                    style: const TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
                             ),
-                            SizedBox(width: 100,),
                             item.deactivate
                                 ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
                                 : const SizedBox(),
@@ -347,6 +348,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                     ),
                                   ];
                                 }),
+                            SizedBox(width: 10,)
                           ],
                         ),
                       );

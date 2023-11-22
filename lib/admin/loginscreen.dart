@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -7,10 +8,8 @@ import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
-import 'package:resvago/main.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
-import '../components/my_textfield.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -167,6 +166,11 @@ class _LogInScreenState extends State<LogInScreen> {
                             email: emailController.text.trim(),
                             password: passwordController.text.trim())
                         .then((userCredential) {
+                          FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).set(
+                              {
+                                'email' : emailController.text.trim(),
+                                'password' : passwordController.text.trim()
+                              });
                       Get.to(const LineChartSample1());
                       Helper.hideLoader(loader);
                     }).catchError((error) {
