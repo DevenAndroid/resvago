@@ -39,6 +39,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
   bool showValidation = false;
   bool showValidationImg = false;
   Future<void> addVendorToFirestore() async {
+    OverlayEntry loader = Helper.overlayLoader(context);
+    Overlay.of(context).insert(loader);
     if(!formKey.currentState!.validate())return;
     if(categoryFile.path.isEmpty){
       showToast("Please select category image");
@@ -55,10 +57,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
     String imageUrl = categoryFile.path;
     print("manish${categoryFile.path}");
     if (!categoryFile.path.contains("https")) {
-      // if (menuItemData != null && menuItemData!.image != null) {
-      //   Reference gg = FirebaseStorage.instance.refFromURL(menuItemData!.image);
-      //   await gg.delete();
-      // }
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -67,17 +65,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     } else {
-      // if (menuItemData != null) {
-      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-      //   await gg.delete();
-      // }
-      // UploadTask uploadTask = FirebaseStorage.instance
-      //     .ref("categoryImages")
-      //     .child(DateTime.now().millisecondsSinceEpoch.toString())
-      //     .putFile(categoryFile);
-
-      // TaskSnapshot snapshot = await uploadTask;
-      // imageUrl = await snapshot.ref.getDownloadURL();
     }
     if (menuItemData != null) {
       await firebaseService.manageCategoryProduct(
@@ -103,6 +90,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
           time: DateTime.now().millisecondsSinceEpoch
       );
       showToast("Category Added");
+      Helper.hideLoader(loader);
+
     }
     Get.back();
   }

@@ -39,6 +39,8 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
   bool showValidation = false;
   bool showValidationImg = false;
   Future<void> addresturentToFirestore() async {
+    OverlayEntry loader = Helper.overlayLoader(context);
+    Overlay.of(context).insert(loader);
     if(!formKey.currentState!.validate())return;
     if(categoryFile.path.isEmpty){
       showToast("Please select category image");
@@ -54,10 +56,6 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     }
     String imageUrl = categoryFile.path;
     if (!categoryFile.path.contains("https")) {
-      // if (resturentData != null) {
-      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-      //   await gg.delete();
-      // }
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
@@ -66,19 +64,9 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       TaskSnapshot snapshot = await uploadTask;
       imageUrl = await snapshot.ref.getDownloadURL();
     } else {
-      // if (resturentData != null) {
-      //   Reference gg = FirebaseStorage.instance.refFromURL(categoryFile.path);
-      //   await gg.delete();
-      // }
-      // UploadTask uploadTask = FirebaseStorage.instance
-      //     .ref("categoryImages")
-      //     .child(DateTime.now().millisecondsSinceEpoch.toString())
-      //     .putFile(categoryFile);
-      //
-      // TaskSnapshot snapshot = await uploadTask;
-      // imageUrl = await snapshot.ref.getDownloadURL();
     }
       if (resturentData != null) {
+
         await firebaseService.manageCategoryProduct(
           documentReference: widget.collectionReference.doc(resturentData!.docid),
           deactivate: resturentData!.deactivate,
@@ -89,6 +77,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           searchName: arrangeNumbers,
         );
         showToast("Category Updated");
+
       }
       else {
         await firebaseService.manageCategoryProduct(
@@ -102,8 +91,10 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           time: DateTime.now().millisecondsSinceEpoch
         );
         showToast("Category Added");
+
       }
-      Get.back();
+    Helper.hideLoader(loader);
+    Get.back();
   }
 
   @override

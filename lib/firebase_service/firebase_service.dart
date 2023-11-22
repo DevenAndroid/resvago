@@ -16,6 +16,7 @@ class FirebaseService {
   }) async {
     try {
       if (time != null) {
+
         await documentReference.set({
           "name": name,
           "image": image,

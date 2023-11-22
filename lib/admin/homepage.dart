@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
+import 'package:resvago/admin/dining_order_list.dart';
 import 'package:resvago/admin/loginscreen.dart';
 import 'package:resvago/admin/order_list_screen.dart';
 import 'package:resvago/admin/vendor_datalist.dart';
@@ -226,7 +227,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                       ListTile(
                         title: const Text('Dining'),
                         onTap: () {
-                          Get.to(const UsersDataScreen());
+                          Get.to(const DiningorderListScreen());
                         },
                       ),
                     ],

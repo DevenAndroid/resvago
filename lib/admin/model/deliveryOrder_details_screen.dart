@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:resvago/admin/model/dining_order_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:resvago/components/my_textfield.dart';
 
@@ -14,8 +15,9 @@ import 'delivery_order_details_modal.dart';
 
 
 class DeliveryOderDetailsScreen extends StatefulWidget {
-  const DeliveryOderDetailsScreen({super.key, required this.model});
-  final MyOrderModel model;
+  const DeliveryOderDetailsScreen({super.key, this.model, this.diningOrderModel});
+  final MyOrderModel? model;
+  final MyDiningOrderModel? diningOrderModel;
 
   @override
   State<DeliveryOderDetailsScreen> createState() =>

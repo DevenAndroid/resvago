@@ -26,7 +26,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
           title: const Text(
-            'Order List',
+            'Delivery Order List',
             style: TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
           ),
           leading: Padding(
@@ -90,7 +90,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
                     return users.isNotEmpty
                         ? ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: users.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
@@ -200,7 +200,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
                     return users.isNotEmpty
                         ? ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: users.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
@@ -310,7 +310,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
                     return users.isNotEmpty
                         ? ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: users.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
@@ -420,7 +420,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
                     return users.isNotEmpty
                         ? ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         itemCount: users.length,
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
