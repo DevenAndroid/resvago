@@ -229,72 +229,76 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                     content: const Text(
                                                         "Are you sure you want to delete this Product Categor"),
                                                     actions: <Widget>[
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(
-                                                                  ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .red,
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(
-                                                                  14),
-                                                          child:
-                                                              const Center(
-                                                                  child:
-                                                                      Text(
-                                                            "Cancel",
-                                                            style: TextStyle(
+                                                      Expanded(
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
                                                                 color: Colors
-                                                                    .white),
-                                                          )),
+                                                                    .red,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(
+                                                                    14),
+                                                            child:
+                                                                const Center(
+                                                                    child:
+                                                                        Text(
+                                                              "Cancel",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
+                                                          ),
                                                         ),
                                                       ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          widget
-                                                              .collectionReference
-                                                              .doc(item
-                                                                  .docid)
-                                                              .delete()
-                                                              .then(
-                                                                  (value) {
-                                                            setState(
-                                                                () {});
-                                                          });
-                                                          Navigator.of(
-                                                                  ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .green,
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(
-                                                                  14),
-                                                          child:
-                                                              const Center(
-                                                                  child:
-                                                                      Text(
-                                                            "okay",
-                                                            style: TextStyle(
+                                                      Expanded(
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            widget
+                                                                .collectionReference
+                                                                .doc(item
+                                                                    .docid)
+                                                                .delete()
+                                                                .then(
+                                                                    (value) {
+                                                              setState(
+                                                                  () {});
+                                                            });
+                                                            Navigator.of(
+                                                                    ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
                                                                 color: Colors
-                                                                    .white),
-                                                          )),
+                                                                    .green,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(
+                                                                    14),
+                                                            child:
+                                                                const Center(
+                                                                    child:
+                                                                        Text(
+                                                              "okay",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
+                                                          ),
                                                         ),
                                                       ),
                                                     ],

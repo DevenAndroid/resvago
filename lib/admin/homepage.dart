@@ -14,7 +14,7 @@ import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'customeruser_list.dart';
-import 'menuitem_list_screen.dart';
+import 'productcategory_list_screen.dart';
 import 'model/deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
 import 'model/dining_order_model.dart';
@@ -413,7 +413,7 @@ class LineChartSample1State extends State<LineChartSample1> {
 
                       return diningOrders.isNotEmpty
                           ? ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: const AlwaysScrollableScrollPhysics(),
                           itemCount: diningOrders.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
@@ -523,7 +523,7 @@ class LineChartSample1State extends State<LineChartSample1> {
 
                       return users.isNotEmpty
                           ? ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
+                          physics: const AlwaysScrollableScrollPhysics(),
                           itemCount: users.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
