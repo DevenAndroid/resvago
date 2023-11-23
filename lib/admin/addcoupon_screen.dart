@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/admin/model/coupen_model.dart';
 import 'package:resvago/admin/model/vendor_register_model.dart';
+import 'package:resvago/components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import 'Couponlist_Screen.dart';
@@ -68,6 +69,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   }
 
   void addCouponToFirestore() {
+    OverlayEntry loader = Helper.overlayLoader(context);
+    Overlay.of(context).insert(loader);
     String promocodename = titleController.text;
     String code = codeController.text;
     String maxDiscount = maxDiscountController.text;
@@ -98,17 +101,29 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
       FirebaseFirestore.instance
           .collection('Coupon_data')
           .doc(widget.documentId)
-          .update(user.toMap()).then((value) => Get.off(CouponListScreen(
-        username: userValue!.restaurantName.toString(),
-      )));
+          .update(user.toMap()).then((value) async{
+        showToast('Coupon Updated');
+        Helper.hideLoader(loader);
+        await Get.off(CouponListScreen(
+          username: userValue!.restaurantName.toString(),
+        ));
+
+      });
     } else {
       FirebaseFirestore.instance
           .collection('Coupon_data')
           .doc()
           .set(user.toMap())
-          .then((value) => Get.off(CouponListScreen(
-                username: userValue!.restaurantName.toString(),
-              )));
+          .then((value) async {
+        showToast('Coupon Added');
+        Helper.hideLoader(loader);
+        await Get.off(CouponListScreen(
+          username: userValue!.restaurantName.toString(),
+        ));
+
+      }
+
+      );
     }
   }
 
@@ -148,7 +163,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Add Coupon', context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit Coupon' : 'Add Coupon', context: context),
         backgroundColor: const Color(0xff3B5998),
         body: Form(
             key: formKey,

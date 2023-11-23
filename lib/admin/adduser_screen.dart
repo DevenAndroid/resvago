@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,16 +9,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
 import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:resvago/admin/model/user_model.dart';
 import 'package:resvago/admin/userdata_screen.dart';
+import '../components/addsize.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import 'location_controller.dart';
 import 'model/resturent_model.dart';
 
 class AddUsersScreen extends StatefulWidget {
@@ -54,6 +59,8 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
   TextEditingController categoryController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+  final locationController = Get.put(LocationController());
+
   File categoryFile = File("");
   UserData? get userData => widget.userData;
   List<ResturentData>? categoryList;
@@ -91,23 +98,28 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
       setState(() {});
     });
   }
+  String code = "+91";
 
   void checkEmailInFirestore() async {
-    if(widget.isEditMode){
-      addusersToFirestore();
-      return;
-    }
     final QuerySnapshot result = await FirebaseFirestore.instance
         .collection('vendor_users')
         .where('email', isEqualTo: emailController.text)
         .get();
-
     if (result.docs.isNotEmpty) {
-      showToast('Email already exits');
-    } else {
-      addusersToFirestore();
+      Fluttertoast.showToast(msg: 'Email already exits');
+      return;
     }
+    final QuerySnapshot phoneResult = await FirebaseFirestore.instance
+        .collection('vendor_users')
+        .where('mobileNumber', isEqualTo: code + phoneNumberController.text)
+        .get();
+    if (phoneResult.docs.isNotEmpty) {
+      Fluttertoast.showToast(msg: 'Mobile Number already exits');
+      return;
+    }
+    addusersToFirestore();
   }
+
 
   Future<void> addusersToFirestore() async {
     OverlayEntry loader = Helper.overlayLoader(context);
@@ -117,7 +129,6 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
     String category = categoryValue!;
     String phoneNumber = phoneNumberController.text;
     String? address = _address;
-    String imageUrl = categoryFile.path;
     Timestamp currentTime = Timestamp.now();
 
     List<String> arrangeNumbers = [];
@@ -127,15 +138,14 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
       arrangeNumbers.add(userNumber.substring(0, i + 1));
     }
 
-
-    if (!categoryFile.path.contains("https")) {
+    String imageUrlProfile = categoryFile.path;
+    if (!categoryFile.path.contains("http")) {
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
           .putFile(categoryFile);
-
       TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
+      imageUrlProfile = await snapshot.ref.getDownloadURL();
     }
     if (name.isNotEmpty && email.isNotEmpty) {
       UserData users = UserData(
@@ -143,11 +153,11 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
           searchName: arrangeNumbers,
           email: email,
           deactivate: false,
-          image: imageUrl,
+          image: imageUrlProfile,
           category: category,
           mobileNumber: phoneNumber,
           address: address,
-          docid: "+91$phoneNumber",
+          docid: code + phoneNumber,
           latitude: latitude.toString(),
           longitude: longitude.toString(),
           time: currentTime);
@@ -157,11 +167,12 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
             .doc(widget.documentId)
             .update(users.toMap());
         Helper.hideLoader(loader);
+        showToast('Updated User Details');
 
       } else {
         FirebaseFirestore.instance
             .collection('vendor_users')
-            .doc("+91$phoneNumber")
+            .doc(code + phoneNumber)
             .set(users.toMap())
             .then((value) => () {
 
@@ -172,9 +183,13 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                   addressController.clear();
                 });
         Helper.hideLoader(loader);
+        showToast('User Details Added');
+
 
       }
       Get.back();
+      Helper.hideLoader(loader);
+
     }
   }
 
@@ -192,13 +207,15 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
       log(categoryValue.toString());
     }
     getVendorCategories();
+    locationController.checkGps(context).then((value) {});
+    locationController.getLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Add Users', context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit Users' :'Add Users', context: context),
         backgroundColor: const Color(0xff3B5998),
         body: Form(
             key: formKey,
@@ -255,7 +272,6 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                       return 'Please enter your email';
                                     }
                                   },
-                                  realonly: widget.isEditMode,
                                   controller: emailController,
                                   hintText: 'Enter Email',
                                   obscureText: false,
@@ -383,19 +399,54 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                   child: Text("Phone Number",style: TextStyle(color: Colors.black),),
                                 ),
                                 const SizedBox(height: 5),
-                                MyTextField(
-                                  validator: (value) {
-                                    if (value!.isEmpty) {
-                                      return 'Please enter your phone number';
-                                    }
-                                  },
-                                  realonly: widget.isEditMode,
-                                  controller: phoneNumberController,
-                                  length: 10,
-                                  hintText: 'Enter Phone Number',
-                                  obscureText: false,
-                                  keyboardtype: TextInputType.phone,
-                                  color: Colors.white,
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 17,right: 17),
+                                  child: IntlPhoneField(
+                                    cursorColor: Colors.black,
+                                    dropdownIcon: const Icon(
+                                      Icons.arrow_drop_down_rounded,
+                                      color: Colors.black,
+                                    ),
+                                    dropdownTextStyle: const TextStyle(color: Colors.black),
+                                    style: const TextStyle(color: Colors.black),
+                                    flagsButtonPadding: const EdgeInsets.all(8),
+                                    dropdownIconPosition: IconPosition.trailing,
+                                    controller: phoneNumberController,
+                                    decoration: InputDecoration(
+                                        hintStyle: GoogleFonts.poppins(
+                                          color: const Color(0xFF384953),
+                                          textStyle: GoogleFonts.poppins(
+                                            color: const Color(0xFF384953),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300,
+                                          ),
+                                          fontSize: 14,
+                                          // fontFamily: 'poppins',
+                                          fontWeight: FontWeight.w300,
+                                        ),
+                                        hintText: 'Phone Number',
+                                        // labelStyle: TextStyle(color: Colors.black),
+                                        border: const OutlineInputBorder(
+                                          borderSide: BorderSide(),
+                                        ),
+                                        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953))),
+                                        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953)))),
+                                    initialCountryCode: 'IN',
+                                    keyboardType: TextInputType.number,
+                                    onCountryChanged: (phone){
+                                      setState(() {
+                                        code = "+${phone.dialCode}";
+                                        log(code.toString());
+                                      });
+                                    },
+                                    onChanged: (phone) {
+                                      // log("fhdfhdf");
+                                      // setState(() {
+                                      //   code = phone.countryCode.toString();
+                                      //   log(code.toString());
+                                      // });
+                                    },
+                                  ),
                                 ),
                                 const SizedBox(height: 10),
                                 const Padding(
@@ -536,17 +587,66 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
                                                   height: 180,
                                                   alignment:
                                                       Alignment.center,
-                                                  child: Image.file(
-                                                      categoryFile,
-                                                      errorBuilder: (_,
-                                                              __, ___) =>
-                                                          Image.network(
-                                                              categoryFile
-                                                                  .path,
-                                                              errorBuilder: (_,
-                                                                      __,
-                                                                      ___) =>
-                                                                  const SizedBox())),
+                                                  child: categoryFile.path
+                                                      .contains(
+                                                      "http") ||
+                                                      categoryFile
+                                                          .path.isEmpty
+                                                      ? Image.network(
+                                                    categoryFile.path,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (_, __,
+                                                        ___) =>
+                                                        CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl:
+                                                          categoryFile
+                                                              .path,
+                                                          height:
+                                                          AddSize.size30,
+                                                          width:
+                                                          AddSize.size30,
+                                                          errorWidget:
+                                                              (_, __, ___) =>
+                                                          const Icon(
+                                                            Icons.person,
+                                                            size: 60,
+                                                          ),
+                                                          placeholder: (
+                                                              _,
+                                                              __,
+                                                              ) =>
+                                                          const SizedBox(),
+                                                        ),
+                                                  )
+                                                      : Image.memory(
+                                                    categoryFile
+                                                        .readAsBytesSync(),
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (_, __,
+                                                        ___) =>
+                                                        CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl:
+                                                          categoryFile
+                                                              .path,
+                                                          height:
+                                                          AddSize.size30,
+                                                          width:
+                                                          AddSize.size30,
+                                                          errorWidget:
+                                                              (_, __, ___) =>
+                                                          const Icon(
+                                                            Icons.person,
+                                                            size: 60,
+                                                          ),
+                                                          placeholder: (
+                                                              _,
+                                                              __,
+                                                              ) =>
+                                                          const SizedBox(),
+                                                        ),
+                                                  )
                                                 ),
                                               ],
                                             )
@@ -636,32 +736,9 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
               Helper.addImagePicker(
                       imageSource: ImageSource.camera, imageQuality: 75)
                   .then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+
+                if (value != null) {
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 
@@ -675,32 +752,9 @@ class _AddUsersScreenState extends State<AddUsersScreen> {
               Helper.addImagePicker(
                       imageSource: ImageSource.gallery, imageQuality: 75)
                   .then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+
+                if (value != null) {
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 

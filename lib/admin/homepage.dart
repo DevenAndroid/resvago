@@ -15,6 +15,7 @@ import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'customeruser_list.dart';
+import 'diningOrders_details_screen.dart';
 import 'productcategory_list_screen.dart';
 import 'model/deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
@@ -430,7 +431,9 @@ class LineChartSample1State extends State<LineChartSample1> {
                                 final item = diningOrders[index];
                                 return GestureDetector(
                                   onTap: () {
-                                    //Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                                    Get.to(() => OderDetailsScreen(
+                                      myDiningOrderModel: item,
+                                    ));
                                   },
                                   child: Container(
                                     height: 120,

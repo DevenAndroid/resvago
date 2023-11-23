@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
+import '../components/addsize.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -54,17 +56,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
     for (var i = 0; i < kk.length; i++) {
       arrangeNumbers.add(kk.substring(0, i + 1));
     }
-    String imageUrl = categoryFile.path;
-    print("manish${categoryFile.path}");
-    if (!categoryFile.path.contains("https")) {
+    String imageUrlProfile = categoryFile.path;
+    if (!categoryFile.path.contains("http")) {
       UploadTask uploadTask = FirebaseStorage.instance
           .ref("categoryImages")
           .child(DateTime.now().millisecondsSinceEpoch.toString())
           .putFile(categoryFile);
-
       TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
-    } else {
+      imageUrlProfile = await snapshot.ref.getDownloadURL();
     }
     if (menuItemData != null) {
       await firebaseService.manageCategoryProduct(
@@ -72,7 +71,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         deactivate: menuItemData!.deactivate,
         description: descriptionController.text.trim(),
         docid: menuItemData!.docid,
-        image: imageUrl,
+        image: imageUrlProfile,
         name: kk,
         searchName: arrangeNumbers,
       );
@@ -86,7 +85,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           deactivate: false,
           description: descriptionController.text.trim(),
           docid: DateTime.now().millisecondsSinceEpoch,
-          image: imageUrl,
+          image: imageUrlProfile,
           name: kk,
           searchName: arrangeNumbers,
           time: DateTime.now().millisecondsSinceEpoch
@@ -205,11 +204,66 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                       width: double.maxFinite,
                                       height: 180,
                                       alignment: Alignment.center,
-                                      child: Image.file(categoryFile,
-                                          errorBuilder: (_, __, ___) =>
-                                              Image.network(categoryFile.path,
-                                                  errorBuilder: (_, __, ___) =>
-                                                      SizedBox())),
+                                      child: categoryFile.path
+                                          .contains(
+                                          "http") ||
+                                          categoryFile
+                                              .path.isEmpty
+                                          ? Image.network(
+                                        categoryFile.path,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __,
+                                            ___) =>
+                                            CachedNetworkImage(
+                                              fit: BoxFit.cover,
+                                              imageUrl:
+                                              categoryFile
+                                                  .path,
+                                              height:
+                                              AddSize.size30,
+                                              width:
+                                              AddSize.size30,
+                                              errorWidget:
+                                                  (_, __, ___) =>
+                                              const Icon(
+                                                Icons.person,
+                                                size: 60,
+                                              ),
+                                              placeholder: (
+                                                  _,
+                                                  __,
+                                                  ) =>
+                                              const SizedBox(),
+                                            ),
+                                      )
+                                          : Image.memory(
+                                        categoryFile
+                                            .readAsBytesSync(),
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __,
+                                            ___) =>
+                                            CachedNetworkImage(
+                                              fit: BoxFit.cover,
+                                              imageUrl:
+                                              categoryFile
+                                                  .path,
+                                              height:
+                                              AddSize.size30,
+                                              width:
+                                              AddSize.size30,
+                                              errorWidget:
+                                                  (_, __, ___) =>
+                                              const Icon(
+                                                Icons.person,
+                                                size: 60,
+                                              ),
+                                              placeholder: (
+                                                  _,
+                                                  __,
+                                                  ) =>
+                                              const SizedBox(),
+                                            ),
+                                      )
                                     ),
                                   ],
                                 )
@@ -292,32 +346,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           CupertinoActionSheetAction(
             onPressed: () {
               Helper.addImagePicker(imageSource: ImageSource.camera, imageQuality: 75).then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+
+                if (value != null) {
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 
@@ -329,32 +360,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
           CupertinoActionSheetAction(
             onPressed: () {
               Helper.addImagePicker(imageSource: ImageSource.gallery, imageQuality: 75).then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+
+                if (value != null) {
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 

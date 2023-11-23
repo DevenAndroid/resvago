@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:resvago/admin/diningOrders_details_screen.dart';
 import 'model/deliveryOrder_details_screen.dart';
 import 'model/dining_order_model.dart';
 
@@ -95,7 +96,7 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                             final item = users[index];
                             return GestureDetector(
                               onTap: (){
-                                Get.to(()=> DeliveryOderDetailsScreen(diningOrderModel: item,));
+                                Get.to(()=> OderDetailsScreen( myDiningOrderModel: item,));
                               },
                               child: Container(
                                 height: 120,
@@ -210,7 +211,7 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                             final item = users[index];
                             return GestureDetector(
                               onTap: (){
-                                Get.to(()=> DeliveryOderDetailsScreen(diningOrderModel: item,));
+                                Get.to(()=> OderDetailsScreen( myDiningOrderModel: item,));
                               },
                               child: Container(
                                 height: 120,
@@ -325,7 +326,7 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                             final item = users[index];
                             return GestureDetector(
                               onTap: (){
-                                Get.to(()=> DeliveryOderDetailsScreen(diningOrderModel: item,));
+                                Get.to(()=> OderDetailsScreen( myDiningOrderModel: item,));
                               },
                               child: Container(
                                 height: 120,
@@ -440,7 +441,7 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                             final item = users[index];
                             return GestureDetector(
                               onTap: (){
-                                Get.to(()=> DeliveryOderDetailsScreen(diningOrderModel: item,));
+                                Get.to(()=> OderDetailsScreen( myDiningOrderModel: item,));
                               },
                               child: Container(
                                 height: 120,

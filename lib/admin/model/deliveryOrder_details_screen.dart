@@ -15,9 +15,8 @@ import 'delivery_order_details_modal.dart';
 
 
 class DeliveryOderDetailsScreen extends StatefulWidget {
-  const DeliveryOderDetailsScreen({super.key, this.model, this.diningOrderModel});
+  const DeliveryOderDetailsScreen({super.key, this.model,});
   final MyOrderModel? model;
-  final MyDiningOrderModel? diningOrderModel;
 
   @override
   State<DeliveryOderDetailsScreen> createState() =>
@@ -174,9 +173,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                             const SizedBox(
                                               width: 15,
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8.0),
+                                            Expanded(
                                               child: Column(
                                                 mainAxisAlignment:
                                                 MainAxisAlignment.start,
@@ -198,18 +195,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                                             FontWeight.w600,
                                                             fontSize: 15),
                                                       ),
-                                                      const SizedBox(
-                                                        width: 150,
-                                                      ),
-                                                      Text(
-                                                        "\$${item.price}",
-                                                        style: GoogleFonts.poppins(
-                                                            color: const Color(
-                                                                0xFF384953),
-                                                            fontWeight:
-                                                            FontWeight.w300,
-                                                            fontSize: 15),
-                                                      ),
+
                                                     ],
                                                   ),
                                                   const SizedBox(
@@ -226,7 +212,17 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                                   ),
                                                 ],
                                               ),
-                                            )
+                                            ),
+                                            Text(
+                                              "\$${item.price}",
+                                              style: GoogleFonts.poppins(
+                                                  color: const Color(
+                                                      0xFF384953),
+                                                  fontWeight:
+                                                  FontWeight.w300,
+                                                  fontSize: 15),
+                                            ),
+                                            SizedBox(width: 10,)
                                           ],
                                         ),
                                         Divider(

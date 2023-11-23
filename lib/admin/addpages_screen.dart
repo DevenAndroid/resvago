@@ -68,7 +68,7 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Add pages', context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit pages' : 'Add pages', context: context),
         backgroundColor: Color(0xff3B5998),
         body: Form(
             key: formKey,
