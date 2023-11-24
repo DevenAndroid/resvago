@@ -6,7 +6,6 @@ import 'package:resvago/admin/loginscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
 
   if(kIsWeb){
     await Firebase.initializeApp(
@@ -18,6 +17,8 @@ Future<void> main() async {
         )
     );
   }
+  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
