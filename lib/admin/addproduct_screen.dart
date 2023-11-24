@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -112,224 +113,226 @@ class _AddProductScreenState extends State<AddProductScreen> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         appBar: backAppBar(title: 'Add product category', context: context),
-        backgroundColor: Color(0xff3B5998),
         body: Form(
           key: formKey,
           child: SizedBox(
             height: size.height,
             width: size.width,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        color: Colors.white,),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
-                          .copyWith(bottom: 0),
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          const SizedBox(height: 10),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 25),
-                            child: Text("Title",style: TextStyle(color: Colors.black),),
-                          ),
-                          const SizedBox(height: 5),
-                          MyTextField(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter Restaurant Name';
-                              }
-                              return null;
-                            },
-                            controller: nameController,
-                            hintText: 'Title',
-                            obscureText: false,
-                            color: Colors.white,
-                          ),
+            child: Padding(
+              padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          color: Colors.white,),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01)
+                            .copyWith(bottom: 0),
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            const SizedBox(height: 10),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text("Title",style: TextStyle(color: Colors.black),),
+                            ),
+                            const SizedBox(height: 5),
+                            MyTextField(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter Restaurant Name';
+                                }
+                                return null;
+                              },
+                              controller: nameController,
+                              hintText: 'Title',
+                              obscureText: false,
+                              color: Colors.white,
+                            ),
 
-                          const SizedBox(height: 20),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 25),
-                            child: Text("Description",style: TextStyle(color: Colors.black),),
-                          ),
-                          const SizedBox(height: 5),
-                          MyTextField(
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Please enter Description';
-                              }
-                              return null;
-                            },
-                            controller: descriptionController,
-                            hintText: 'Description',
-                            obscureText: false,
-                            minLines: 5,
-                            maxLines: 5,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(
-                            height: 20,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: DottedBorder(
-                              borderType: BorderType.RRect,
-                              radius: const Radius.circular(20),
-                              padding: const EdgeInsets.only(
-                                  left: 40, right: 40, bottom: 10),
-                              color: showValidationImg == false
-                                  ? const Color(0xFFFAAF40)
-                                  : Colors.red,
-                              dashPattern: const [6],
-                              strokeWidth: 1,
-                              child: InkWell(
-                                onTap: () {
-                                  _showActionSheet(context);
-                                },
-                                child: categoryFile.path != ""
-                                    ? Stack(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white,
-                                        image: DecorationImage(
-                                            image: FileImage(categoryFile),
-                                            fit: BoxFit.fill),
-                                      ),
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 10, horizontal: 10),
-                                      width: double.maxFinite,
-                                      height: 180,
-                                      alignment: Alignment.center,
-                                      child: categoryFile.path
-                                          .contains(
-                                          "http") ||
-                                          categoryFile
-                                              .path.isEmpty
-                                          ? Image.network(
-                                        categoryFile.path,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __,
-                                            ___) =>
-                                            CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl:
-                                              categoryFile
-                                                  .path,
-                                              height:
-                                              AddSize.size30,
-                                              width:
-                                              AddSize.size30,
-                                              errorWidget:
-                                                  (_, __, ___) =>
-                                              const Icon(
-                                                Icons.person,
-                                                size: 60,
-                                              ),
-                                              placeholder: (
-                                                  _,
-                                                  __,
-                                                  ) =>
-                                              const SizedBox(),
-                                            ),
-                                      )
-                                          : Image.memory(
-                                        categoryFile
-                                            .readAsBytesSync(),
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __,
-                                            ___) =>
-                                            CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl:
-                                              categoryFile
-                                                  .path,
-                                              height:
-                                              AddSize.size30,
-                                              width:
-                                              AddSize.size30,
-                                              errorWidget:
-                                                  (_, __, ___) =>
-                                              const Icon(
-                                                Icons.person,
-                                                size: 60,
-                                              ),
-                                              placeholder: (
-                                                  _,
-                                                  __,
-                                                  ) =>
-                                              const SizedBox(),
-                                            ),
-                                      )
-                                    ),
-                                  ],
-                                )
-                                    : Container(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 8),
-                                  width: double.maxFinite,
-                                  height: 130,
-                                  alignment: Alignment.center,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                            const SizedBox(height: 20),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 25),
+                              child: Text("Description",style: TextStyle(color: Colors.black),),
+                            ),
+                            const SizedBox(height: 5),
+                            MyTextField(
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter Description';
+                                }
+                                return null;
+                              },
+                              controller: descriptionController,
+                              hintText: 'Description',
+                              obscureText: false,
+                              minLines: 5,
+                              maxLines: 5,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 15),
+                              child: DottedBorder(
+                                borderType: BorderType.RRect,
+                                radius: const Radius.circular(20),
+                                padding: const EdgeInsets.only(
+                                    left: 40, right: 40, bottom: 10),
+                                color: showValidationImg == false
+                                    ? const Color(0xFFFAAF40)
+                                    : Colors.red,
+                                dashPattern: const [6],
+                                strokeWidth: 1,
+                                child: InkWell(
+                                  onTap: () {
+                                    _showActionSheet(context);
+                                  },
+                                  child: categoryFile.path != ""
+                                      ? Stack(
                                     children: [
-                                      Image.asset(
-                                        'assets/images/gallery.png',
-                                        height: 60,
-                                        width: 50,
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      const Text(
-                                        'Accepted file types: JPEG, Doc, PDF, PNG',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black54),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      const SizedBox(
-                                        height: 11,
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10),
+                                          color: Colors.white,
+                                          image: DecorationImage(
+                                              image: FileImage(categoryFile),
+                                              fit: BoxFit.fill),
+                                        ),
+                                        margin: const EdgeInsets.symmetric(
+                                            vertical: 10, horizontal: 10),
+                                        width: double.maxFinite,
+                                        height: 180,
+                                        alignment: Alignment.center,
+                                        child: categoryFile.path
+                                            .contains(
+                                            "http") ||
+                                            categoryFile
+                                                .path.isEmpty
+                                            ? Image.network(
+                                          categoryFile.path,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __,
+                                              ___) =>
+                                              CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl:
+                                                categoryFile
+                                                    .path,
+                                                height:
+                                                AddSize.size30,
+                                                width:
+                                                AddSize.size30,
+                                                errorWidget:
+                                                    (_, __, ___) =>
+                                                const Icon(
+                                                  Icons.person,
+                                                  size: 60,
+                                                ),
+                                                placeholder: (
+                                                    _,
+                                                    __,
+                                                    ) =>
+                                                const SizedBox(),
+                                              ),
+                                        )
+                                            : Image.memory(
+                                          categoryFile
+                                              .readAsBytesSync(),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __,
+                                              ___) =>
+                                              CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl:
+                                                categoryFile
+                                                    .path,
+                                                height:
+                                                AddSize.size30,
+                                                width:
+                                                AddSize.size30,
+                                                errorWidget:
+                                                    (_, __, ___) =>
+                                                const Icon(
+                                                  Icons.person,
+                                                  size: 60,
+                                                ),
+                                                placeholder: (
+                                                    _,
+                                                    __,
+                                                    ) =>
+                                                const SizedBox(),
+                                              ),
+                                        )
                                       ),
                                     ],
+                                  )
+                                      : Container(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 8),
+                                    width: double.maxFinite,
+                                    height: 130,
+                                    alignment: Alignment.center,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/gallery.png',
+                                          height: 60,
+                                          width: 50,
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        const Text(
+                                          'Accepted file types: JPEG, Doc, PDF, PNG',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black54),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        const SizedBox(
+                                          height: 11,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                            height: size.height * .1,
-                          ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            SizedBox(
+                              height: size.height * .1,
+                            ),
 
-                          // sign in button
-                          MyButton(
-                            color: Colors.white,
-                            backgroundcolor:  Colors.black,
-                            onTap: (){
-                              if (formKey.currentState!.validate()) {
-                                addVendorToFirestore();
-                              } else {
-                                showToast('Please add data');
-                              }
-                            },
-                            text: menuItemData != null ? 'Update' : 'Add',
-                          ),
+                            // sign in button
+                            MyButton(
+                              color: Colors.white,
+                              backgroundcolor:  Colors.black,
+                              onTap: (){
+                                if (formKey.currentState!.validate()) {
+                                  addVendorToFirestore();
+                                } else {
+                                  showToast('Please add data');
+                                }
+                              },
+                              text: menuItemData != null ? 'Update' : 'Add',
+                            ),
 
-                          const SizedBox(height: 50),
-                        ]),
+                            const SizedBox(height: 50),
+                          ]),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           )
         ));

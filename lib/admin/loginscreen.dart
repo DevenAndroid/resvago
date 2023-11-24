@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/instance_manager.dart';
@@ -23,20 +24,11 @@ final GoogleSignIn googleSignIn = GoogleSignIn();
 class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   Future<void> checkUserAuth() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    User? user = _auth.currentUser;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    User? user = auth.currentUser;
     if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LineChartSample1()),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LogInScreen()),
-      );
+      Get.offAll(()=>const HomePage());
     }
   }
 
@@ -44,6 +36,7 @@ class _LogInScreenState extends State<LogInScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    //checkUserAuth();
   }
 
   @override
@@ -54,11 +47,14 @@ class _LogInScreenState extends State<LogInScreen> {
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Container(
+          margin: kIsWeb ? EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero ,
           height: Get.height,
           decoration: const BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.fill,
-                  image: AssetImage(
+                  image: kIsWeb ? AssetImage(
+                    "assets/images/loginscreen.png",
+                  ) : AssetImage(
                     "assets/images/login.png",
                   ))),
           child: Padding(
@@ -171,7 +167,7 @@ class _LogInScreenState extends State<LogInScreen> {
                                 'email' : emailController.text.trim(),
                                 'password' : passwordController.text.trim()
                               });
-                      Get.to(const LineChartSample1());
+                      Get.to(const HomePage());
                       Helper.hideLoader(loader);
                     }).catchError((error) {
                       Helper.hideLoader(loader);

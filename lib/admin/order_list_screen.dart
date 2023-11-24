@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -54,491 +55,494 @@ class _OrderListScreenState extends State<OrderListScreen> {
             ),
           ],
         ),
-      body: DefaultTabController(
-        length: 4,
-        child: Column(children: [
-          const TabBar(
-              labelColor: Color(0xFF454B5C),
-              indicatorColor: Color(0xFF3B5998),
-              indicatorWeight: 4,
-              tabs: [
-                Tab(
-                  text: "Active",
-                ),
-                Tab(
-                  text: "Completed",
-                ),
-                Tab(
-                  text: "Due",
-                ),
-                Tab(
-                  text: "Cancelled",
-                ),
+      body: Padding(
+        padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+        child: DefaultTabController(
+          length: 4,
+          child: Column(children: [
+            const TabBar(
+                labelColor: Color(0xFF454B5C),
+                indicatorColor: Color(0xFF3B5998),
+                indicatorWeight: 4,
+                tabs: [
+                  Tab(
+                    text: "Active",
+                  ),
+                  Tab(
+                    text: "Completed",
+                  ),
+                  Tab(
+                    text: "Due",
+                  ),
+                  Tab(
+                    text: "Cancelled",
+                  ),
 
-              ]),
-          Expanded(
-            child: TabBarView(children: [
-              StreamBuilder<List<MyOrderModel>>(
-                stream: getOrdersStreamFromFirestore(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<MyOrderModel> users = snapshot.data ?? [];
+                ]),
+            Expanded(
+              child: TabBarView(children: [
+                StreamBuilder<List<MyOrderModel>>(
+                  stream: getOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyOrderModel> users = snapshot.data ?? [];
 
-                    return users.isNotEmpty
-                        ? ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: users.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                      final item = users[index];
-                      return GestureDetector(
-                        onTap: (){
-                          Get.to(()=> DeliveryOderDetailsScreen(model: item,));
-                        },
-                        child: Container(
-                          height: 120,
-                          width: Get.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(11),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 2,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 100,
-                                width: 110,
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 10),
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(25)),
-                              ),
-                               Expanded(
-                                 child: Column(
+                      return users.isNotEmpty
+                          ? ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                        final item = users[index];
+                        return GestureDetector(
+                          onTap: (){
+                            Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                          },
+                          child: Container(
+                            height: 120,
+                            width: Get.width,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(11),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 100,
+                                  width: 110,
+                                  margin: const EdgeInsets.symmetric(
+                                      vertical: 10, horizontal: 10),
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(25)),
+                                ),
+                                 Expanded(
+                                   child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        item.orderId,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.normal,
+                                            fontSize: 14,
+                                            color: Colors.grey),
+                                      ),
+                                      const SizedBox(height: 3,),
+                                       Text(
+                                        item.orderType,
+                                        style: const TextStyle(
+                                            fontSize: 14, color: Color(0xff1A2E33)),
+                                      ),
+                                      const SizedBox(height: 3,),
+                                       Text(
+                                        item.orderDetails!.restaurantInfo!.restaurantName,
+                                        style:
+                                        const TextStyle(fontSize: 12, color: Colors.grey),
+                                      )
+                                    ],
+                                                                 ),
+                                 ),
+                                const SizedBox(width: 5,),
+                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      item.orderId,
+                                    Text(DateFormat("dd-mm-yy").format(
+                                        DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                       style: const TextStyle(
                                           fontWeight: FontWeight.normal,
-                                          fontSize: 14,
+                                          fontSize: 12,
                                           color: Colors.grey),
                                     ),
-                                    const SizedBox(height: 3,),
-                                     Text(
-                                      item.orderType,
+                                    const SizedBox(height: 10,),
+                                    Text(
+                                      '\$${item.total}',
                                       style: const TextStyle(
-                                          fontSize: 14, color: Color(0xff1A2E33)),
+                                          fontSize: 17, color: Color(0xff1A2E33)),
                                     ),
-                                    const SizedBox(height: 3,),
-                                     Text(
-                                      item.orderDetails!.restaurantInfo!.restaurantName,
-                                      style:
-                                      const TextStyle(fontSize: 12, color: Colors.grey),
-                                    )
                                   ],
-                                                               ),
-                               ),
-                              const SizedBox(width: 5,),
-                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(DateFormat("dd-mm-yy").format(
-                                      DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 12,
-                                        color: Colors.grey),
-                                  ),
-                                  const SizedBox(height: 10,),
-                                  Text(
-                                    '\$${item.total}',
-                                    style: const TextStyle(
-                                        fontSize: 17, color: Color(0xff1A2E33)),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 10,)
-                            ],
+                                ),
+                                SizedBox(width: 10,)
+                              ],
+                            ),
                           ),
-                        ),
+                        );
+                      })
+                          : const Center(
+                        child: Text("No User Found"),
                       );
-                    })
-                        : const Center(
-                      child: Text("No User Found"),
-                    );
-                  }
-                  return const CircularProgressIndicator();
-                },
-              ),
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
 
-              StreamBuilder<List<MyOrderModel>>(
-                stream: getCompletedOrdersStreamFromFirestore(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<MyOrderModel> users = snapshot.data ?? [];
+                StreamBuilder<List<MyOrderModel>>(
+                  stream: getCompletedOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyOrderModel> users = snapshot.data ?? [];
 
-                    return users.isNotEmpty
-                        ? ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: users.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final item = users[index];
-                          return GestureDetector(
-                            onTap: (){
-                              Get.to(()=> DeliveryOderDetailsScreen(model: item,));
-                            },
-                            child: Container(
-                              height: 120,
-                              width: Get.width,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(11),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 100,
-                                    width: 110,
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(25)),
-                                  ),
-                                  Expanded(
-                                    child: Column(
+                      return users.isNotEmpty
+                          ? ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = users[index];
+                            return GestureDetector(
+                              onTap: (){
+                                Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                              },
+                              child: Container(
+                                height: 120,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 110,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(25)),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderDetails!.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5,),
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          item.orderId,
+                                        Text(DateFormat("dd-mm-yy").format(
+                                            DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 14,
+                                              fontSize: 12,
                                               color: Colors.grey),
                                         ),
-                                        const SizedBox(height: 3,),
+                                        const SizedBox(height: 10,),
                                         Text(
-                                          item.orderType,
+                                          '\$${item.total}',
                                           style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
+                                              fontSize: 17, color: Color(0xff1A2E33)),
                                         ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderDetails!.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 5,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(DateFormat("dd-mm-yy").format(
-                                          DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 12,
-                                            color: Colors.grey),
-                                      ),
-                                      const SizedBox(height: 10,),
-                                      Text(
-                                        '\$${item.total}',
-                                        style: const TextStyle(
-                                            fontSize: 17, color: Color(0xff1A2E33)),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10,)
+                                    SizedBox(width: 10,)
 
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        })
-                        : const Center(
-                      child: Text("No User Found"),
-                    );
-                  }
-                  return const CircularProgressIndicator();
-                },
-              ),
+                            );
+                          })
+                          : const Center(
+                        child: Text("No User Found"),
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
 
-              StreamBuilder<List<MyOrderModel>>(
-                stream: getDueOrdersStreamFromFirestore(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<MyOrderModel> users = snapshot.data ?? [];
+                StreamBuilder<List<MyOrderModel>>(
+                  stream: getDueOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyOrderModel> users = snapshot.data ?? [];
 
-                    return users.isNotEmpty
-                        ? ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: users.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final item = users[index];
-                          return GestureDetector(
-                            onTap: (){
-                              Get.to(()=> DeliveryOderDetailsScreen(model: item,));
-                            },
-                            child: Container(
-                              height: 120,
-                              width: Get.width,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(11),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 100,
-                                    width: 110,
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(25)),
-                                  ),
-                                  Expanded(
-                                    child: Column(
+                      return users.isNotEmpty
+                          ? ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = users[index];
+                            return GestureDetector(
+                              onTap: (){
+                                Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                              },
+                              child: Container(
+                                height: 120,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 110,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(25)),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderDetails!.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5,),
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          item.orderId,
+                                        Text(DateFormat("dd-mm-yy").format(
+                                            DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 14,
+                                              fontSize: 12,
                                               color: Colors.grey),
                                         ),
-                                        const SizedBox(height: 3,),
+                                        const SizedBox(height: 10,),
                                         Text(
-                                          item.orderType,
+                                          '\$${item.total}',
                                           style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
+                                              fontSize: 17, color: Color(0xff1A2E33)),
                                         ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderDetails!.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 5,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(DateFormat("dd-mm-yy").format(
-                                          DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 12,
-                                            color: Colors.grey),
-                                      ),
-                                      const SizedBox(height: 10,),
-                                      Text(
-                                        '\$${item.total}',
-                                        style: const TextStyle(
-                                            fontSize: 17, color: Color(0xff1A2E33)),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10,)
+                                    SizedBox(width: 10,)
 
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        })
-                        : const Center(
-                      child: Text("No User Found"),
-                    );
-                  }
-                  return const CircularProgressIndicator();
-                },
-              ),
+                            );
+                          })
+                          : const Center(
+                        child: Text("No User Found"),
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
 
-              StreamBuilder<List<MyOrderModel>>(
-                stream: getCancelledOrdersStreamFromFirestore(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    List<MyOrderModel> users = snapshot.data ?? [];
+                StreamBuilder<List<MyOrderModel>>(
+                  stream: getCancelledOrdersStreamFromFirestore(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      List<MyOrderModel> users = snapshot.data ?? [];
 
-                    return users.isNotEmpty
-                        ? ListView.builder(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: users.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          final item = users[index];
-                          return GestureDetector(
-                            onTap: (){
-                              Get.to(()=> DeliveryOderDetailsScreen(model: item,));
-                            },
-                            child: Container(
-                              height: 120,
-                              width: Get.width,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(11),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                    offset: Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              margin: const EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 10),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 100,
-                                    width: 110,
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(25)),
-                                  ),
-                                  Expanded(
-                                    child: Column(
+                      return users.isNotEmpty
+                          ? ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount: users.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = users[index];
+                            return GestureDetector(
+                              onTap: (){
+                                Get.to(()=> DeliveryOderDetailsScreen(model: item,));
+                              },
+                              child: Container(
+                                height: 120,
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: 100,
+                                      width: 110,
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(25)),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.orderId,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderType,
+                                            style: const TextStyle(
+                                                fontSize: 14, color: Color(0xff1A2E33)),
+                                          ),
+                                          const SizedBox(height: 3,),
+                                          Text(
+                                            item.orderDetails!.restaurantInfo!.restaurantName,
+                                            style:
+                                            const TextStyle(fontSize: 12, color: Colors.grey),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5,),
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          item.orderId,
+                                        Text(DateFormat("dd-mm-yy").format(
+                                            DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.normal,
-                                              fontSize: 14,
+                                              fontSize: 12,
                                               color: Colors.grey),
                                         ),
-                                        const SizedBox(height: 3,),
+                                        const SizedBox(height: 10,),
                                         Text(
-                                          item.orderType,
+                                          '\$${item.total}',
                                           style: const TextStyle(
-                                              fontSize: 14, color: Color(0xff1A2E33)),
+                                              fontSize: 17, color: Color(0xff1A2E33)),
                                         ),
-                                        const SizedBox(height: 3,),
-                                        Text(
-                                          item.orderDetails!.restaurantInfo!.restaurantName,
-                                          style:
-                                          const TextStyle(fontSize: 12, color: Colors.grey),
-                                        )
                                       ],
                                     ),
-                                  ),
-                                  const SizedBox(width: 5,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(DateFormat("dd-mm-yy").format(
-                                          DateTime.parse(DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.normal,
-                                            fontSize: 12,
-                                            color: Colors.grey),
-                                      ),
-                                      const SizedBox(height: 10,),
-                                      Text(
-                                        '\$${item.total}',
-                                        style: const TextStyle(
-                                            fontSize: 17, color: Color(0xff1A2E33)),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(width: 10,)
+                                    SizedBox(width: 10,)
 
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        })
-                        : const Center(
-                      child: Text("No User Found"),
-                    );
-                  }
-                  return const CircularProgressIndicator();
-                },
-              ),
-            ]),
-          )
-        ]),
+                            );
+                          })
+                          : const Center(
+                        child: Text("No User Found"),
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                ),
+              ]),
+            )
+          ]),
+        ),
       ));
   }
   Stream<List<MyOrderModel>> getOrdersStreamFromFirestore() {

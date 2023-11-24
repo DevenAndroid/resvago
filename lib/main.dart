@@ -7,21 +7,19 @@ import 'package:resvago/admin/loginscreen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if(kIsWeb){
+  if (kIsWeb) {
     await Firebase.initializeApp(
         options: const FirebaseOptions(
-          apiKey: "AIzaSyBCol-O-qoqmOCLI_aRN0PeJ5KPvGPVQB8",
-          projectId: "resvago-b7bd4",
-          messagingSenderId: "671324938172",
-          appId: "1:671324938172:web:730e39e60b81133aaed5b9",
-        )
-    );
+      apiKey: "AIzaSyBCol-O-qoqmOCLI_aRN0PeJ5KPvGPVQB8",
+      projectId: "resvago-b7bd4",
+      messagingSenderId: "671324938172",
+      appId: "1:671324938172:web:730e39e60b81133aaed5b9",
+    ));
   }
   await Firebase.initializeApp();
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

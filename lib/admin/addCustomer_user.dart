@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -117,155 +118,174 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        backgroundColor: Color(0xff3B5998),
         appBar: backAppBar(
             title: widget.isEditMode ? 'Edit Customer' : 'Add new Customer',
             context: context),
         body: Form(
             key: formKey,
-            child: Column(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                              horizontal: size.width * .04,
-                              vertical: size.height * .01)
-                          .copyWith(bottom: 0),
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  "userName",
-                                  style: TextStyle(color: Colors.black),
+            child: Padding(
+              padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                                horizontal: size.width * .04,
+                                vertical: size.height * .01)
+                            .copyWith(bottom: 0),
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(
+                                  height: 10,
                                 ),
-                              ),
-                              const SizedBox(height: 5),
-                              MyTextField(
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Please enter your userName';
-                                  }
-                                },
-                                controller: userNameController,
-                                hintText: 'userName',
-                                obscureText: false,
-                                color: Colors.white,
-                              ),
-
-                              const SizedBox(height: 10),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  "Email",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              MyTextField(
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return 'Please enter email';
-                                  }
-                                },
-                                controller: emailController,
-                                hintText: 'Email',
-                                obscureText: false,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(height: 10),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  "Mobile Number",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 17,right: 17),
-                                child: IntlPhoneField(
-                                  cursorColor: Colors.black,
-                                  dropdownIcon: const Icon(
-                                    Icons.arrow_drop_down_rounded,
-                                    color: Colors.black,
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text(
+                                    "userName",
+                                    style: TextStyle(color: Colors.black),
                                   ),
-                                  dropdownTextStyle: const TextStyle(color: Colors.black),
-                                  style: const TextStyle(color: Colors.black),
-                                  flagsButtonPadding: const EdgeInsets.all(8),
-                                  dropdownIconPosition: IconPosition.trailing,
+                                ),
+                                const SizedBox(height: 5),
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter your userName';
+                                    }
+                                  },
+                                  controller: userNameController,
+                                  hintText: 'userName',
+                                  obscureText: false,
+                                  color: Colors.white,
+                                ),
+
+                                const SizedBox(height: 10),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text(
+                                    "Email",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter email';
+                                    }
+                                  },
+                                  controller: emailController,
+                                  hintText: 'Email',
+                                  obscureText: false,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(height: 10),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 25),
+                                  child: Text(
+                                    "Mobile Number",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                widget.isEditMode ?
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter phone number';
+                                    }
+                                  },
                                   controller: mobileNumberController,
-                                  decoration: InputDecoration(
-                                      hintStyle: GoogleFonts.poppins(
-                                        color: const Color(0xFF384953),
-                                        textStyle: GoogleFonts.poppins(
+                                  hintText: 'Enter Phone Number',
+                                  keyboardtype: TextInputType.name,
+                                  obscureText: false,
+                                  realonly: true,
+                                  color: Colors.white,
+                                ) : Padding(
+                                  padding: const EdgeInsets.only(left: 17,right: 17),
+                                  child: IntlPhoneField(
+                                    cursorColor: Colors.black,
+                                    dropdownIcon: const Icon(
+                                      Icons.arrow_drop_down_rounded,
+                                      color: Colors.black,
+                                    ),
+                                    dropdownTextStyle: const TextStyle(color: Colors.black),
+                                    style: const TextStyle(color: Colors.black),
+                                    flagsButtonPadding: const EdgeInsets.all(8),
+                                    readOnly: widget.isEditMode ? true : false,
+                                    dropdownIconPosition: IconPosition.trailing,
+                                    controller: mobileNumberController,
+                                    decoration: InputDecoration(
+                                        hintStyle: GoogleFonts.poppins(
                                           color: const Color(0xFF384953),
+                                          textStyle: GoogleFonts.poppins(
+                                            color: const Color(0xFF384953),
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300,
+                                          ),
                                           fontSize: 14,
+                                          // fontFamily: 'poppins',
                                           fontWeight: FontWeight.w300,
                                         ),
-                                        fontSize: 14,
-                                        // fontFamily: 'poppins',
-                                        fontWeight: FontWeight.w300,
-                                      ),
-                                      hintText: 'Phone Number',
-                                      // labelStyle: TextStyle(color: Colors.black),
-                                      border: const OutlineInputBorder(
-                                        borderSide: BorderSide(),
-                                      ),
-                                      enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953))),
-                                      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953)))),
-                                  initialCountryCode: 'IN',
-                                  keyboardType: TextInputType.number,
-                                  onCountryChanged: (phone){
-                                    setState(() {
-                                      code = "+${phone.dialCode}";
-                                      log(code.toString());
-                                    });
-                                  },
-                                  onChanged: (phone) {
-                                    // log("fhdfhdf");
-                                    // setState(() {
-                                    //   code = phone.countryCode.toString();
-                                    //   log(code.toString());
-                                    // });
-                                  },
+                                        hintText: 'Phone Number',
+                                        // labelStyle: TextStyle(color: Colors.black),
+                                        border: const OutlineInputBorder(
+                                          borderSide: BorderSide(),
+                                        ),
+                                        enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953))),
+                                        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF384953)))),
+                                    initialCountryCode: 'IN',
+                                    keyboardType: TextInputType.number,
+                                    onCountryChanged: (phone){
+                                      setState(() {
+                                        code = "+${phone.dialCode}";
+                                        log(code.toString());
+                                      });
+                                    },
+                                    onChanged: (phone) {
+                                      // log("fhdfhdf");
+                                      // setState(() {
+                                      //   code = phone.countryCode.toString();
+                                      //   log(code.toString());
+                                      // });
+                                    },
+                                  ),
                                 ),
-                              ),
 
 
-                              const SizedBox(height: 10),
+                                const SizedBox(height: 10),
 
-                              const SizedBox(height: 30),
+                                const SizedBox(height: 30),
 
-                              // sign in button
-                              MyButton(
-                                color: Colors.white,
-                                backgroundcolor: Colors.black,
-                                onTap: () {
-                                  if (formKey.currentState!.validate()) {
-                                    checkEmailInFirestore();
-                                  }
-                                },
-                                text: widget.isEditMode
-                                    ? 'Update User'
-                                    : 'Add User',
-                              ),
-                            ]),
+                                // sign in button
+                                MyButton(
+                                  color: Colors.white,
+                                  backgroundcolor: Colors.black,
+                                  onTap: () {
+                                    if (formKey.currentState!.validate()) {
+                                      if(widget.isEditMode)
+                                        addUserToFirestore();
+                                        if(!widget.isEditMode)
+                                      checkEmailInFirestore();
+                                    }
+                                  },
+                                  text: widget.isEditMode
+                                      ? 'Update User'
+                                      : 'Add User',
+                                ),
+                              ]),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             )));
   }
 }

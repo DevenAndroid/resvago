@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -140,147 +141,150 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                         // if (item.deactivate) {
                         //   return SizedBox.shrink();
                         // }
-                        return Container(
-                          height: 90,
-                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                          width: Get.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(11),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 2,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                              child: ListTile(
-                                  contentPadding: EdgeInsets.only(left: 15),
-                                  title: RichText(
-                                    overflow: TextOverflow.clip,
-                                    textAlign: TextAlign.end,
-                                    textDirection: TextDirection.rtl,
-                                    softWrap: true,
-                                    maxLines: 1,
-                                    textScaleFactor: 1,
-                                    text: TextSpan(
-                                      text: item.userName.toString(),
-                                      style: DefaultTextStyle.of(context).style,
+                        return Padding(
+                          padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+                          child: Container(
+                            height: 90,
+                            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                            width: Get.width,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(11),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.2),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                                child: ListTile(
+                                    contentPadding: EdgeInsets.only(left: 15),
+                                    title: RichText(
+                                      overflow: TextOverflow.clip,
+                                      textAlign: TextAlign.end,
+                                      textDirection: TextDirection.rtl,
+                                      softWrap: true,
+                                      maxLines: 1,
+                                      textScaleFactor: 1,
+                                      text: TextSpan(
+                                        text: item.userName.toString(),
+                                        style: DefaultTextStyle.of(context).style,
+                                      ),
                                     ),
-                                  ),
-                                  leading: Container(
-                                    height: 80,
-                                    width: 80,
-                                   child: Icon(Icons.person),
-                                  ),
-                                  subtitle: Text(item.email),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      item.deactivate
-                                          ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
-                                          : const SizedBox(),
-                                      PopupMenuButton<int>(
-                                          padding: EdgeInsets.zero,
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: Colors.black,
-                                          ),
-                                          color: Colors.white,
-                                          itemBuilder: (context) {
-                                            return [
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  Get.to(AddCustomerUserScreen(
-                                                      isEditMode: true,
-                                                      documentId: item.docid,
-                                                    userName: item.userName,
-                                                      email: item.email,
-                                                    phonenumber: item.mobileNumber,
+                                    leading: Container(
+                                      height: 80,
+                                      width: 80,
+                                     child: Icon(Icons.person),
+                                    ),
+                                    subtitle: Text(item.email),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        item.deactivate
+                                            ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                            : const SizedBox(),
+                                        PopupMenuButton<int>(
+                                            padding: EdgeInsets.zero,
+                                            icon: const Icon(
+                                              Icons.more_vert,
+                                              color: Colors.black,
+                                            ),
+                                            color: Colors.white,
+                                            itemBuilder: (context) {
+                                              return [
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    Get.to(AddCustomerUserScreen(
+                                                        isEditMode: true,
+                                                        documentId: item.docid,
+                                                      userName: item.userName,
+                                                        email: item.email,
+                                                      phonenumber: item.mobileNumber,
 
-                                                  ));
-                                                },
-                                                child: const Text("Edit"),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (ctx) => AlertDialog(
-                                                      title: const Text("Delete user"),
-                                                      content: const Text("Are you sure you want to delete this user"),
-                                                      actions: <Widget>[
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(ctx).pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors.red,
-                                                                borderRadius: BorderRadius.circular(11)),
-                                                            width: 100,
-                                                            padding: const EdgeInsets.all(14),
-                                                            child: const Center(
-                                                                child: Text(
-                                                                  "Cancel",
-                                                                  style: TextStyle(color: Colors.white),
-                                                                )),
+                                                    ));
+                                                  },
+                                                  child: const Text("Edit"),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (ctx) => AlertDialog(
+                                                        title: const Text("Delete user"),
+                                                        content: const Text("Are you sure you want to delete this user"),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(ctx).pop();
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors.red,
+                                                                  borderRadius: BorderRadius.circular(11)),
+                                                              width: 100,
+                                                              padding: const EdgeInsets.all(14),
+                                                              child: const Center(
+                                                                  child: Text(
+                                                                    "Cancel",
+                                                                    style: TextStyle(color: Colors.white),
+                                                                  )),
+                                                            ),
                                                           ),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () {
-                                                            FirebaseFirestore.instance
-                                                                .collection("customer_users")
-                                                                .doc(item.docid)
-                                                                .delete()
-                                                                .then((value) {
-                                                              setState(() {});
-                                                            });
-                                                            Navigator.of(ctx).pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors.green,
-                                                                borderRadius: BorderRadius.circular(11)),
-                                                            width: 100,
-                                                            padding: const EdgeInsets.all(14),
-                                                            child: const Center(
-                                                                child: Text(
-                                                                  "okay",
-                                                                  style: TextStyle(color: Colors.white),
-                                                                )),
+                                                          TextButton(
+                                                            onPressed: () {
+                                                              FirebaseFirestore.instance
+                                                                  .collection("customer_users")
+                                                                  .doc(item.docid)
+                                                                  .delete()
+                                                                  .then((value) {
+                                                                setState(() {});
+                                                              });
+                                                              Navigator.of(ctx).pop();
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors.green,
+                                                                  borderRadius: BorderRadius.circular(11)),
+                                                              width: 100,
+                                                              padding: const EdgeInsets.all(14),
+                                                              child: const Center(
+                                                                  child: Text(
+                                                                    "okay",
+                                                                    style: TextStyle(color: Colors.white),
+                                                                  )),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text("Delete"),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  item.deactivate ?  FirebaseFirestore.instance
-                                                      .collection('customer_users')
-                                                      .doc(item.docid)
-                                                      .update({"deactivate": false}) :
-                                                  FirebaseFirestore.instance
-                                                      .collection('customer_users')
-                                                      .doc(item.docid)
-                                                      .update({"deactivate": true});
-                                                  setState(() {});
-                                                },
-                                                child: Text(item.deactivate ? "Activate" : "Deactivate"),
-                                              ),
-                                            ];
-                                          }),
-                                    ],
-                                  ))),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: const Text("Delete"),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    item.deactivate ?  FirebaseFirestore.instance
+                                                        .collection('customer_users')
+                                                        .doc(item.docid)
+                                                        .update({"deactivate": false}) :
+                                                    FirebaseFirestore.instance
+                                                        .collection('customer_users')
+                                                        .doc(item.docid)
+                                                        .update({"deactivate": true});
+                                                    setState(() {});
+                                                  },
+                                                  child: Text(item.deactivate ? "Activate" : "Deactivate"),
+                                                ),
+                                              ];
+                                            }),
+                                      ],
+                                    ))),
+                          ),
                         );
                       })
                       : const Center(

@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -41,12 +42,13 @@ class _PagesListScreenState extends State<PagesListScreen> {
         surfaceTintColor: Colors.white,
         title: const Text(
           'Pages List',
-          style: TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
           child: GestureDetector(
-              onTap: (){
+              onTap: () {
                 Get.back();
               },
               child: SvgPicture.asset('assets/images/arrowback.svg')),
@@ -85,7 +87,6 @@ class _PagesListScreenState extends State<PagesListScreen> {
             icon: Icon(Icons.search),
             onPressed: toggleTextFieldVisibility,
             color: Color(0xff3B5998),
-
           )
         ],
         bottom: PreferredSize(
@@ -123,8 +124,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
       ),
       body: StreamBuilder<List<PagesData>>(
         stream: getPagesStream(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<PagesData>> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<List<PagesData>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -145,163 +146,175 @@ class _PagesListScreenState extends State<PagesListScreen> {
                       // if (item.deactivate) {
                       //   return SizedBox.shrink();
                       // }
-                      return Container(
-                        height: 90,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
-                        width: Get.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(11),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 2,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
+                      return Padding(
+                        padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+                        child: Container(
+                          height: 90,
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 10),
+                          width: Get.width,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(11),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 1,
+                                blurRadius: 2,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                              child: ListTile(
+                                  contentPadding:
+                                      const EdgeInsets.only(left: 15, right: 5),
+                                  title: Text(
+                                    item.title.toString(),
+                                    style: const TextStyle(
+                                        color: Color(0xff384953),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  subtitle: Text(
+                                    item.longdescription.toString(),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      item.deactivate
+                                          ? Image.asset(
+                                              'assets/images/deactivate.png',
+                                              height: 20,
+                                              width: 20,
+                                            )
+                                          : const SizedBox(),
+                                      PopupMenuButton<int>(
+                                          icon: const Icon(
+                                            Icons.more_vert,
+                                            color: Colors.black,
+                                          ),
+                                          color: Colors.white,
+                                          itemBuilder: (context) {
+                                            return [
+                                              PopupMenuItem(
+                                                value: 1,
+                                                onTap: () {
+                                                  Get.to(AddPagesScreen(
+                                                    isEditMode: true,
+                                                    documentId: item.docid,
+                                                    title: item.title,
+                                                    longdescription:
+                                                        item.longdescription,
+                                                  ));
+                                                },
+                                                child: const Text("Edit"),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 1,
+                                                onTap: () {
+                                                  showDialog(
+                                                    context: context,
+                                                    builder: (ctx) => AlertDialog(
+                                                      title: const Text(
+                                                          "Delete Page"),
+                                                      content: const Text(
+                                                          "Are you sure you want to delete this Page"),
+                                                      actions: <Widget>[
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                color: Colors.red,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(14),
+                                                            child: const Center(
+                                                                child: Text(
+                                                              "Cancel",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    "Pages")
+                                                                .doc(item.docid)
+                                                                .delete()
+                                                                .then((value) {
+                                                              setState(() {});
+                                                            });
+                                                            Navigator.of(ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                color:
+                                                                    Colors.green,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(14),
+                                                            child: const Center(
+                                                                child: Text(
+                                                              "okay",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            )),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
+                                                child: const Text("Delete"),
+                                              ),
+                                              PopupMenuItem(
+                                                value: 1,
+                                                onTap: () {
+                                                  item.deactivate
+                                                      ? FirebaseFirestore.instance
+                                                          .collection('Pages')
+                                                          .doc(item.docid)
+                                                          .update({
+                                                          "deactivate": false
+                                                        })
+                                                      : FirebaseFirestore.instance
+                                                          .collection('Pages')
+                                                          .doc(item.docid)
+                                                          .update({
+                                                          "deactivate": true
+                                                        });
+                                                  setState(() {});
+                                                },
+                                                child: Text(item.deactivate
+                                                    ? "Activate"
+                                                    : "Deactivate"),
+                                              ),
+                                            ];
+                                          }),
+                                    ],
+                                  ))),
                         ),
-                        child: Center(
-                            child: ListTile(
-                              contentPadding: EdgeInsets.only(left: 15,right: 5),
-                                title: Text(
-                                  item.title.toString(),
-                                  style: const TextStyle(
-                                      color: Color(0xff384953),
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                subtitle:
-                                    Text(item.longdescription.toString(),overflow: TextOverflow.ellipsis,),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    item.deactivate
-                                        ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
-                                        : const SizedBox(),
-                                    PopupMenuButton<int>(
-                                        icon: const Icon(
-                                          Icons.more_vert,
-                                          color: Colors.black,
-                                        ),
-                                        color: Colors.white,
-                                        itemBuilder: (context) {
-                                          return [
-                                            PopupMenuItem(
-                                              value: 1,
-                                              onTap: () {
-                                                Get.to(AddPagesScreen(
-                                                  isEditMode: true,
-                                                  documentId: item.docid,
-                                                  title: item.title,
-                                                  longdescription:
-                                                      item.longdescription,
-                                                ));
-                                              },
-                                              child: const Text("Edit"),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 1,
-                                              onTap: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder: (ctx) =>
-                                                      AlertDialog(
-                                                    title: const Text(
-                                                        "Delete Page"),
-                                                    content: const Text(
-                                                        "Are you sure you want to delete this Page"),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.red,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
-                                                          child: const Center(
-                                                              child: Text(
-                                                            "Cancel",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          )),
-                                                        ),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  "Pages")
-                                                              .doc(item.docid)
-                                                              .delete()
-                                                              .then((value) {
-                                                            setState(() {});
-                                                          });
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .green,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
-                                                          child: const Center(
-                                                              child: Text(
-                                                            "okay",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          )),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              },
-                                              child: const Text("Delete"),
-                                            ),
-                                            PopupMenuItem(
-                                              value: 1,
-                                              onTap: () {
-                                                item.deactivate ? FirebaseFirestore.instance
-                                                    .collection('Pages')
-                                                    .doc(item.docid)
-                                                    .update(
-                                                        {"deactivate": false}):
-                                                FirebaseFirestore.instance
-                                                    .collection('Pages')
-                                                    .doc(item.docid)
-                                                    .update(
-                                                    {"deactivate": true});
-                                                setState(() {});
-                                              },
-                                              child: Text(item.deactivate
-                                                  ? "Activate"
-                                                  : "Deactivate"),
-                                            ),
-                                          ];
-                                        }),
-                                  ],
-                                ))),
                       );
                     })
                 : const Center(

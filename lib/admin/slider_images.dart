@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -100,32 +101,35 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
             imageWidgets.add(imageWidget);
           }
 
-          return GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4.0,
-              crossAxisSpacing: 4.0,
-            ),
-            itemCount: imageWidgets.length,
-            itemBuilder: (context, index) {
-              var documentId = images[index].id;
-              return Stack(
-                children: [
-                  imageWidgets[index],
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        print("object");
-                        FirebaseFirestore.instance.collection('slider').doc(documentId).delete();
-                      },
+          return Padding(
+            padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+            child: GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 4.0,
+                crossAxisSpacing: 4.0,
+              ),
+              itemCount: imageWidgets.length,
+              itemBuilder: (context, index) {
+                var documentId = images[index].id;
+                return Stack(
+                  children: [
+                    imageWidgets[index],
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          print("object");
+                          FirebaseFirestore.instance.collection('slider').doc(documentId).delete();
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              );
-            },
+                  ],
+                );
+              },
+            ),
           );
         },
       ),
