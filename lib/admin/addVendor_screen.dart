@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import '../components/addsize.dart';
+import '../components/appassets.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -37,7 +38,8 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
 
   TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  File categoryFile = File("");
+  Rx<File> categoryFile = File("").obs;
+  Uint8List? pickedFile;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool showValidation = false;
   bool showValidationImg = false;
@@ -45,12 +47,12 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
     try {
-      if (!formKey.currentState!.validate()) return;
-      if (categoryFile.path.isEmpty) {
-        showToast("Please select category image");
-        Helper.hideLoader(loader);
-        return;
-      }
+      // if (!formKey.currentState!.validate()) return;
+      // if (categoryFile.path.isEmpty) {
+      //   showToast("Please select category image");
+      //   Helper.hideLoader(loader);
+      //   return;
+      // }
 
       List<String> arrangeNumbers = [];
       String kk = nameController.text.trim();
@@ -59,14 +61,26 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       for (var i = 0; i < kk.length; i++) {
         arrangeNumbers.add(kk.substring(0, i + 1));
       }
-      String imageUrlProfile = categoryFile.path;
-      if (!categoryFile.path.contains("http")) {
+      String? imageUrl;
+      if (kIsWeb) {
         UploadTask uploadTask = FirebaseStorage.instance
-            .ref("categoryImages")
-            .child(DateTime.now().millisecondsSinceEpoch.toString())
-            .putFile(categoryFile);
+            .ref("profileImage}")
+            .child("profile_image")
+            .putData(pickedFile!);
         TaskSnapshot snapshot = await uploadTask;
-        imageUrlProfile = await snapshot.ref.getDownloadURL();
+        imageUrl = await snapshot.ref.getDownloadURL();
+      } else {
+        if(!categoryFile.value.path.contains("http")){
+          UploadTask uploadTask = FirebaseStorage.instance
+              .ref("categoryImages")
+              .child(DateTime.now().millisecondsSinceEpoch.toString())
+              .putFile(categoryFile.value);
+          TaskSnapshot snapshot = await uploadTask;
+          imageUrl = await snapshot.ref.getDownloadURL();
+        }
+        else{
+          imageUrl = categoryFile.value.path;
+        }
       }
 
       if (resturentData != null) {
@@ -76,7 +90,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           deactivate: resturentData!.deactivate,
           description: descriptionController.text.trim(),
           docid: resturentData!.docid,
-          image: imageUrlProfile,
+          image: imageUrl,
           name: kk,
           searchName: arrangeNumbers,
         );
@@ -89,7 +103,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
             deactivate: false,
             description: descriptionController.text.trim(),
             docid: DateTime.now().millisecondsSinceEpoch,
-            image: imageUrlProfile,
+            image: imageUrl,
             name: kk,
             searchName: arrangeNumbers,
             time: DateTime.now().millisecondsSinceEpoch);
@@ -110,7 +124,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     if (resturentData != null) {
       nameController.text = resturentData!.name ?? "";
       descriptionController.text = resturentData!.description ?? "";
-      categoryFile = File(resturentData!.image.toString());
+      categoryFile = File(resturentData!.image ?? "").obs;
     }
   }
 
@@ -193,140 +207,179 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 15),
-                                  child: DottedBorder(
-                                    borderType: BorderType.RRect,
-                                    radius: const Radius.circular(20),
-                                    padding: const EdgeInsets.only(
-                                        left: 40, right: 40, bottom: 10),
-                                    color: showValidationImg == false
-                                        ? const Color(0xFFFAAF40)
-                                        : Colors.red,
-                                    dashPattern: const [6],
-                                    strokeWidth: 1,
-                                    child: InkWell(
-                                      onTap: () {
-                                        _showActionSheet(context);
-                                      },
-                                      child: categoryFile.path != ""
-                                          ? Stack(
-                                              children: [
-                                                Container(
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: Colors.white,
-                                                      image: DecorationImage(
-                                                          image: FileImage(
-                                                              categoryFile),
-                                                          fit: BoxFit.fill),
-                                                    ),
-                                                    margin: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical: 10,
-                                                        horizontal: 10),
-                                                    width: double.maxFinite,
-                                                    height: 180,
-                                                    alignment: Alignment.center,
-                                                    child: categoryFile.path
-                                                                .contains(
-                                                                    "http") ||
-                                                            categoryFile
-                                                                .path.isEmpty
-                                                        ? Image.network(
-                                                            categoryFile.path,
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder: (_, __,
-                                                                    ___) =>
-                                                                CachedNetworkImage(
-                                                              fit: BoxFit.cover,
-                                                              imageUrl:
-                                                                  categoryFile
-                                                                      .path,
-                                                              height:
-                                                                  AddSize.size30,
-                                                              width:
-                                                                  AddSize.size30,
-                                                              errorWidget:
-                                                                  (_, __, ___) =>
-                                                                      const Icon(
-                                                                Icons.person,
-                                                                size: 60,
-                                                              ),
-                                                              placeholder: (
-                                                                _,
-                                                                __,
-                                                              ) =>
-                                                                  const SizedBox(),
-                                                            ),
-                                                          )
-                                                        : Image.memory(
-                                                            categoryFile
-                                                                .readAsBytesSync(),
-                                                            fit: BoxFit.cover,
-                                                            errorBuilder: (_, __,
-                                                                    ___) =>
-                                                                CachedNetworkImage(
-                                                              fit: BoxFit.cover,
-                                                              imageUrl:
-                                                                  categoryFile
-                                                                      .path,
-                                                              height:
-                                                                  AddSize.size30,
-                                                              width:
-                                                                  AddSize.size30,
-                                                              errorWidget:
-                                                                  (_, __, ___) =>
-                                                                      const Icon(
-                                                                Icons.person,
-                                                                size: 60,
-                                                              ),
-                                                              placeholder: (
-                                                                _,
-                                                                __,
-                                                              ) =>
-                                                                  const SizedBox(),
-                                                            ),
-                                                          )
-                                                ),
-                                              ],
-                                            )
-                                          : Container(
-                                              padding:
-                                                  const EdgeInsets.only(top: 8),
-                                              margin: const EdgeInsets.symmetric(
-                                                  vertical: 8, horizontal: 8),
-                                              width: double.maxFinite,
-                                              height: 130,
-                                              alignment: Alignment.center,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Image.asset(
-                                                    'assets/images/gallery.png',
-                                                    height: 60,
-                                                    width: 50,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  const Text(
-                                                    'Accepted file types: JPEG, Doc, PDF, PNG',
-                                                    style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black54),
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 11,
-                                                  ),
-                                                ],
-                                              ),
+                                kIsWeb
+                                    ? DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(20),
+                                  padding: const EdgeInsets.only(
+                                      left: 40, right: 40, bottom: 10),
+                                  color: showValidationImg == false
+                                      ? const Color(0xFFFAAF40)
+                                      : Colors.red,
+                                  dashPattern: const [6],
+                                  strokeWidth: 1,
+                                  child: InkWell(
+                                    onTap: () {
+                                      // showActionSheet(context);
+                                      Helper.addFilePicker().then((value) {
+                                        if (kIsWeb) {
+                                          pickedFile = value;
+                                          setState(() {});
+                                          return;
+                                        }
+                                        setState(() {});
+                                        categoryFile.value = value;
+                                        print("Image----${categoryFile.value}");
+                                      });
+                                    },
+                                    child: pickedFile != null
+                                        ? Stack(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                            color: Colors.white,
+                                          ),
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 10),
+                                          width: double.maxFinite,
+                                          height: 180,
+                                          alignment: Alignment.center,
+                                          child: kIsWeb
+                                              ? pickedFile != null
+                                              ? Image.memory(pickedFile!)
+                                              : Image.asset(
+                                            AppAssets.gallery,
+                                            height: 60,
+                                            width: 50,
+                                          )
+                                              : Image.memory(pickedFile!,
+                                              errorBuilder: (_, __,
+                                                  ___) =>
+                                                  Image.network(
+                                                      categoryFile
+                                                          .value.path,
+                                                      errorBuilder: (_,
+                                                          __, ___) =>
+                                                      const SizedBox())),
+                                        ),
+                                      ],
+                                    )
+                                        : Container(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 8),
+                                      width: double.maxFinite,
+                                      height: 130,
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            AppAssets.gallery,
+                                            height: 60,
+                                            width: 50,
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          const Text(
+                                            'Accepted file types: JPEG, Doc, PDF, PNG',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black54),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(
+                                            height: 11,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                    : DottedBorder(
+                                  borderType: BorderType.RRect,
+                                  radius: const Radius.circular(20),
+                                  padding: const EdgeInsets.only(
+                                      left: 40, right: 40, bottom: 10),
+                                  color: showValidationImg == false
+                                      ? const Color(0xFFFAAF40)
+                                      : Colors.red,
+                                  dashPattern: const [6],
+                                  strokeWidth: 1,
+                                  child: InkWell(
+                                    onTap: () {
+                                      // showActionSheet(context);
+                                      Helper.addFilePicker().then((value) {
+                                        categoryFile.value = value;
+                                        setState(() {});
+                                        print("Image----${categoryFile.value}");
+                                      });
+                                    },
+                                    child: categoryFile.value.path != ""
+                                        ? Obx(() {
+                                      return Stack(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              color: Colors.white,
                                             ),
+                                            margin:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 10,
+                                                horizontal: 10),
+                                            width: double.maxFinite,
+                                            height: 180,
+                                            alignment: Alignment.center,
+                                            child: Image.file(
+                                                categoryFile.value,
+                                                errorBuilder: (_, __, ___) =>
+                                                    Image.network(
+                                                        categoryFile
+                                                            .value.path,
+                                                        errorBuilder: (_, __,
+                                                            ___) =>
+                                                        const SizedBox())),
+                                          ),
+                                        ],
+                                      );
+                                    })
+                                        : Container(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 8),
+                                      width: double.maxFinite,
+                                      height: 130,
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            AppAssets.gallery,
+                                            height: 60,
+                                            width: 50,
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
+                                          const Text(
+                                            'Accepted file types: JPEG, Doc, PDF, PNG',
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black54),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          const SizedBox(
+                                            height: 11,
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -378,7 +431,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       imageSource: ImageSource.camera, imageQuality: 75)
                   .then((value) async {
                 if (value != null) {
-                  categoryFile = File(value.path);
+                  categoryFile.value = File(value.path);
                   setState(() {});
                 }
 
@@ -393,7 +446,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       imageSource: ImageSource.gallery, imageQuality: 75)
                   .then((value) async {
                 if (value != null) {
-                  categoryFile = File(value.path);
+                  categoryFile.value = File(value.path);
                   setState(() {});
                 }
 

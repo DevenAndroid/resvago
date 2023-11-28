@@ -14,7 +14,9 @@ Future<void> main() async {
       projectId: "resvago-b7bd4",
       messagingSenderId: "671324938172",
       appId: "1:671324938172:web:730e39e60b81133aaed5b9",
-    ));
+          storageBucket: "resvago-b7bd4.appspot.com",
+
+        ));
   }
   await Firebase.initializeApp();
 

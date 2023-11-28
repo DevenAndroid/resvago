@@ -102,7 +102,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       GestureDetector(
                         onTap: () {},
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                           decoration: BoxDecoration(
                             color: getStatusColor(myDiningOrderModel!.orderStatus),
                             borderRadius: BorderRadius.circular(9),

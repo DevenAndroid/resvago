@@ -358,7 +358,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                               height: 10,
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 8.0, right: 8),
+                              padding: const EdgeInsets.only(left: 8, right: 2),
                               child: Row(
                                 children: [
                                   Column(

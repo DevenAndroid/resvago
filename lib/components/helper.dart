@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,6 +21,18 @@ class Helper {
         return null;
       } else {
         return File(item.path);
+      }
+    } on PlatformException catch (e) {
+      throw Exception(e);
+    }
+  }
+  static Future addFilePicker() async {
+    try {
+      final item = await FilePicker.platform.pickFiles(type: FileType.custom,allowedExtensions: ['jpg','png','jpeg'],);
+      if (item == null) {
+        return null;
+      } else {
+        return kIsWeb ? item.files.first.bytes! : File(item.files.first.path!);
       }
     } on PlatformException catch (e) {
       throw Exception(e);
@@ -75,6 +88,37 @@ showToast(message) {
       fontSize: 14);
 }
 
+extension AddPaddingtoAll on Widget{
+
+  Widget get appPadding{
+    if(kIsWeb){
+      return Center(
+        child: SizedBox(
+          width: 700,
+          child: this,
+        ),
+      );
+    }
+    return this;
+  }
+
+  Widget get appPaddingForScreen{
+    if(kIsWeb){
+      return Center(
+        child: SizedBox(
+          width: 1200,
+          child: this,
+        ),
+      );
+    }
+    return this;
+  }
+
+  Widget addPadding(EdgeInsetsGeometry padding){
+    return Padding(padding: padding,child: this,);
+  }
+
+}
 
 extension DateOnlyCompare on DateTime {
   bool isSmallerThen(DateTime other) {

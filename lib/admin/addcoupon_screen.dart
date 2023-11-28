@@ -194,14 +194,14 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                     height: 10,
                                   ),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("Restaurant Name",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
                                   if (userList != null)
                                     Padding(
                                       padding: const EdgeInsets.only(
-                                          left: 15, right: 15),
+                                          left: 0, right: 0),
                                       child:
                                           DropdownButtonFormField<dynamic>(
                                         focusColor: Colors.white,
@@ -244,17 +244,17 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                                   vertical: 15),
                                           // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
                                           focusedBorder: OutlineInputBorder(
-                                            borderSide: BorderSide(
+                                            borderSide: const BorderSide(
                                                 color:
                                                     Colors.black),
                                             borderRadius:
                                                 BorderRadius.circular(6.0),
                                           ),
-                                          enabledBorder: OutlineInputBorder(
+                                          enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.black),
                                               borderRadius:
-                                                  const BorderRadius.all(
+                                                  BorderRadius.all(
                                                       Radius.circular(
                                                           6.0))),
                                           errorBorder: OutlineInputBorder(
@@ -266,7 +266,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                                       Radius.circular(
                                                           6.0))),
                                           border: OutlineInputBorder(
-                                              borderSide: BorderSide(
+                                              borderSide: const BorderSide(
                                                   color: Colors.black,
                                                   width: 3.0),
                                               borderRadius:
@@ -304,7 +304,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                     ),
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("PromoCode Name",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
@@ -322,7 +322,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
 
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("Code",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
@@ -339,7 +339,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("Discount",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
@@ -357,7 +357,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("Max Discount",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
@@ -375,7 +375,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("Start Date",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
@@ -408,7 +408,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                   ),
                                   const SizedBox(height: 10),
                                   const Padding(
-                                    padding: EdgeInsets.only(left: 25),
+                                    padding: EdgeInsets.only(left: 5),
                                     child: Text("End Date",style: TextStyle(color: Colors.black),),
                                   ),
                                   const SizedBox(height: 5),
