@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -147,7 +146,9 @@ class _PagesListScreenState extends State<PagesListScreen> {
                       //   return SizedBox.shrink();
                       // }
                       return Padding(
-                        padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
+                        padding: kIsWeb
+                            ? const EdgeInsets.only(left: 250, right: 250)
+                            : EdgeInsets.zero,
                         child: Container(
                           height: 90,
                           margin: const EdgeInsets.symmetric(
@@ -216,7 +217,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                 onTap: () {
                                                   showDialog(
                                                     context: context,
-                                                    builder: (ctx) => AlertDialog(
+                                                    builder: (ctx) =>
+                                                        AlertDialog(
                                                       title: const Text(
                                                           "Delete Page"),
                                                       content: const Text(
@@ -229,7 +231,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                           },
                                                           child: Container(
                                                             decoration: BoxDecoration(
-                                                                color: Colors.red,
+                                                                color:
+                                                                    Colors.red,
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -263,8 +266,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                           },
                                                           child: Container(
                                                             decoration: BoxDecoration(
-                                                                color:
-                                                                    Colors.green,
+                                                                color: Colors
+                                                                    .green,
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -292,13 +295,15 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                                 value: 1,
                                                 onTap: () {
                                                   item.deactivate
-                                                      ? FirebaseFirestore.instance
+                                                      ? FirebaseFirestore
+                                                          .instance
                                                           .collection('Pages')
                                                           .doc(item.docid)
                                                           .update({
                                                           "deactivate": false
                                                         })
-                                                      : FirebaseFirestore.instance
+                                                      : FirebaseFirestore
+                                                          .instance
                                                           .collection('Pages')
                                                           .doc(item.docid)
                                                           .update({
