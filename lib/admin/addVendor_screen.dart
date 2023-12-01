@@ -38,8 +38,10 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
 
   TextEditingController descriptionController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  Rx<File> categoryFile = File("").obs;
+  File categoryFile = File("");
   Uint8List? pickedFile;
+  String fileUrl = "";
+  File profileImage = File("");
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool showValidation = false;
   bool showValidationImg = false;
@@ -63,23 +65,25 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       }
       String? imageUrl;
       if (kIsWeb) {
-        UploadTask uploadTask = FirebaseStorage.instance
-            .ref("profileImage}")
-            .child("profile_image")
-            .putData(pickedFile!);
-        TaskSnapshot snapshot = await uploadTask;
-        imageUrl = await snapshot.ref.getDownloadURL();
+        if (pickedFile != null) {
+          UploadTask uploadTask = FirebaseStorage.instance.ref("categoryImages}").child("profile_image").putData(pickedFile!);
+          TaskSnapshot snapshot = await uploadTask;
+          imageUrl = await snapshot.ref.getDownloadURL();
+        } else {
+          imageUrl = fileUrl;
+        }
       } else {
-        if(!categoryFile.value.path.contains("http")){
+        if (!categoryFile.path.contains("https")) {
+          Reference gg = FirebaseStorage.instance.refFromURL(resturentData!.image.toString());
+          await gg.delete();
+
           UploadTask uploadTask = FirebaseStorage.instance
               .ref("categoryImages")
               .child(DateTime.now().millisecondsSinceEpoch.toString())
-              .putFile(categoryFile.value);
+              .putFile(categoryFile);
+
           TaskSnapshot snapshot = await uploadTask;
           imageUrl = await snapshot.ref.getDownloadURL();
-        }
-        else{
-          imageUrl = categoryFile.value.path;
         }
       }
 
@@ -124,8 +128,11 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     if (resturentData != null) {
       nameController.text = resturentData!.name ?? "";
       descriptionController.text = resturentData!.description ?? "";
-      categoryFile = File(resturentData!.image ?? "").obs;
-    }
+      if (!kIsWeb) {
+        categoryFile = File(resturentData!.image ?? "");
+      } else {
+        fileUrl = resturentData!.image ?? "";
+      }     }
   }
 
   @override
@@ -138,8 +145,6 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
           child: SizedBox(
             height: size.height,
             width: size.width,
-            child: Padding(
-              padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
               child: Column(
                 children: [
                   Expanded(
@@ -149,8 +154,8 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       ),
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                                horizontal: size.width * .04,
-                                vertical: size.height * .01)
+                            horizontal: size.width * .04,
+                            vertical: size.height * .01)
                             .copyWith(bottom: 0),
                         child: SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
@@ -211,25 +216,15 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                     ? DottedBorder(
                                   borderType: BorderType.RRect,
                                   radius: const Radius.circular(20),
-                                  padding: const EdgeInsets.only(
-                                      left: 40, right: 40, bottom: 10),
-                                  color: showValidationImg == false
-                                      ? const Color(0xFFFAAF40)
-                                      : Colors.red,
+                                  padding: const EdgeInsets.only(left: 40, right: 40, bottom: 10),
+                                  color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                                   dashPattern: const [6],
                                   strokeWidth: 1,
                                   child: InkWell(
                                     onTap: () {
-                                      // showActionSheet(context);
                                       Helper.addFilePicker().then((value) {
-                                        if (kIsWeb) {
-                                          pickedFile = value;
-                                          setState(() {});
-                                          return;
-                                        }
+                                        pickedFile = value;
                                         setState(() {});
-                                        categoryFile.value = value;
-                                        print("Image----${categoryFile.value}");
                                       });
                                     },
                                     child: pickedFile != null
@@ -237,59 +232,42 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                       children: [
                                         Container(
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                            BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(10),
                                             color: Colors.white,
                                           ),
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                           width: double.maxFinite,
                                           height: 180,
                                           alignment: Alignment.center,
-                                          child: kIsWeb
-                                              ? pickedFile != null
-                                              ? Image.memory(pickedFile!)
-                                              : Image.asset(
-                                            AppAssets.gallery,
-                                            height: 60,
-                                            width: 50,
-                                          )
-                                              : Image.memory(pickedFile!,
-                                              errorBuilder: (_, __,
-                                                  ___) =>
-                                                  Image.network(
-                                                      categoryFile
-                                                          .value.path,
-                                                      errorBuilder: (_,
-                                                          __, ___) =>
-                                                      const SizedBox())),
+                                          child: Image.memory(pickedFile!),
                                         ),
                                       ],
                                     )
                                         : Container(
                                       padding: const EdgeInsets.only(top: 8),
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 8),
+                                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                                       width: double.maxFinite,
                                       height: 130,
                                       alignment: Alignment.center,
                                       child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          Image.asset(
-                                            AppAssets.gallery,
+                                          Image.network(
+                                            fileUrl,
                                             height: 60,
                                             width: 50,
+                                            errorBuilder: (_, __, ___) => Image.asset(
+                                              AppAssets.gallery,
+                                              height: 60,
+                                              width: 50,
+                                            ),
                                           ),
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          const Text(
-                                            'Accepted file types: JPEG, Doc, PDF, PNG',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black54),
+                                          Text(
+                                            'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
+                                            style: TextStyle(fontSize: 16, color: Colors.black54),
                                             textAlign: TextAlign.center,
                                           ),
                                           const SizedBox(
@@ -302,77 +280,55 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                 )
                                     : DottedBorder(
                                   borderType: BorderType.RRect,
-                                  radius: const Radius.circular(20),
-                                  padding: const EdgeInsets.only(
-                                      left: 40, right: 40, bottom: 10),
-                                  color: showValidationImg == false
-                                      ? const Color(0xFFFAAF40)
-                                      : Colors.red,
+                                  radius: const Radius.circular(4),
+                                  padding: const EdgeInsets.only(left: 40, right: 40, bottom: 10),
+                                  color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                                   dashPattern: const [6],
                                   strokeWidth: 1,
                                   child: InkWell(
                                     onTap: () {
-                                      // showActionSheet(context);
-                                      Helper.addFilePicker().then((value) {
-                                        categoryFile.value = value;
-                                        setState(() {});
-                                        print("Image----${categoryFile.value}");
-                                      });
+                                      showActionSheet(context);
                                     },
-                                    child: categoryFile.value.path != ""
-                                        ? Obx(() {
-                                      return Stack(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                              BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            margin:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 10,
-                                                horizontal: 10),
-                                            width: double.maxFinite,
-                                            height: 180,
-                                            alignment: Alignment.center,
-                                            child: Image.file(
-                                                categoryFile.value,
-                                                errorBuilder: (_, __, ___) =>
-                                                    Image.network(
-                                                        categoryFile
-                                                            .value.path,
-                                                        errorBuilder: (_, __,
-                                                            ___) =>
-                                                        const SizedBox())),
+                                    child: categoryFile.path != ""
+                                        ? Stack(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(10),
+                                            color: Colors.white,
+                                            image: DecorationImage(image: FileImage(profileImage), fit: BoxFit.fill),
                                           ),
-                                        ],
-                                      );
-                                    })
+                                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                          width: double.maxFinite,
+                                          height: 180,
+                                          alignment: Alignment.center,
+                                          child: Image.file(categoryFile,
+                                              errorBuilder: (_, __, ___) => Image.network(categoryFile.path,
+                                                  errorBuilder: (_, __, ___) => const SizedBox())),
+                                        ),
+                                      ],
+                                    )
                                         : Container(
                                       padding: const EdgeInsets.only(top: 8),
-                                      margin: const EdgeInsets.symmetric(
-                                          vertical: 8, horizontal: 8),
+                                      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                                       width: double.maxFinite,
                                       height: 130,
                                       alignment: Alignment.center,
                                       child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           Image.asset(
                                             AppAssets.gallery,
-                                            height: 60,
-                                            width: 50,
+                                            height: 50,
+                                            width: 40,
                                           ),
                                           const SizedBox(
                                             height: 5,
                                           ),
-                                          const Text(
-                                            'Accepted file types: JPEG, Doc, PDF, PNG',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black54),
+                                          Text(
+                                            'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
+                                            style:
+                                            TextStyle(fontSize: 14, color: Color(0xff141C21), fontWeight: FontWeight.w300),
                                             textAlign: TextAlign.center,
                                           ),
                                           const SizedBox(
@@ -409,13 +365,12 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                     ),
                   ),
                 ],
-              ),
-            ),
+              ).appPaddingForScreen
           ),
         ));
   }
 
-  void _showActionSheet(BuildContext context) {
+  void showActionSheet(BuildContext context) {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -431,7 +386,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       imageSource: ImageSource.camera, imageQuality: 75)
                   .then((value) async {
                 if (value != null) {
-                  categoryFile.value = File(value.path);
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 
@@ -446,7 +401,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       imageSource: ImageSource.gallery, imageQuality: 75)
                   .then((value) async {
                 if (value != null) {
-                  categoryFile.value = File(value.path);
+                  categoryFile = File(value.path);
                   setState(() {});
                 }
 

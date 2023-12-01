@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:resvago/components/helper.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
 import 'model/Pages_model.dart';
@@ -74,25 +75,23 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
             child: SizedBox(
               height: size.height,
               width: size.width,
-              child: Padding(
-                padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
                 child: Column(
                   children: [
                     Expanded(
                       child: Container(
                         decoration: const BoxDecoration(
-                            color: Colors.white,
+                          color: Colors.white,
                         ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                                  horizontal: size.width * .04,
-                                  vertical: size.height * .01)
+                              horizontal: size.width * .04,
+                              vertical: size.height * .01)
                               .copyWith(bottom: 0),
                           child: SingleChildScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(
                                 crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(
                                     height: 10,
@@ -161,8 +160,8 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
+                ).appPaddingForScreen
+
             )));
   }
 }

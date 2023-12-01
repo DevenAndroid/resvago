@@ -170,25 +170,23 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
             child: SizedBox(
               height: size.height,
               width: size.width,
-              child: Padding(
-                padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
                 child: Column(
                   children: [
                     Expanded(
                       child: Container(
                         decoration: const BoxDecoration(
-                            color: Colors.white,
+                          color: Colors.white,
                         ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                                  horizontal: size.width * .04,
-                                  vertical: size.height * .01)
+                              horizontal: size.width * .04,
+                              vertical: size.height * .01)
                               .copyWith(bottom: 0),
                           child: SingleChildScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(
                                 crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                CrossAxisAlignment.start,
                                 children: [
                                   const SizedBox(
                                     height: 10,
@@ -203,15 +201,15 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                       padding: const EdgeInsets.only(
                                           left: 0, right: 0),
                                       child:
-                                          DropdownButtonFormField<dynamic>(
+                                      DropdownButtonFormField<dynamic>(
                                         focusColor: Colors.white,
                                         isExpanded: true,
                                         iconEnabledColor:
-                                            const Color(0xff97949A),
+                                        const Color(0xff97949A),
                                         icon: const Icon(Icons
                                             .keyboard_arrow_down_rounded),
                                         borderRadius:
-                                            BorderRadius.circular(10),
+                                        BorderRadius.circular(10),
                                         hint: Text(
                                           "Select Restaurant Name".tr,
                                           style: const TextStyle(
@@ -222,12 +220,12 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                         ),
                                         decoration: InputDecoration(
                                           focusColor:
-                                              const Color(0xFF384953),
+                                          const Color(0xFF384953),
                                           hintStyle: GoogleFonts.poppins(
                                             color: const Color(0xFF384953),
                                             textStyle: GoogleFonts.poppins(
                                               color:
-                                                  const Color(0xFF384953),
+                                              const Color(0xFF384953),
                                               fontSize: 14,
                                               fontWeight: FontWeight.w300,
                                             ),
@@ -237,41 +235,41 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                           ),
                                           filled: true,
                                           fillColor:
-                                              Colors.white.withOpacity(.10),
+                                          Colors.white.withOpacity(.10),
                                           contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 15,
-                                                  vertical: 15),
+                                          const EdgeInsets.symmetric(
+                                              horizontal: 15,
+                                              vertical: 15),
                                           // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
                                           focusedBorder: OutlineInputBorder(
                                             borderSide: const BorderSide(
                                                 color:
-                                                    Colors.black),
+                                                Colors.black),
                                             borderRadius:
-                                                BorderRadius.circular(6.0),
+                                            BorderRadius.circular(6.0),
                                           ),
                                           enabledBorder: const OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.black),
                                               borderRadius:
-                                                  BorderRadius.all(
-                                                      Radius.circular(
-                                                          6.0))),
+                                              BorderRadius.all(
+                                                  Radius.circular(
+                                                      6.0))),
                                           errorBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color:
-                                                      Colors.red.shade800),
+                                                  Colors.red.shade800),
                                               borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(
-                                                          6.0))),
+                                              const BorderRadius.all(
+                                                  Radius.circular(
+                                                      6.0))),
                                           border: OutlineInputBorder(
                                               borderSide: const BorderSide(
                                                   color: Colors.black,
                                                   width: 3.0),
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      6.0)),
+                                              BorderRadius.circular(
+                                                  6.0)),
                                         ),
                                         value: userValue,
                                         items: userList!.map((items) {
@@ -391,7 +389,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                             selectedStartDateTime = gg;
                                           },
                                           initialDate:
-                                              selectedStartDateTime,
+                                          selectedStartDateTime,
                                           lastDate: selectedEndDateTIme);
                                     },
                                     validator: (value) {
@@ -400,9 +398,9 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                       }
                                     },
                                     hintText:
-                                        startdateController.text.isEmpty
-                                            ? 'Select Start Date'
-                                            : startdateController.text,
+                                    startdateController.text.isEmpty
+                                        ? 'Select Start Date'
+                                        : startdateController.text,
                                     obscureText: false,
                                     color: Colors.white,
                                   ),
@@ -424,8 +422,8 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                                             selectedEndDateTIme = gg;
                                           },
                                           initialDate:
-                                              selectedEndDateTIme ??
-                                                  selectedStartDateTime,
+                                          selectedEndDateTIme ??
+                                              selectedStartDateTime,
                                           firstDate: selectedStartDateTime);
                                     },
                                     validator: (value) {
@@ -468,8 +466,7 @@ class _AddCouponScreenState extends State<AddCouponScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
+                ).appPaddingForScreen
             )));
   }
 }

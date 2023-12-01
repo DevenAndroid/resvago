@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addproduct_screen.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
+import 'package:resvago/components/helper.dart';
 
 class ProductCategoryScreen extends StatefulWidget {
   final CollectionReference collectionReference;
@@ -146,216 +147,213 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                       // if (item.deactivate) {
                       //   return SizedBox.shrink();
                       // }
-                      return Padding(
-                        padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
-                        child: Container(
-                          height: 90,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          width: Get.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(11),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 2,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                              child: ListTile(
-                                  contentPadding:
-                                      EdgeInsets.only(left: 15, right: 5),
-                                  title: Text(
-                                    item.name.toString(),
-                                    style: const TextStyle(
-                                        color: Color(0xff384953),
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  leading: Container(
-                                    height: 80,
-                                    width: 80,
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                              item.image.toString()),
-                                          fit: BoxFit.cover,
+                      return Container(
+                        height: 90,
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        width: Get.width,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(11),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                            child: ListTile(
+                                contentPadding:
+                                    EdgeInsets.only(left: 15, right: 5),
+                                title: Text(
+                                  item.name.toString(),
+                                  style: const TextStyle(
+                                      color: Color(0xff384953),
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                leading: Container(
+                                  height: 80,
+                                  width: 80,
+                                  decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            item.image.toString()),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      color: Colors.white,
+                                      borderRadius:
+                                          BorderRadius.circular(5)),
+                                ),
+                                subtitle: Text(item.description),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    item.deactivate
+                                        ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                        : const SizedBox(),
+                                    PopupMenuButton<int>(
+                                        icon: const Icon(
+                                          Icons.more_vert,
+                                          color: Colors.black,
                                         ),
                                         color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(5)),
-                                  ),
-                                  subtitle: Text(item.description),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      item.deactivate
-                                          ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
-                                          : const SizedBox(),
-                                      PopupMenuButton<int>(
-                                          icon: const Icon(
-                                            Icons.more_vert,
-                                            color: Colors.black,
-                                          ),
-                                          color: Colors.white,
-                                          itemBuilder: (context) {
-                                            return [
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              AddProductScreen(
-                                                                collectionReference:
-                                                                    widget
-                                                                        .collectionReference,
-                                                                menuItemData:
-                                                                    item,
-                                                              )));
-                                                },
-                                                child: const Text("Edit"),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder: (ctx) =>
-                                                        AlertDialog(
-                                                      title: const Text(
-                                                          "Delete Product Category"),
-                                                      content: const Text(
-                                                          "Are you sure you want to delete this Product Categor"),
-                                                      actions: <Widget>[
-                                                        Expanded(
-                                                          child: TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      ctx)
-                                                                  .pop();
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
+                                        itemBuilder: (context) {
+                                          return [
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AddProductScreen(
+                                                              collectionReference:
+                                                                  widget
+                                                                      .collectionReference,
+                                                              menuItemData:
+                                                                  item,
+                                                            )));
+                                              },
+                                              child: const Text("Edit"),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (ctx) =>
+                                                      AlertDialog(
+                                                    title: const Text(
+                                                        "Delete Product Category"),
+                                                    content: const Text(
+                                                        "Are you sure you want to delete this Product Categor"),
+                                                    actions: <Widget>[
+                                                      Expanded(
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(
+                                                                    ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .red,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(
+                                                                    14),
+                                                            child:
+                                                                const Center(
+                                                                    child:
+                                                                        Text(
+                                                              "Cancel",
+                                                              style: TextStyle(
                                                                   color: Colors
-                                                                      .red,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          11)),
-                                                              width: 100,
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(
-                                                                      14),
-                                                              child:
-                                                                  const Center(
-                                                                      child:
-                                                                          Text(
-                                                                "Cancel",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                              )),
-                                                            ),
+                                                                      .white),
+                                                            )),
                                                           ),
                                                         ),
-                                                        Expanded(
-                                                          child: TextButton(
-                                                            onPressed: () {
-                                                              widget
-                                                                  .collectionReference
-                                                                  .doc(item
-                                                                      .docid)
-                                                                  .delete()
-                                                                  .then(
-                                                                      (value) {
-                                                                setState(
-                                                                    () {});
-                                                              });
-                                                              Navigator.of(
-                                                                      ctx)
-                                                                  .pop();
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
+                                                      ),
+                                                      Expanded(
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            widget
+                                                                .collectionReference
+                                                                .doc(item
+                                                                    .docid)
+                                                                .delete()
+                                                                .then(
+                                                                    (value) {
+                                                              setState(
+                                                                  () {});
+                                                            });
+                                                            Navigator.of(
+                                                                    ctx)
+                                                                .pop();
+                                                          },
+                                                          child: Container(
+                                                            decoration: BoxDecoration(
+                                                                color: Colors
+                                                                    .green,
+                                                                borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        11)),
+                                                            width: 100,
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(
+                                                                    14),
+                                                            child:
+                                                                const Center(
+                                                                    child:
+                                                                        Text(
+                                                              "okay",
+                                                              style: TextStyle(
                                                                   color: Colors
-                                                                      .green,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          11)),
-                                                              width: 100,
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(
-                                                                      14),
-                                                              child:
-                                                                  const Center(
-                                                                      child:
-                                                                          Text(
-                                                                "okay",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                              )),
-                                                            ),
+                                                                      .white),
+                                                            )),
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text("Delete"),
-                                              ),
-                                              PopupMenuItem(
-                                                value: 1,
-                                                onTap: () {
-                                                  item.deactivate ? widget.collectionReference
-                                                      .doc(item.docid)
-                                                      .update({
-                                                    "deactivate": false
-                                                  }) :
-                                                  widget.collectionReference
-                                                      .doc(item.docid)
-                                                      .update({
-                                                    "deactivate": true
-                                                  });
-                                                },
-                                                child: Text(item.deactivate
-                                                    ? "Activate"
-                                                    : "Deactivate"),
-                                              ),
-                                              // PopupMenuItem(
-                                              //   value: 1,
-                                              //   onTap: () {
-                                              //     Navigator.push(
-                                              //         context,
-                                              //         MaterialPageRoute(
-                                              //             builder: (context) => ProductCategoryScreen(
-                                              //                 collectionReference: widget
-                                              //                     .collectionReference
-                                              //                     .doc(item
-                                              //                         .docid)
-                                              //                     .collection(
-                                              //                         "sub_category"),
-                                              //                 menuItemData:
-                                              //                     item,
-                                              //                 key: ValueKey(
-                                              //                     DateTime.now()
-                                              //                         .millisecondsSinceEpoch))));
-                                              //   },
-                                              //   child: const Text(
-                                              //       'View SubCategory'),
-                                              // ),
-                                            ];
-                                          }),
-                                    ],
-                                  ))),
-                        ),
-                      );
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text("Delete"),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                item.deactivate ? widget.collectionReference
+                                                    .doc(item.docid)
+                                                    .update({
+                                                  "deactivate": false
+                                                }) :
+                                                widget.collectionReference
+                                                    .doc(item.docid)
+                                                    .update({
+                                                  "deactivate": true
+                                                });
+                                              },
+                                              child: Text(item.deactivate
+                                                  ? "Activate"
+                                                  : "Deactivate"),
+                                            ),
+                                            // PopupMenuItem(
+                                            //   value: 1,
+                                            //   onTap: () {
+                                            //     Navigator.push(
+                                            //         context,
+                                            //         MaterialPageRoute(
+                                            //             builder: (context) => ProductCategoryScreen(
+                                            //                 collectionReference: widget
+                                            //                     .collectionReference
+                                            //                     .doc(item
+                                            //                         .docid)
+                                            //                     .collection(
+                                            //                         "sub_category"),
+                                            //                 menuItemData:
+                                            //                     item,
+                                            //                 key: ValueKey(
+                                            //                     DateTime.now()
+                                            //                         .millisecondsSinceEpoch))));
+                                            //   },
+                                            //   child: const Text(
+                                            //       'View SubCategory'),
+                                            // ),
+                                          ];
+                                        }),
+                                  ],
+                                ))),
+                      ).appPaddingForScreen;
                     })
                 : const Center(
                     child: Text("No SubCategory Found"),

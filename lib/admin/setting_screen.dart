@@ -51,8 +51,6 @@ class _settingScreenState extends State<settingScreen> {
             child: SizedBox(
               height: size.height,
               width: size.width,
-              child: Padding(
-                padding: kIsWeb ? const EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero,
                 child: Column(
                   children: [
                     Expanded(
@@ -62,8 +60,8 @@ class _settingScreenState extends State<settingScreen> {
                         ),
                         child: Padding(
                           padding: EdgeInsets.symmetric(
-                                  horizontal: size.width * .04,
-                                  vertical: size.height * .01)
+                              horizontal: size.width * .04,
+                              vertical: size.height * .01)
                               .copyWith(bottom: 0),
                           child: SingleChildScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
@@ -116,8 +114,8 @@ class _settingScreenState extends State<settingScreen> {
                       ),
                     ),
                   ],
-                ),
-              ),
+                ).appPaddingForScreen
+
             )));
   }
 }

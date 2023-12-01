@@ -47,7 +47,6 @@ class _LogInScreenState extends State<LogInScreen> {
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         child: Container(
-          margin: kIsWeb ? EdgeInsets.only(left: 250,right: 250) : EdgeInsets.zero ,
           height: Get.height,
           decoration: const BoxDecoration(
               image: DecorationImage(
@@ -180,7 +179,7 @@ class _LogInScreenState extends State<LogInScreen> {
               ],
             ),
           ),
-        ),
+        ).appPaddingForScreen
       ),
     );
   }

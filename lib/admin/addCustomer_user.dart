@@ -301,7 +301,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                     )
                   ]),
             ),
-          ).appPadding,
+          ).appPaddingForScreen,
         ));
   }
 }
