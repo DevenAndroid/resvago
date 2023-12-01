@@ -16,17 +16,20 @@ class MyTextField extends StatelessWidget {
   final Color color;
   final String? Function(String?)? validator;
   final TextInputType? keyboardtype;
+  final TextInputFormatter? textInputFormatter;
   final int? maxLines;
   final int? minLines;
   final Callback? ontap;
   final bool? realonly;
   final length;
+  final List<TextInputFormatter>? inputFormatters;
 
   const MyTextField({
     super.key,
     required this.controller,
     required this.hintText,
     this.lableText,
+    this.textInputFormatter,
     this.ontap,
     this.realonly = false,
     this.length,
@@ -35,7 +38,7 @@ class MyTextField extends StatelessWidget {
     this.validator,
     this.keyboardtype,
     this.maxLines,
-    this.minLines,
+    this.minLines, this.inputFormatters,
   });
 
   @override
@@ -54,6 +57,8 @@ class MyTextField extends StatelessWidget {
         obscureText: obscureText,
         cursorColor: Colors.white,
         inputFormatters: [
+          if(inputFormatters != null)
+            ...inputFormatters!,
           LengthLimitingTextInputFormatter(length),
         ],
         decoration: InputDecoration(
