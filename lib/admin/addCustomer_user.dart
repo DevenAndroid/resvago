@@ -48,37 +48,52 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   String verificationId = "";
   bool value = false;
   bool showValidation = false;
+  String? uid;
   FirebaseService firebaseService = FirebaseService();
   FirebaseUserService firebaseUserService = FirebaseUserService();
   Future<void> addUserToFirestore() async {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
     if (!widget.isEditMode) {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text.trim(), password: "123456");
+      FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: "123456",
+      ).then((UserCredential userCredential) {
+         uid = userCredential.user!.uid;
+        print("User UID: $uid");
+        log(uid.toString());
+
+      }).catchError((e) {
+        print("Error creating user: $e");
+      });
     }
     if (FirebaseAuth.instance.currentUser != null) {
       if(widget.isEditMode){
-        await firebaseUserService
-            .customerRegisterUsers(
-            userName: userNameController.text.trim(),
-            email: emailController.text.trim(),
-            mobileNumber: phoneNumberController.text.trim(),
-            password: "123456")
-            .then((value) {
+        CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
+        var DocumentReference = collection.doc(widget.documentId);
+        DocumentReference.update({
+          "userName": userNameController.text,
+          "email": emailController.text,
+          "mobileNumber": phoneNumberController.text,
+        }).then((value) {
+          Get.to(const CustomeruserListScreen());
           Helper.hideLoader(loader);
-          Get.to(CustomeruserListScreen());
         });
       }else{
-        await firebaseUserService
-            .customerRegisterUsers(
-            userName: userNameController.text.trim(),
-            email: emailController.text.trim(),
-            mobileNumber: code + phoneNumberController.text.trim(),
-            password: "123456")
-            .then((value) {
+        CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
+        var DocumentReference = collection.doc(uid);
+        DocumentReference.set({
+          "userName": userNameController.text,
+          "email": emailController.text,
+          "docid": uid,
+          "mobileNumber": phoneNumberController.text,
+          "userID": phoneNumberController.text,
+          "profile_image": "",
+          "password": "123456",
+          "deactivate": false,
+        }).then((value) {
+          Get.to(const CustomeruserListScreen());
           Helper.hideLoader(loader);
-          Get.to(CustomeruserListScreen());
         });
       }
 
@@ -121,6 +136,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log(uid.toString());
     return Scaffold(
         appBar: backAppBar(
             title:

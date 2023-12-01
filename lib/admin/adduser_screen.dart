@@ -155,45 +155,55 @@ class _AddUserScreenState extends State<AddUserScreen> {
       if (kDebugMode) {
         print("got image url.........    $imageUrl");
       }
+      String? uid;
       if (!widget.isEditMode) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text.trim(), password: "123456");
+        FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: "123456",
+        ).then((UserCredential userCredential) {
+          uid = userCredential.user!.uid;
+          print("User UID: $uid");
+          log(uid.toString());
+
+        }).catchError((e) {
+          print("Error creating user: $e");
+        });
       }
       if (widget.isEditMode) {
-        await firebaseUserService
-            .manageRegisterUsers(
-          restaurantName: restaurantNameController.text.trim(),
-          category: categoryController.text.trim(),
-          email: emailController.text.trim(),
-          mobileNumber: mobileNumberController.text.trim(),
-          address: _address,
-          latitude: latitude.toString(),
-          longitude: longitude.toString(),
-          password: "123456",
-          image: imageUrl,
-          restaurant_position: geoFirePoint.data.toString(),
-        )
-            .then((value) {
-          Get.back();
-          Helper.hideLoader(loader);
+        CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
+        var documentReference = collection.doc(widget.documentId);
+        documentReference.set({
+          "restaurantName": restaurantNameController.text.trim(),
+          "category": categoryController.text.trim(),
+          "email": emailController.text.trim(),
+          "docid": widget.documentId,
+          "mobileNumber": mobileNumberController.text.trim(),
+          "address": _address,
+          "latitude": latitude.toString(),
+          "longitude": longitude.toString(),
+          'password': "123456",
+          'image': imageUrl,
+          "time": DateTime.now(),
+          "userID": mobileNumberController.text.trim(),
+          "deactivate":false
         });
       } else {
-        await firebaseUserService
-            .manageRegisterUsers(
-          restaurantName: restaurantNameController.text.trim(),
-          category: categoryController.text.trim(),
-          email: emailController.text.trim(),
-          mobileNumber: code + mobileNumberController.text.trim(),
-          address: _address,
-          latitude: latitude.toString(),
-          longitude: longitude.toString(),
-          password: "123456",
-          image: imageUrl,
-          restaurant_position: geoFirePoint.data.toString(),
-        )
-            .then((value) {
-          Get.back();
-          Helper.hideLoader(loader);
+        CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
+        var documentReference = collection.doc(uid);
+        documentReference.set({
+          "restaurantName": restaurantNameController.text.trim(),
+          "category": categoryController.text.trim(),
+          "email": emailController.text.trim(),
+          "docid": uid,
+          "mobileNumber": code + mobileNumberController.text.trim(),
+          "address": _address,
+          "latitude": latitude.toString(),
+          "longitude": longitude.toString(),
+           'password': "123456",
+          'image': imageUrl,
+          "time": DateTime.now(),
+          "userID": mobileNumberController.text.trim(),
+          "deactivate":false
         });
       }
 
