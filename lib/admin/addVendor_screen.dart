@@ -220,7 +220,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                   color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                                   dashPattern: const [6],
                                   strokeWidth: 1,
-                                  child: InkWell(
+                                  child: GestureDetector(
                                     onTap: () {
                                       Helper.addFilePicker().then((value) {
                                         pickedFile = value;
@@ -285,7 +285,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                   color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                                   dashPattern: const [6],
                                   strokeWidth: 1,
-                                  child: InkWell(
+                                  child: GestureDetector(
                                     onTap: () {
                                       showActionSheet(context);
                                     },

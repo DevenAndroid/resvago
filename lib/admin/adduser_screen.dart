@@ -346,7 +346,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                     shrinkWrap: true,
                                     itemBuilder:
                                         (BuildContext context, int index) {
-                                      return InkWell(
+                                      return GestureDetector(
                                           onTap: () {
                                             categoryController.text =
                                                 categoryList![index].name;
@@ -512,7 +512,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       const SizedBox(
                         height: 10,
                       ),
-                      InkWell(
+                      GestureDetector(
                           onTap: () async {
                             var place = await PlacesAutocomplete.show(
                                 hint: "Location",
@@ -601,7 +601,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                         dashPattern: const [6],
                         strokeWidth: 1,
-                        child: InkWell(
+                        child: GestureDetector(
                           onTap: () {
                             Helper.addFilePicker().then((value) {
                               pickedFile = value;
@@ -666,7 +666,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         color: showValidationImg == false ? const Color(0xFFFAAF40) : Colors.red,
                         dashPattern: const [6],
                         strokeWidth: 1,
-                        child: InkWell(
+                        child: GestureDetector(
                           onTap: () {
                             showActionSheet(context);
                           },
