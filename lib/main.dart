@@ -8,19 +8,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  if(kIsWeb){
+  if (kIsWeb) {
     await Firebase.initializeApp(
         options: const FirebaseOptions(
-          apiKey: "AIzaSyBCol-O-qoqmOCLI_aRN0PeJ5KPvGPVQB8",
-          projectId: "resvago-b7bd4",
-          messagingSenderId: "671324938172",
-          appId: "1:671324938172:web:730e39e60b81133aaed5b9",
-        )
-    );
+      apiKey: "AIzaSyBN7-pBlJcY6p8stbdeDRgo-JVF6MO2K30",
+      projectId: "resvago-ire",
+      storageBucket: "resvago-ire.appspot.com",
+      messagingSenderId: "382013840274",
+      appId: "1:382013840274:web:05b02bbef51966a4abff4b",
+    ));
   }
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
