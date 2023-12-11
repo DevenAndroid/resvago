@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -14,6 +15,7 @@ import 'package:resvago/admin/setting_screen.dart';
 import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
+import 'package:resvago/components/helper.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'productcategory_list_screen.dart';
@@ -21,14 +23,14 @@ import 'model/deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
 import 'model/dining_order_model.dart';
 
-class LineChartSample1 extends StatefulWidget {
-  const LineChartSample1({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<StatefulWidget> createState() => LineChartSample1State();
+  State<StatefulWidget> createState() => HomePageState();
 }
 
-class LineChartSample1State extends State<LineChartSample1> {
+class HomePageState extends State<HomePage> {
   late bool isShowingMainData;
   int touchedIndex = -1;
   bool isDropdownOpen = false;
@@ -44,7 +46,7 @@ class LineChartSample1State extends State<LineChartSample1> {
     super.initState();
     isShowingMainData = true;
   }
-  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +302,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '₹1000',
+                        '\$${1000}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
@@ -356,7 +358,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '₹500',
+                        '\$${500}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
@@ -380,7 +382,7 @@ class LineChartSample1State extends State<LineChartSample1> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '₹132',
+                        '\$${132}',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 30,
@@ -697,8 +699,9 @@ class LineChartSample1State extends State<LineChartSample1> {
                 ),
               ]),
             )
-          ]),
-        ));
+          ]).appPaddingForScreen,
+        )
+    );
   }
 
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {

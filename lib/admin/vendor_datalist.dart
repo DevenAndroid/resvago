@@ -1,9 +1,11 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addVendor_screen.dart';
+import 'package:resvago/components/helper.dart';
 import 'model/resturent_model.dart';
 
 class VendorDataScreen extends StatefulWidget {
@@ -41,12 +43,13 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
           widget.resturentData != null
               ? "${widget.resturentData!.name} Sub Category"
               : 'Vendor Category',
-          style: const TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
           child: GestureDetector(
-              onTap:(){
+              onTap: () {
                 Get.back();
               },
               child: SvgPicture.asset('assets/images/arrowback.svg')),
@@ -85,7 +88,10 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                 ),
               )),
           IconButton(
-            icon: const Icon(Icons.search,color: Color(0xff3B5998),),
+            icon: const Icon(
+              Icons.search,
+              color: Color(0xff3B5998),
+            ),
             onPressed: toggleTextFieldVisibility,
           )
         ],
@@ -162,19 +168,21 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                         ),
                         child: Center(
                           child: ListTile(
-                            contentPadding: const EdgeInsets.only(right: 0,left: 10),
+                              contentPadding:
+                                  const EdgeInsets.only(right: 0, left: 10),
                               title: Text(
                                 item.name.toString(),
                                 style: const TextStyle(
                                     color: Color(0xff384953),
-                                fontWeight: FontWeight.bold),
+                                    fontWeight: FontWeight.bold),
                               ),
                               leading: Container(
                                 height: 80,
                                 width: 80,
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image: NetworkImage(item.image.toString()),
+                                      image:
+                                          NetworkImage(item.image.toString()),
                                       fit: BoxFit.cover,
                                     ),
                                     color: Colors.white,
@@ -189,7 +197,11 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   item.deactivate
-                                      ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                      ? Image.asset(
+                                          'assets/images/deactivate.png',
+                                          height: 20,
+                                          width: 20,
+                                        )
                                       : const SizedBox(),
                                   PopupMenuButton<int>(
                                       icon: const Icon(
@@ -210,8 +222,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                             collectionReference:
                                                                 widget
                                                                     .collectionReference,
-                                                            resturentData:
-                                                                item,
+                                                            resturentData: item,
                                                           )));
                                             },
                                             child: const Text("Edit"),
@@ -221,8 +232,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                             onTap: () {
                                               showDialog(
                                                 context: context,
-                                                builder: (ctx) =>
-                                                    AlertDialog(
+                                                builder: (ctx) => AlertDialog(
                                                   title: const Text(
                                                       "Delete Vendor Category"),
                                                   content: const Text(
@@ -236,8 +246,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .red,
+                                                              color: Colors.red,
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
@@ -246,10 +255,8 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(14),
-                                                          child:
-                                                              const Center(
-                                                                  child:
-                                                                      Text(
+                                                          child: const Center(
+                                                              child: Text(
                                                             "Cancel",
                                                             style: TextStyle(
                                                                 color: Colors
@@ -263,11 +270,9 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                         onPressed: () {
                                                           widget
                                                               .collectionReference
-                                                              .doc(item
-                                                                  .docid)
+                                                              .doc(item.docid)
                                                               .delete()
-                                                              .then(
-                                                                  (value) {
+                                                              .then((value) {
                                                             setState(() {});
                                                           });
                                                           Navigator.of(ctx)
@@ -275,8 +280,8 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .green,
+                                                              color:
+                                                                  Colors.green,
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
@@ -285,10 +290,8 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(14),
-                                                          child:
-                                                              const Center(
-                                                                  child:
-                                                                      Text(
+                                                          child: const Center(
+                                                              child: Text(
                                                             "okay",
                                                             style: TextStyle(
                                                                 color: Colors
@@ -306,50 +309,49 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                           PopupMenuItem(
                                             value: 1,
                                             onTap: () {
-                                              item.deactivate ? widget.collectionReference
-                                                  .doc(item.docid)
-                                                  .update({
-                                                "deactivate": false
-                                              }) :
-                                              widget.collectionReference
-                                                  .doc(item.docid)
-                                                  .update({
-                                                "deactivate": true
-                                              });
+                                              item.deactivate
+                                                  ? widget.collectionReference
+                                                      .doc(item.docid)
+                                                      .update(
+                                                          {"deactivate": false})
+                                                  : widget.collectionReference
+                                                      .doc(item.docid)
+                                                      .update(
+                                                          {"deactivate": true});
                                               setState(() {});
                                             },
                                             child: Text(item.deactivate
                                                 ? "Activate"
                                                 : "Deactivate"),
                                           ),
-                                          PopupMenuItem(
-                                            value: 1,
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) => VendorDataScreen(
-                                                          collectionReference: widget
-                                                              .collectionReference
-                                                              .doc(item
-                                                                  .docid)
-                                                              .collection(
-                                                                  "sub_category"),
-                                                          resturentData:
-                                                              item,
-                                                          key: ValueKey(
-                                                              DateTime.now()
-                                                                  .millisecondsSinceEpoch))));
-                                            },
-                                            child: const Text(
-                                                'View SubCategory'),
-                                          ),
+                                          // PopupMenuItem(
+                                          //   value: 1,
+                                          //   onTap: () {
+                                          //     Navigator.push(
+                                          //         context,
+                                          //         MaterialPageRoute(
+                                          //             builder: (context) => VendorDataScreen(
+                                          //                 collectionReference: widget
+                                          //                     .collectionReference
+                                          //                     .doc(item
+                                          //                         .docid)
+                                          //                     .collection(
+                                          //                         "sub_category"),
+                                          //                 resturentData:
+                                          //                     item,
+                                          //                 key: ValueKey(
+                                          //                     DateTime.now()
+                                          //                         .millisecondsSinceEpoch))));
+                                          //   },
+                                          //   child: const Text(
+                                          //       'View SubCategory'),
+                                          // ),
                                         ];
                                       }),
                                 ],
                               )),
                         ),
-                      );
+                      ).appPaddingForScreen;
                     })
                 : const Center(
                     child: Text("No SubCategory Found"),

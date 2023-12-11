@@ -1,9 +1,11 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
+import 'package:resvago/components/helper.dart';
 
 import 'model/customer_register_model.dart';
 
@@ -281,7 +283,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                           }),
                                     ],
                                   ))),
-                        );
+                        ).appPaddingForScreen;
                       })
                       : const Center(
                     child: Text("No User Found"),

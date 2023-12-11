@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -13,9 +14,11 @@ import '../../components/apptheme.dart';
 import '../../components/helper.dart';
 import 'delivery_order_details_modal.dart';
 
-
 class DeliveryOderDetailsScreen extends StatefulWidget {
-  const DeliveryOderDetailsScreen({super.key, this.model,});
+  const DeliveryOderDetailsScreen({
+    super.key,
+    this.model,
+  });
   final MyOrderModel? model;
 
   @override
@@ -94,7 +97,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                             DateFormat("dd-mm-yy hh:mm a").format(
                                 DateTime.parse(
                                     DateTime.fromMillisecondsSinceEpoch(
-                                        myOrderModel!.time)
+                                            myOrderModel!.time)
                                         .toLocal()
                                         .toString())),
                             style: GoogleFonts.poppins(
@@ -107,7 +110,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                       const Spacer(),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 7),
+                            horizontal: 5, vertical: 3),
                         decoration: BoxDecoration(
                           color: getStatusColor(myOrderModel!.orderStatus),
                           borderRadius: BorderRadius.circular(9),
@@ -161,9 +164,9 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.start,
+                                              MainAxisAlignment.start,
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Image.network(
                                               item.image,
@@ -176,14 +179,14 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                             Expanded(
                                               child: Column(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Row(
                                                     mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
                                                       Text(
                                                         item.dishName
@@ -192,10 +195,9 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                                             color: const Color(
                                                                 0xFF1A2E33),
                                                             fontWeight:
-                                                            FontWeight.w600,
+                                                                FontWeight.w600,
                                                             fontSize: 15),
                                                       ),
-
                                                     ],
                                                   ),
                                                   const SizedBox(
@@ -207,7 +209,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                                         color: const Color(
                                                             0xFF384953),
                                                         fontWeight:
-                                                        FontWeight.w300,
+                                                            FontWeight.w300,
                                                         fontSize: 15),
                                                   ),
                                                 ],
@@ -216,19 +218,20 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                             Text(
                                               "\$${item.price}",
                                               style: GoogleFonts.poppins(
-                                                  color: const Color(
-                                                      0xFF384953),
-                                                  fontWeight:
-                                                  FontWeight.w300,
+                                                  color:
+                                                      const Color(0xFF384953),
+                                                  fontWeight: FontWeight.w300,
                                                   fontSize: 15),
                                             ),
-                                            SizedBox(width: 10,)
+                                            SizedBox(
+                                              width: 10,
+                                            )
                                           ],
                                         ),
                                         Divider(
                                           thickness: 1,
                                           color:
-                                          Colors.black12.withOpacity(0.09),
+                                              Colors.black12.withOpacity(0.09),
                                         ),
                                       ],
                                     ),
@@ -354,28 +357,31 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                             height: 10,
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 8.0, right: 8),
+                            padding: const EdgeInsets.only(left: 8, right: 2),
                             child: Row(
                               children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Customer Address",
-                                      style: GoogleFonts.poppins(
-                                          color: const Color(0xFF486769),
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: 14),
-                                    ),
-                                    Text(
-                                      myOrderModel!.address.toString(),
-                                      style: GoogleFonts.poppins(
-                                          color: const Color(0xFF21283D),
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Customer Address",
+                                        style: GoogleFonts.poppins(
+                                            color: const Color(0xFF486769),
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 14),
+                                      ),
+                                      Text(
+                                        myOrderModel!.address.toString(),
+                                        style: GoogleFonts.poppins(
+                                            color: const Color(0xFF21283D),
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                                 const Spacer(),
                                 // Image.asset(
@@ -523,7 +529,6 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                             .doc(myOrderModel!.docid)
                             .update({'order_status': 'Order Completed'});
 
-
                         showToast("Order is Completed");
                       },
                       style: ElevatedButton.styleFrom(
@@ -579,7 +584,6 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                   .doc(myOrderModel!.docid)
                                   .update({'order_status': 'Order Accepted'});
 
-
                               showToast("Order is Accepted");
                             },
                             style: ElevatedButton.styleFrom(
@@ -595,9 +599,9 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                   .textTheme
                                   .headline5!
                                   .copyWith(
-                                  color: AppTheme.backgroundcolor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: AddSize.font18),
+                                      color: AppTheme.backgroundcolor,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: AddSize.font18),
                             )),
                       ),
                       const SizedBox(
@@ -614,7 +618,6 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                     .doc(myOrderModel!.docid)
                                     .update({'order_status': 'Order Rejected'});
 
-
                                 showToast("Order is Rejected");
                               },
                               style: ElevatedButton.styleFrom(
@@ -630,9 +633,9 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                     .textTheme
                                     .headline5!
                                     .copyWith(
-                                    color: AppTheme.backgroundcolor,
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: AddSize.font18),
+                                        color: AppTheme.backgroundcolor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: AddSize.font18),
                               )))
                     ],
                   ),
@@ -641,7 +644,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                 height: 40,
               ),
             ],
-          ),
+          ).appPaddingForScreen,
         ));
   }
 }

@@ -1,10 +1,11 @@
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addpages_screen.dart';
+import 'package:resvago/components/helper.dart';
 
 import 'model/Pages_model.dart';
 
@@ -41,12 +42,13 @@ class _PagesListScreenState extends State<PagesListScreen> {
         surfaceTintColor: Colors.white,
         title: const Text(
           'Pages List',
-          style: TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
+          style:
+              TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
           child: GestureDetector(
-              onTap: (){
+              onTap: () {
                 Get.back();
               },
               child: SvgPicture.asset('assets/images/arrowback.svg')),
@@ -85,7 +87,6 @@ class _PagesListScreenState extends State<PagesListScreen> {
             icon: Icon(Icons.search),
             onPressed: toggleTextFieldVisibility,
             color: Color(0xff3B5998),
-
           )
         ],
         bottom: PreferredSize(
@@ -123,8 +124,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
       ),
       body: StreamBuilder<List<PagesData>>(
         stream: getPagesStream(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<PagesData>> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<List<PagesData>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
@@ -164,20 +165,28 @@ class _PagesListScreenState extends State<PagesListScreen> {
                         ),
                         child: Center(
                             child: ListTile(
-                              contentPadding: EdgeInsets.only(left: 15,right: 5),
+                                contentPadding:
+                                    const EdgeInsets.only(left: 15, right: 5),
                                 title: Text(
                                   item.title.toString(),
                                   style: const TextStyle(
                                       color: Color(0xff384953),
                                       fontWeight: FontWeight.bold),
                                 ),
-                                subtitle:
-                                    Text(item.longdescription.toString(),overflow: TextOverflow.ellipsis,),
+                                subtitle: Text(
+                                  item.longdescription.toString(),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                ),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     item.deactivate
-                                        ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                        ? Image.asset(
+                                            'assets/images/deactivate.png',
+                                            height: 20,
+                                            width: 20,
+                                          )
                                         : const SizedBox(),
                                     PopupMenuButton<int>(
                                         icon: const Icon(
@@ -282,16 +291,21 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                item.deactivate ? FirebaseFirestore.instance
-                                                    .collection('Pages')
-                                                    .doc(item.docid)
-                                                    .update(
-                                                        {"deactivate": false}):
-                                                FirebaseFirestore.instance
-                                                    .collection('Pages')
-                                                    .doc(item.docid)
-                                                    .update(
-                                                    {"deactivate": true});
+                                                item.deactivate
+                                                    ? FirebaseFirestore
+                                                        .instance
+                                                        .collection('Pages')
+                                                        .doc(item.docid)
+                                                        .update({
+                                                        "deactivate": false
+                                                      })
+                                                    : FirebaseFirestore
+                                                        .instance
+                                                        .collection('Pages')
+                                                        .doc(item.docid)
+                                                        .update({
+                                                        "deactivate": true
+                                                      });
                                                 setState(() {});
                                               },
                                               child: Text(item.deactivate
@@ -302,7 +316,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                         }),
                                   ],
                                 ))),
-                      );
+                      ).appPaddingForScreen;
                     })
                 : const Center(
                     child: Text("No Pages Found"),

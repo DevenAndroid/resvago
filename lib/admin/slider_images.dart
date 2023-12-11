@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -24,25 +25,29 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   Future<void> uploadImage() async {
     try {
-      UploadTask uploadTask = FirebaseStorage.instance
-          .ref("categoryImages")
-          .child(DateTime.now().millisecondsSinceEpoch.toString())
-          .putFile(categoryFile);
-
-      TaskSnapshot snapshot = await uploadTask;
-      imageUrl = await snapshot.ref.getDownloadURL();
+      String imageUrlProfile = categoryFile.path;
+      if (!categoryFile.path.contains("http")) {
+        UploadTask uploadTask = FirebaseStorage.instance
+            .ref("categoryImages")
+            .child(DateTime.now().millisecondsSinceEpoch.toString())
+            .putFile(categoryFile);
+        TaskSnapshot snapshot = await uploadTask;
+        imageUrlProfile = await snapshot.ref.getDownloadURL();
+      }
       await FirebaseFirestore.instance.collection('slider').add({
-        'imageUrl': imageUrl,
+        'imageUrl': imageUrlProfile,
         'timestamp': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       print('Error uploading image: $e');
     }
   }
-@override
+
+  @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,14 +124,17 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
                       icon: Icon(Icons.delete),
                       onPressed: () {
                         print("object");
-                        FirebaseFirestore.instance.collection('slider').doc(documentId).delete();
+                        FirebaseFirestore.instance
+                            .collection('slider')
+                            .doc(documentId)
+                            .delete();
                       },
                     ),
                   ),
                 ],
               );
             },
-          );
+          ).appPaddingForScreen;
         },
       ),
     );
@@ -147,32 +155,8 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
               Helper.addImagePicker(
                       imageSource: ImageSource.camera, imageQuality: 75)
                   .then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+                if (value != null) {
+                  categoryFile = File(value.path);
                   uploadImage();
                   setState(() {});
                 }
@@ -187,32 +171,8 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
               Helper.addImagePicker(
                       imageSource: ImageSource.gallery, imageQuality: 75)
                   .then((value) async {
-                CroppedFile? croppedFile = await ImageCropper().cropImage(
-                  sourcePath: value.path,
-                  aspectRatioPresets: [
-                    CropAspectRatioPreset.square,
-                    CropAspectRatioPreset.ratio3x2,
-                    CropAspectRatioPreset.original,
-                    CropAspectRatioPreset.ratio4x3,
-                    CropAspectRatioPreset.ratio16x9
-                  ],
-                  uiSettings: [
-                    AndroidUiSettings(
-                        toolbarTitle: 'Cropper',
-                        toolbarColor: Colors.deepOrange,
-                        toolbarWidgetColor: Colors.white,
-                        initAspectRatio: CropAspectRatioPreset.original,
-                        lockAspectRatio: false),
-                    IOSUiSettings(
-                      title: 'Cropper',
-                    ),
-                    WebUiSettings(
-                      context: context,
-                    ),
-                  ],
-                );
-                if (croppedFile != null) {
-                  categoryFile = File(croppedFile.path);
+                if (value != null) {
+                  categoryFile = File(value.path);
                   uploadImage();
                   setState(() {});
                 }

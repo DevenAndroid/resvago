@@ -6,7 +6,13 @@ class PagesData {
   final bool deactivate;
   final dynamic time;
 
-  PagesData( {required this.deactivate, this.docid,this.searchName,this.time, required this.title, required this.longdescription});
+  PagesData(
+      {required this.deactivate,
+      this.docid,
+      this.searchName,
+      this.time,
+      required this.title,
+      required this.longdescription});
 
   Map<String, dynamic> toMap() {
     return {
@@ -24,7 +30,7 @@ class PagesData {
       title: map['title'],
       longdescription: map['longdescription'],
       deactivate: map['deactivate'],
-       docid: map['docid'],
+      docid: map['docid'],
       time: map['time'],
       searchName: map['searchName'],
     );

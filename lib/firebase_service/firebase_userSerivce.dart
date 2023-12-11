@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:resvago/components/helper.dart';
 
-class FirebaseService {
+class FirebaseUserService {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future manageRegisterUsers({
@@ -56,78 +55,28 @@ class FirebaseService {
       throw Exception(e);
     }
   }
-  Future manageCategoryProduct({
-    required DocumentReference documentReference,
-    dynamic name,
-    dynamic image,
-    dynamic description,
+
+  Future customerRegisterUsers({
+    dynamic userName,
+    dynamic email,
     dynamic docid,
-    dynamic deactivate,
-    dynamic time,
-    dynamic searchName,
+    dynamic mobileNumber,
+    dynamic password,
+    dynamic userID,
   }) async {
     try {
-      if (time != null) {
-
-        await documentReference.set({
-          "name": name,
-          "image": image,
-          "description": description,
-          "docid": docid,
-          "deactivate": deactivate,
-          "time": time,
-          "searchName": searchName,
-        }).then((value) => (){
-          showToast('Category Added');
-        });
-      } else {
-        await documentReference.update({
-          "name": name,
-          "image": image,
-          "description": description,
-          "docid": docid,
-          "searchName": searchName,
-        }).then((value) => (){
-          showToast('Category updated');
-        });
-      }
-
-
-    } catch (e) {
-      throw Exception(e);
-    }
-  }
-
-  Future manageVendorCategory({
-    required DocumentReference documentReference,
-    dynamic name,
-    dynamic image,
-    dynamic description,
-    dynamic docid,
-    dynamic deactivate,
-    dynamic time,
-    dynamic searchName,
-  }) async {
-    try {
-      if (time != null) {
-        await documentReference.set({
-          "name": name,
-          "image": image,
-          "description": description,
-          "docid": docid,
-          "deactivate": deactivate,
-          "time": time,
-          "searchName": searchName,
-        });
-      } else {
-        await documentReference.update({
-          "name": name,
-          "image": image,
-          "description": description,
-          "docid": docid,
-          "searchName": searchName,
-        });
-      }
+      CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
+      var DocumentReference = collection.doc(FirebaseAuth.instance.currentUser!.uid);
+      DocumentReference.set({
+        "userName": userName,
+        "email": email,
+        "docid": docid,
+        "mobileNumber": mobileNumber,
+        "userID": mobileNumber,
+        "profile_image": "",
+        "password": "123456",
+        "deactivate": false,
+      }).then((value) {});
     } catch (e) {
       throw Exception(e);
     }

@@ -1,10 +1,12 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addproduct_screen.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
+import 'package:resvago/components/helper.dart';
 
 class ProductCategoryScreen extends StatefulWidget {
   final CollectionReference collectionReference;
@@ -325,33 +327,33 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                   ? "Activate"
                                                   : "Deactivate"),
                                             ),
-                                            PopupMenuItem(
-                                              value: 1,
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) => ProductCategoryScreen(
-                                                            collectionReference: widget
-                                                                .collectionReference
-                                                                .doc(item
-                                                                    .docid)
-                                                                .collection(
-                                                                    "sub_category"),
-                                                            menuItemData:
-                                                                item,
-                                                            key: ValueKey(
-                                                                DateTime.now()
-                                                                    .millisecondsSinceEpoch))));
-                                              },
-                                              child: const Text(
-                                                  'View SubCategory'),
-                                            ),
+                                            // PopupMenuItem(
+                                            //   value: 1,
+                                            //   onTap: () {
+                                            //     Navigator.push(
+                                            //         context,
+                                            //         MaterialPageRoute(
+                                            //             builder: (context) => ProductCategoryScreen(
+                                            //                 collectionReference: widget
+                                            //                     .collectionReference
+                                            //                     .doc(item
+                                            //                         .docid)
+                                            //                     .collection(
+                                            //                         "sub_category"),
+                                            //                 menuItemData:
+                                            //                     item,
+                                            //                 key: ValueKey(
+                                            //                     DateTime.now()
+                                            //                         .millisecondsSinceEpoch))));
+                                            //   },
+                                            //   child: const Text(
+                                            //       'View SubCategory'),
+                                            // ),
                                           ];
                                         }),
                                   ],
                                 ))),
-                      );
+                      ).appPaddingForScreen;
                     })
                 : const Center(
                     child: Text("No SubCategory Found"),

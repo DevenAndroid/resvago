@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/admin/diningOrders_details_screen.dart';
+import 'package:resvago/components/helper.dart';
 import 'model/deliveryOrder_details_screen.dart';
 import 'model/dining_order_model.dart';
 
@@ -538,7 +540,7 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
                 ),
               ]),
             )
-          ]),
+          ]).appPaddingForScreen,
         ));
   }
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {

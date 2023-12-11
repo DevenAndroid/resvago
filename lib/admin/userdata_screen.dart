@@ -1,9 +1,12 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/adduser_screen.dart';
+import 'package:resvago/components/helper.dart';
 
 import 'model/user_model.dart';
 
@@ -24,6 +27,9 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
       isTextFieldVisible = !isTextFieldVisible;
     });
   }
+
+
+
 
   @override
   void initState() {
@@ -68,7 +74,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to( const AddUsersScreen(
+                Get.to( const AddUserScreen(
                   isEditMode: false,
                 ));
               },
@@ -201,7 +207,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(AddUsersScreen(
+                                                      Get.to(AddUserScreen(
                                                         isEditMode: true,
                                                         documentId: item.docid,
                                                           restaurantNamename: item.restaurantName,
@@ -241,7 +247,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                               ),
                                                             ),
                                                             TextButton(
-                                                              onPressed: () {
+                                                              onPressed: () async {
                                                                 FirebaseFirestore.instance
                                                                     .collection("vendor_users")
                                                                     .doc(item.docid)
@@ -250,6 +256,13 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                                   setState(() {});
                                                                 });
                                                                 Navigator.of(ctx).pop();
+                                                                QuerySnapshot postsSnapshot = await FirebaseFirestore.instance
+                                                                    .collection('Coupon_data')
+                                                                    .where('userID', isEqualTo: item.docid)
+                                                                    .get();
+                                                                for (QueryDocumentSnapshot doc in postsSnapshot.docs) {
+                                                                  await doc.reference.delete();
+                                                                }
                                                               },
                                                               child: Container(
                                                                 decoration: BoxDecoration(
@@ -298,7 +311,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                               }),
                                         ],
                                       ))),
-                            );
+                            ).appPaddingForScreen;
                           })
                       : const Center(
                           child: Text("No User Found"),

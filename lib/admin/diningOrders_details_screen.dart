@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -82,7 +83,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-// mainAxisAlignment: MainAxisAlignment.start,
+        // mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
                           "Order ID: ${myDiningOrderModel!.orderId.toString()}",
@@ -99,7 +100,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                     GestureDetector(
                       onTap: () {},
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
+                        padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                         decoration: BoxDecoration(
                           color: getStatusColor(myDiningOrderModel!.orderStatus),
                           borderRadius: BorderRadius.circular(9),
@@ -716,7 +717,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
               height: 40,
             ),
           ],
-        ),
+        ).appPaddingForScreen,
       ),
     );
   }
