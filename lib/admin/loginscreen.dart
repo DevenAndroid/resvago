@@ -157,7 +157,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     OverlayEntry loader = Helper.overlayLoader(context);
                     Overlay.of(context).insert(loader);
                     FirebaseAuth.instance
-                        .signInWithEmailAndPassword(
+                        .createUserWithEmailAndPassword(
                             email: emailController.text.trim(),
                             password: passwordController.text.trim())
                         .then((userCredential) {
