@@ -68,7 +68,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       } else {
         imageUrl = fileUrl;
       }
-    } else {
+    } else if (menuItemData != null) {
       if (!categoryFile.path.contains("https")) {
         Reference gg = FirebaseStorage.instance.refFromURL(menuItemData!.image.toString());
         await gg.delete();
