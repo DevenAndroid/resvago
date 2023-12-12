@@ -144,8 +144,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
         }
       } else {
         if (!categoryFile.path.contains("https")) {
-            Reference gg = FirebaseStorage.instance.refFromURL(widget.image.toString());
-            await gg.delete();
+            // Reference gg = FirebaseStorage.instance.refFromURL(widget.image.toString());
+            // await gg.delete();
 
           UploadTask uploadTask = FirebaseStorage.instance
               .ref("categoryImages")

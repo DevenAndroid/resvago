@@ -74,8 +74,8 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
         }
       }  else if (resturentData != null) { // Check if resturentData is not null
         if (!categoryFile.path.contains("https")) {
-          Reference gg = FirebaseStorage.instance.refFromURL(resturentData!.image.toString());
-          await gg.delete();
+          // Reference gg = FirebaseStorage.instance.refFromURL(resturentData!.image.toString());
+          // await gg.delete();
 
           UploadTask uploadTask = FirebaseStorage.instance
               .ref("categoryImages")
