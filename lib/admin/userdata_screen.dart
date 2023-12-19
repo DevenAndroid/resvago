@@ -28,9 +28,6 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
     });
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
@@ -42,22 +39,23 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
       appBar: AppBar(
         elevation: 10,
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor:Colors.white,
+        backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: const Text(
           'Vendor Users List',
-          style: TextStyle(color: Color(0xFF423E5E),fontSize: 20,fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xFF423E5E), fontSize: 20, fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
           child: GestureDetector(
-            onTap: (){
-              Get.back();
-            },
+              onTap: () {
+                Get.back();
+              },
               child: SvgPicture.asset('assets/images/arrowback.svg')),
         ),
         actions: [
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               setState(() {
                 isDescendingOrder = !isDescendingOrder;
@@ -74,7 +72,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to( const AddUserScreen(
+                Get.to(const AddUserScreen(
                   isEditMode: false,
                 ));
               },
@@ -87,9 +85,12 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                 ),
               )),
           IconButton(
-            icon: const Icon(Icons.search,size: 30,),
+            icon: const Icon(
+              Icons.search,
+              size: 30,
+            ),
             onPressed: toggleTextFieldVisibility,
-            color: Color(0xff3B5998),
+            color: const Color(0xff3B5998),
           )
         ],
         bottom: PreferredSize(
@@ -128,7 +129,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
               stream: getUsersStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: const CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                  return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
@@ -158,13 +159,13 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                     color: Colors.grey.withOpacity(0.2),
                                     spreadRadius: 1,
                                     blurRadius: 2,
-                                    offset: Offset(0, 1),
+                                    offset: const Offset(0, 1),
                                   ),
                                 ],
                               ),
                               child: Center(
                                   child: ListTile(
-                                      contentPadding: EdgeInsets.only(left: 15),
+                                      contentPadding: const EdgeInsets.only(left: 15),
                                       title: RichText(
                                         overflow: TextOverflow.clip,
                                         textAlign: TextAlign.end,
@@ -193,7 +194,11 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           item.deactivate == true
-                                              ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                              ? Image.asset(
+                                                  'assets/images/deactivate.png',
+                                                  height: 20,
+                                                  width: 20,
+                                                )
                                               : const SizedBox(),
                                           PopupMenuButton<int>(
                                               padding: EdgeInsets.zero,
@@ -208,15 +213,14 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                     value: 1,
                                                     onTap: () {
                                                       Get.to(AddUserScreen(
-                                                        isEditMode: true,
-                                                        documentId: item.docid,
+                                                          isEditMode: true,
+                                                          documentId: item.docid,
                                                           restaurantNamename: item.restaurantName,
-                                                        email: item.email,
-                                                        category: item.category,
-                                                        phoneNumber: item.mobileNumber,
-                                                        image: item.image,
-                                                        address: item.address
-                                                      ));
+                                                          email: item.email,
+                                                          category: item.category,
+                                                          phoneNumber: item.mobileNumber,
+                                                          image: item.image,
+                                                          address: item.address));
                                                     },
                                                     child: const Text("Edit"),
                                                   ),
@@ -227,57 +231,74 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                         context: context,
                                                         builder: (ctx) => AlertDialog(
                                                           title: const Text("Delete user"),
-                                                          content: const Text("Are you sure you want to delete this user"),
-                                                          actions: <Widget>[
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(ctx).pop();
-                                                              },
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: Colors.red,
-                                                                    borderRadius: BorderRadius.circular(11)),
-                                                                width: 100,
-                                                                padding: const EdgeInsets.all(14),
-                                                                child: const Center(
-                                                                    child: Text(
-                                                                  "Cancel",
-                                                                  style: TextStyle(color: Colors.white),
-                                                                )),
-                                                              ),
+                                                          content: SizedBox(
+                                                            height: 140,
+                                                            child: Column(
+                                                              children: [
+                                                                const Text("Are you sure you want to delete this user"),
+                                                                const SizedBox(
+                                                                  height: 20,
+                                                                ),
+                                                                Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: TextButton(
+                                                                        onPressed: () {
+                                                                          Navigator.of(ctx).pop();
+                                                                        },
+                                                                        child: Container(
+                                                                          decoration: BoxDecoration(
+                                                                              color: Colors.red,
+                                                                              borderRadius: BorderRadius.circular(11)),
+                                                                          // width: 100,
+                                                                          padding: const EdgeInsets.all(14),
+                                                                          child: const Center(
+                                                                              child: Text(
+                                                                            "Cancel",
+                                                                            style: TextStyle(color: Colors.white),
+                                                                          )),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Expanded(
+                                                                      child: TextButton(
+                                                                        onPressed: () async {
+                                                                          FirebaseFirestore.instance
+                                                                              .collection("vendor_users")
+                                                                              .doc(item.docid)
+                                                                              .delete()
+                                                                              .then((value) {
+                                                                            setState(() {});
+                                                                          });
+                                                                          Navigator.of(ctx).pop();
+                                                                          QuerySnapshot postsSnapshot = await FirebaseFirestore
+                                                                              .instance
+                                                                              .collection('Coupon_data')
+                                                                              .where('userID', isEqualTo: item.docid)
+                                                                              .get();
+                                                                          for (QueryDocumentSnapshot doc in postsSnapshot.docs) {
+                                                                            await doc.reference.delete();
+                                                                          }
+                                                                        },
+                                                                        child: Container(
+                                                                          decoration: BoxDecoration(
+                                                                              color: Colors.green,
+                                                                              borderRadius: BorderRadius.circular(11)),
+                                                                          width: 100,
+                                                                          padding: const EdgeInsets.all(14),
+                                                                          child: const Center(
+                                                                              child: Text(
+                                                                            "okay",
+                                                                            style: TextStyle(color: Colors.white),
+                                                                          )),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                )
+                                                              ],
                                                             ),
-                                                            TextButton(
-                                                              onPressed: () async {
-                                                                FirebaseFirestore.instance
-                                                                    .collection("vendor_users")
-                                                                    .doc(item.docid)
-                                                                    .delete()
-                                                                    .then((value) {
-                                                                  setState(() {});
-                                                                });
-                                                                Navigator.of(ctx).pop();
-                                                                QuerySnapshot postsSnapshot = await FirebaseFirestore.instance
-                                                                    .collection('Coupon_data')
-                                                                    .where('userID', isEqualTo: item.docid)
-                                                                    .get();
-                                                                for (QueryDocumentSnapshot doc in postsSnapshot.docs) {
-                                                                  await doc.reference.delete();
-                                                                }
-                                                              },
-                                                              child: Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: Colors.green,
-                                                                    borderRadius: BorderRadius.circular(11)),
-                                                                width: 100,
-                                                                padding: const EdgeInsets.all(14),
-                                                                child: const Center(
-                                                                    child: Text(
-                                                                  "okay",
-                                                                  style: TextStyle(color: Colors.white),
-                                                                )),
-                                                              ),
-                                                            ),
-                                                          ],
+                                                          ),
                                                         ),
                                                       );
                                                     },
@@ -286,23 +307,16 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      if(item.deactivate == true) {
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                            'vendor_users')
-                                                            .doc(item.docid)
-                                                            .update({
-                                                          "deactivate": false
-                                                        });
-                                                    } else {
-                                                        FirebaseFirestore
-                                                            .instance
+                                                      if (item.deactivate == true) {
+                                                        FirebaseFirestore.instance
                                                             .collection('vendor_users')
                                                             .doc(item.docid)
-                                                            .update({
-                                                          "deactivate": true
-                                                        });
+                                                            .update({"deactivate": false});
+                                                      } else {
+                                                        FirebaseFirestore.instance
+                                                            .collection('vendor_users')
+                                                            .doc(item.docid)
+                                                            .update({"deactivate": true});
                                                       }
                                                     },
                                                     child: Text(item.deactivate == true ? "Activate" : "Deactivate"),
@@ -339,18 +353,18 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
     }
   }
 
+
   Stream<List<UserData>> getUsersStreamFromFirestore() {
-    return FirebaseFirestore.instance
-        .collection('vendor_users')
-        .snapshots()
-        .map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('vendor_users').snapshots().map((querySnapshot) {
       List<UserData> users = [];
       try {
         for (var doc in querySnapshot.docs) {
-          users.add(UserData.fromMap(doc.data(),doc.id));
+          users.add(UserData.fromMap(doc.data(), doc.id));
         }
       } catch (e) {
-        print(e.toString());
+        if (kDebugMode) {
+          print(e.toString());
+        }
         throw Exception(e.toString());
       }
       return users;

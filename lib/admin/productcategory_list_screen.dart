@@ -54,7 +54,8 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
               child: SvgPicture.asset('assets/images/arrowback.svg')),
         ),
         actions: [
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               setState(() {
                 isDescendingOrder = !isDescendingOrder;

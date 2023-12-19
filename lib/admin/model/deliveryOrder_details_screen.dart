@@ -157,8 +157,11 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                 itemBuilder: (context, index) {
                                   final item = myOrderModel!
                                       .orderDetails!.menuList![index];
-                                  print("manish ${item.dishName}");
-                                  return InkWell(
+                                  if (kDebugMode) {
+                                    print("manish ${item.dishName}");
+                                  }
+                                  return GestureDetector(
+                                    behavior: HitTestBehavior.translucent,
                                     onTap: () {},
                                     child: Column(
                                       children: [

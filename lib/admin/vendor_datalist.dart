@@ -11,9 +11,7 @@ import 'model/resturent_model.dart';
 class VendorDataScreen extends StatefulWidget {
   final CollectionReference collectionReference;
   final ResturentData? resturentData;
-  const VendorDataScreen(
-      {Key? key, required this.collectionReference, this.resturentData})
-      : super(key: key);
+  const VendorDataScreen({Key? key, required this.collectionReference, this.resturentData}) : super(key: key);
 
   @override
   State<VendorDataScreen> createState() => _VendorDataScreenState();
@@ -40,11 +38,8 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: Text(
-          widget.resturentData != null
-              ? "${widget.resturentData!.name} Sub Category"
-              : 'Vendor Category',
-          style: const TextStyle(
-              color: Color(0xff423E5E), fontWeight: FontWeight.bold),
+          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category" : 'Vendor Category',
+          style: const TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
@@ -106,16 +101,12 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.black), // Change the outline border color
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .black), // Change the outline border color when focused
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
                   ),
                 ),
                 onChanged: (value) {
@@ -132,7 +123,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
         stream: getResturentStreamFromFirestore(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else {
@@ -151,8 +142,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                       // }
                       return Container(
                         height: 90,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         width: Get.width,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -162,37 +152,30 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                               color: Colors.grey.withOpacity(0.2),
                               spreadRadius: 1,
                               blurRadius: 2,
-                              offset: Offset(0, 1),
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
                         child: Center(
                           child: ListTile(
-                              contentPadding:
-                                  const EdgeInsets.only(right: 0, left: 10),
+                              contentPadding: const EdgeInsets.only(right: 0, left: 10),
                               title: Text(
                                 item.name.toString(),
-                                style: const TextStyle(
-                                    color: Color(0xff384953),
-                                    fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: Color(0xff384953), fontWeight: FontWeight.bold),
                               ),
                               leading: Container(
                                 height: 80,
                                 width: 80,
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                      image:
-                                          NetworkImage(item.image.toString()),
+                                      image: NetworkImage(item.image.toString()),
                                       fit: BoxFit.cover,
                                     ),
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(5)),
                               ),
                               subtitle: Text(item.description.toString(),
-                                  style: const TextStyle(
-                                      color: Color(0xff384953),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.normal)),
+                                  style: const TextStyle(color: Color(0xff384953), fontSize: 12, fontWeight: FontWeight.normal)),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -217,11 +200,8 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                               Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          AddVendorScreen(
-                                                            collectionReference:
-                                                                widget
-                                                                    .collectionReference,
+                                                      builder: (context) => AddVendorScreen(
+                                                            collectionReference: widget.collectionReference,
                                                             resturentData: item,
                                                           )));
                                             },
@@ -232,76 +212,60 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                             onTap: () {
                                               showDialog(
                                                 context: context,
-                                                builder: (ctx) => AlertDialog(
-                                                  title: const Text(
-                                                      "Delete Vendor Category"),
-                                                  content: const Text(
-                                                      "Are you sure you want to delete this Vendor Category"),
-                                                  actions: <Widget>[
-                                                    Expanded(
-                                                      child: TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color: Colors.red,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
-                                                          child: const Center(
-                                                              child: Text(
-                                                            "Cancel",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          )),
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                      surfaceTintColor: Colors.white,
+                                                      title: const Text("Delete Vendor Category"),
+                                                      content: Column(mainAxisSize: MainAxisSize.min, children: [
+                                                        const Text("Are you sure you want to delete this Vendor"),
+                                                        const SizedBox(
+                                                          height: 20,
                                                         ),
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                      child: TextButton(
-                                                        onPressed: () {
-                                                          widget
-                                                              .collectionReference
-                                                              .doc(item.docid)
-                                                              .delete()
-                                                              .then((value) {
-                                                            setState(() {});
-                                                          });
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.green,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
-                                                          width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
-                                                          child: const Center(
-                                                              child: Text(
-                                                            "okay",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
-                                                          )),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: GestureDetector(
+                                                                onTap: () {
+                                                                  Navigator.of(context).pop();
+                                                                },
+                                                                child: Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors.red, borderRadius: BorderRadius.circular(11)),
+                                                                  // width: 100,
+                                                                  padding: const EdgeInsets.all(14),
+                                                                  child: const Center(
+                                                                      child: Text(
+                                                                        "Cancel",
+                                                                        style: TextStyle(color: Colors.white),
+                                                                      )),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: GestureDetector(
+                                                                onTap: () {
+                                                                  widget.collectionReference.doc(item.docid).delete().then((value) {
+                                                                    setState(() {});
+                                                                  });
+                                                                  Navigator.of(context).pop();
+                                                                },
+                                                                child: Container(
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors.green, borderRadius: BorderRadius.circular(11)),
+                                                                  // width: 100,
+                                                                  padding: const EdgeInsets.all(14),
+                                                                  child: const Center(
+                                                                      child: Text(
+                                                                        "okay",
+                                                                        style: TextStyle(color: Colors.white),
+                                                                      )),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      ]));
+                                                },
                                               );
                                             },
                                             child: const Text("Delete"),
@@ -310,19 +274,11 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                             value: 1,
                                             onTap: () {
                                               item.deactivate
-                                                  ? widget.collectionReference
-                                                      .doc(item.docid)
-                                                      .update(
-                                                          {"deactivate": false})
-                                                  : widget.collectionReference
-                                                      .doc(item.docid)
-                                                      .update(
-                                                          {"deactivate": true});
+                                                  ? widget.collectionReference.doc(item.docid).update({"deactivate": false})
+                                                  : widget.collectionReference.doc(item.docid).update({"deactivate": true});
                                               setState(() {});
                                             },
-                                            child: Text(item.deactivate
-                                                ? "Activate"
-                                                : "Deactivate"),
+                                            child: Text(item.deactivate ? "Activate" : "Deactivate"),
                                           ),
                                           // PopupMenuItem(
                                           //   value: 1,
@@ -376,10 +332,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
   }
 
   Stream<List<ResturentData>> getResturentStreamFromFirestore() {
-    return widget.collectionReference
-        .orderBy('time', descending: isDescendingOrder)
-        .snapshots()
-        .map((querySnapshot) {
+    return widget.collectionReference.orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
       List<ResturentData> resturent = [];
       try {
         for (var doc in querySnapshot.docs) {

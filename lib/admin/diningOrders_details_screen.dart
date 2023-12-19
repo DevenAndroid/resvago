@@ -12,7 +12,6 @@ import '../components/helper.dart';
 import '../components/my_textfield.dart';
 import 'model/dining_order_model.dart';
 
-
 class OderDetailsScreen extends StatefulWidget {
   const OderDetailsScreen({super.key, required this.myDiningOrderModel});
   final MyDiningOrderModel myDiningOrderModel;
@@ -83,7 +82,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-        // mainAxisAlignment: MainAxisAlignment.start,
+                      // mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
                           "Order ID: ${myDiningOrderModel!.orderId.toString()}",
@@ -270,7 +269,8 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = myDiningOrderModel!.menuList![index];
-                            return InkWell(
+                            return GestureDetector(
+                              behavior: HitTestBehavior.translucent,
                               onTap: () {},
                               child: Column(
                                 children: [
@@ -492,12 +492,12 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                             Text(
                               "Subtotal",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
+                                  GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
                             ),
                             Text(
                               "\$${myDiningOrderModel!.total}",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
+                                  GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
                           ],
                         ),
@@ -510,12 +510,12 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                             Text(
                               "Service Fees",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
+                                  GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
                             ),
                             Text(
                               "\$0.00",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
+                                  GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
                           ],
                         ),
@@ -528,12 +528,12 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                             Text(
                               "Meat Pasta",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
+                                  GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
                             ),
                             Text(
                               "\0.00",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
+                                  GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
                           ],
                         ),
@@ -550,12 +550,12 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                             Text(
                               "Total",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
+                                  GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
                             Text(
                               "\$${myDiningOrderModel!.total}",
                               style:
-                              GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
+                                  GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
                           ],
                         ),

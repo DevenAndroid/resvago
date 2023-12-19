@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,8 @@ import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/helper.dart';
+import '../components/addsize.dart';
+import '../components/apptheme.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'productcategory_list_screen.dart';
@@ -41,11 +44,64 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+  Future<int> totalSoldItem() async {
+    final item1 = await FirebaseFirestore.instance.collection('order').where("order_status", isEqualTo: "Order Completed").count().get();
+    final item2 = await FirebaseFirestore.instance.collection('dining_order').where("order_status", isEqualTo: "Order Completed").count().get();
+    return item1.count + item2.count;
+  }
+
+
+  Future<int> totalItem() async {
+    final item1 = await FirebaseFirestore.instance
+        .collection('order')
+        .count()
+        .get();
+    final item2 = await FirebaseFirestore.instance
+        .collection('dining_order')
+        .count()
+        .get();
+    return item1.count + item2.count;
+  }
+
+  double totalEarnings = 0;
+  Future<double> calculateTotalEarnings() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance.collection('dining_order').where("order_status", isEqualTo: "Order Completed").get();
+    for (QueryDocumentSnapshot<Map<String, dynamic>> documentSnapshot in querySnapshot.docs) {
+      double orderAmount = double.parse(documentSnapshot.data()["total"]);
+      totalEarnings += orderAmount;
+    }
+
+    return totalEarnings;
+  }
+
+  Future<double> calculateTotalEarnings1() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance.collection('order').where("order_status", isEqualTo: "Order Completed").get();
+    for (QueryDocumentSnapshot<Map<String, dynamic>> documentSnapshot in querySnapshot.docs) {
+      double orderAmount = double.parse(documentSnapshot.data()["total"]);
+      totalEarnings += orderAmount;
+    }
+
+    return totalEarnings;
+  }
+
+  Future<void> fetchTotalEarnings() async {
+    double earnings = await calculateTotalEarnings();
+    double earnings1 = await calculateTotalEarnings();
+    setState(() {
+      totalEarnings = earnings + earnings1;
+      log("dgdfhdfh$totalEarnings");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     isShowingMainData = true;
+    fetchTotalEarnings();
   }
+
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -54,11 +110,12 @@ class HomePageState extends State<HomePage> {
         key: scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
+          surfaceTintColor: Colors.white,
           leading: GestureDetector(
-            onTap: (){
-               scaffoldKey.currentState!.openDrawer();
-            },
-              child: Icon(Icons.menu)),
+              onTap: () {
+                scaffoldKey.currentState!.openDrawer();
+              },
+              child: const Icon(Icons.menu)),
           title: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,7 +138,6 @@ class HomePageState extends State<HomePage> {
               ),
             )
           ],
-
           backgroundColor: Colors.white,
         ),
         drawer: Drawer(
@@ -173,10 +229,8 @@ class HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => VendorDataScreen(
-                                collectionReference: FirebaseFirestore.instance
-                                    .collection("resturent"),
-                                key: ValueKey(
-                                    DateTime.now().millisecondsSinceEpoch),
+                                collectionReference: FirebaseFirestore.instance.collection("resturent"),
+                                key: ValueKey(DateTime.now().millisecondsSinceEpoch),
                               )));
                 },
               ),
@@ -192,10 +246,8 @@ class HomePageState extends State<HomePage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ProductCategoryScreen(
-                                collectionReference: FirebaseFirestore.instance
-                                    .collection("menuItemsList"),
-                                key: ValueKey(
-                                    DateTime.now().millisecondsSinceEpoch),
+                                collectionReference: FirebaseFirestore.instance.collection("menuItemsList"),
+                                key: ValueKey(DateTime.now().millisecondsSinceEpoch),
                               )));
                 },
               ),
@@ -253,7 +305,9 @@ class HomePageState extends State<HomePage> {
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),
                 onTap: () {
-                  Get.to(const settingScreen(isEditMode: false,));
+                  Get.to(const settingScreen(
+                    isEditMode: false,
+                  ));
                 },
               ),
               Divider(
@@ -294,21 +348,28 @@ class HomePageState extends State<HomePage> {
                 Container(
                   height: 100,
                   width: 160,
-                  decoration: BoxDecoration(
-                      color: Color(0xff1AB0B0),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: const Column(
+                  decoration: BoxDecoration(color: const Color(0xff1AB0B0), borderRadius: BorderRadius.circular(20)),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        '\$${1000}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white),
+                      FutureBuilder(
+                        future: totalSoldItem(),
+                        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                          if (snapshot.hasData) {
+                            log(snapshot.data.toString());
+                            return Text(
+                              (snapshot.data ?? "0").toString(),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
+                            );
+                          }
+                          return const Text(
+                            "0",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
+                          );
+                        },
                       ),
-                      Text(
+                      const Text(
                         'Total Sale',
                         style: TextStyle(fontSize: 17, color: Colors.white),
                       )
@@ -318,21 +379,28 @@ class HomePageState extends State<HomePage> {
                 Container(
                   height: 100,
                   width: 160,
-                  decoration: BoxDecoration(
-                      color: Color(0xffFF7443),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: const Column(
+                  decoration: BoxDecoration(color: const Color(0xffFF7443), borderRadius: BorderRadius.circular(20)),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
-                        '120',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white),
+                      FutureBuilder(
+                        future: totalItem(),
+                        builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                          if (snapshot.hasData) {
+                            log(snapshot.data.toString());
+                            return Text(
+                              (snapshot.data ?? "0").toString(),
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
+                            );
+                          }
+                          return const Text(
+                            "0",
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
+                          );
+                        },
                       ),
-                      Text(
+                      const Text(
                         'Total Orders  ',
                         style: TextStyle(fontSize: 17, color: Colors.white),
                       )
@@ -350,21 +418,16 @@ class HomePageState extends State<HomePage> {
                 Container(
                   height: 100,
                   width: 160,
-                  decoration: BoxDecoration(
-                      color: Color(0xffF65579),
-                      borderRadius: BorderRadius.circular(20)),
-                  child: const Column(
+                  decoration: BoxDecoration(color: const Color(0xffF65579), borderRadius: BorderRadius.circular(20)),
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '\$${500}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white),
+                        "\$${totalEarnings.toString()}",
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
-                      Text(
+                      const Text(
                         'Total Profit',
                         style: TextStyle(fontSize: 17, color: Colors.white),
                       )
@@ -374,19 +437,14 @@ class HomePageState extends State<HomePage> {
                 Container(
                   height: 100,
                   width: 160,
-                  decoration: BoxDecoration(
-                      color: Color(0xff8676FE),
-                      borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: const Color(0xff8676FE), borderRadius: BorderRadius.circular(20)),
                   child: const Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         '\$${132}',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 30,
-                            color: Colors.white),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
                       Text(
                         'Total Products',
@@ -397,18 +455,14 @@ class HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const TabBar(
-                labelColor: Color(0xFF454B5C),
-                indicatorColor: Color(0xFF3B5998),
-                indicatorWeight: 4,
-                tabs: [
-                  Tab(
-                    text: "Dining",
-                  ),
-                  Tab(
-                    text: "Delivery",
-                  ),
-                ]),
+            const TabBar(labelColor: Color(0xFF454B5C), indicatorColor: Color(0xFF3B5998), indicatorWeight: 4, tabs: [
+              Tab(
+                text: "Dining",
+              ),
+              Tab(
+                text: "Delivery",
+              ),
+            ]),
             Expanded(
               child: TabBarView(children: [
                 StreamBuilder<List<MyDiningOrderModel>>(
@@ -416,13 +470,11 @@ class HomePageState extends State<HomePage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                          child:
-                              CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                          child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
-                      List<MyDiningOrderModel> diningOrders =
-                          snapshot.data ?? [];
+                      List<MyDiningOrderModel> diningOrders = snapshot.data ?? [];
 
                       return diningOrders.isNotEmpty
                           ? ListView.builder(
@@ -434,75 +486,61 @@ class HomePageState extends State<HomePage> {
                                 return GestureDetector(
                                   onTap: () {
                                     Get.to(() => OderDetailsScreen(
-                                      myDiningOrderModel: item,
-                                    ));
+                                          myDiningOrderModel: item,
+                                        ));
                                   },
                                   child: Container(
-                                    height: 120,
+                                    height: 100,
                                     width: Get.width,
                                     decoration: BoxDecoration(
                                         color: Colors.white,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
+                                            color: Colors.grey.withOpacity(0.1),
                                             spreadRadius: 5,
                                             blurRadius: 7,
-                                            offset: const Offset(0, 3),
+                                            // offset: const Offset(0, 3),
                                           ),
                                         ],
-                                        borderRadius:
-                                            BorderRadius.circular(11)),
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
+                                        borderRadius: BorderRadius.circular(11)),
+                                    margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                     child: Row(
                                       children: [
                                         Container(
                                           height: 100,
-                                          width: 110,
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                          width: 90,
+                                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                           decoration: BoxDecoration(
                                               image: DecorationImage(
-                                                image: NetworkImage(
-                                                    item.restaurantInfo!.image),
+                                                image: NetworkImage(item.restaurantInfo!.image),
                                                 fit: BoxFit.cover,
                                               ),
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(25)),
+                                              borderRadius: BorderRadius.circular(25)),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Text(
                                                 item.orderId,
                                                 style: const TextStyle(
-                                                    fontWeight: FontWeight.normal,
-                                                    fontSize: 14,
-                                                    color: Colors.grey),
+                                                    fontWeight: FontWeight.normal, fontSize: 14, color: Colors.grey),
                                               ),
                                               const SizedBox(
                                                 height: 3,
                                               ),
                                               Text(
                                                 item.orderType,
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: Color(0xff1A2E33)),
+                                                style: const TextStyle(fontSize: 14, color: Color(0xff1A2E33)),
                                               ),
                                               const SizedBox(
                                                 height: 3,
                                               ),
                                               Text(
-                                                item.restaurantInfo!
-                                                    .restaurantName,
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey),
+                                                item.restaurantInfo!.restaurantName,
+                                                style: const TextStyle(fontSize: 12, color: Colors.grey),
                                               )
                                             ],
                                           ),
@@ -511,42 +549,34 @@ class HomePageState extends State<HomePage> {
                                           width: 5,
                                         ),
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              DateFormat("dd-mm-yy").format(
-                                                  DateTime.parse(DateTime
-                                                          .fromMillisecondsSinceEpoch(
-                                                              item.time)
-                                                      .toLocal()
-                                                      .toString())),
+                                              DateFormat("dd-mm-yy").format(DateTime.parse(
+                                                  DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 12,
-                                                  color: Colors.grey),
+                                                  fontWeight: FontWeight.normal, fontSize: 12, color: Colors.grey),
                                             ),
                                             const SizedBox(
                                               height: 10,
                                             ),
                                             Text(
                                               '\$${item.total}',
-                                              style: const TextStyle(
-                                                  fontSize: 17,
-                                                  color: Color(0xff1A2E33)),
+                                              style: const TextStyle(fontSize: 17, color: Color(0xff1A2E33)),
                                             ),
                                           ],
                                         ),
-                                        SizedBox(width: 10,),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
                                       ],
                                     ),
                                   ),
                                 );
                               })
                           : const Center(
-                              child: Text("No User Found"),
+                              child: Text("Order Not Found"),
                             );
                     }
                     return const CircularProgressIndicator();
@@ -557,8 +587,7 @@ class HomePageState extends State<HomePage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                          child:
-                              CircularProgressIndicator()); // Show a loading indicator while data is being fetched
+                          child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
                     } else if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else {
@@ -578,76 +607,57 @@ class HomePageState extends State<HomePage> {
                                         ));
                                   },
                                   child: Container(
-                                    height: 120,
+                                    height: 100,
                                     width: Get.width,
                                     decoration: BoxDecoration(
                                         color: Colors.white,
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
+                                            color: Colors.grey.withOpacity(0.1),
                                             spreadRadius: 5,
                                             blurRadius: 7,
-                                            offset: const Offset(0, 3),
+                                            // offset: const Offset(0, 3),
                                           ),
                                         ],
-                                        borderRadius:
-                                            BorderRadius.circular(11)),
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 10),
+                                        borderRadius: BorderRadius.circular(11)),
+                                    margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                     child: Row(
                                       children: [
                                         Container(
                                           height: 100,
-                                          width: 110,
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                          width: 90,
+                                          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                                           decoration: BoxDecoration(
                                               image: DecorationImage(
-                                                image: NetworkImage(item
-                                                    .orderDetails!
-                                                    .restaurantInfo!
-                                                    .image),
+                                                image: NetworkImage(item.orderDetails!.restaurantInfo!.image),
                                                 fit: BoxFit.cover,
                                               ),
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(25)),
+                                              borderRadius: BorderRadius.circular(25)),
                                         ),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment: MainAxisAlignment.center,
                                             children: [
                                               Text(
                                                 item.orderId,
                                                 style: const TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.normal,
-                                                    fontSize: 14,
-                                                    color: Colors.grey),
+                                                    fontWeight: FontWeight.normal, fontSize: 14, color: Colors.grey),
                                               ),
                                               const SizedBox(
                                                 height: 3,
                                               ),
                                               Text(
                                                 item.orderType,
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    color: Color(0xff1A2E33)),
+                                                style: const TextStyle(fontSize: 14, color: Color(0xff1A2E33)),
                                               ),
                                               const SizedBox(
                                                 height: 3,
                                               ),
                                               Text(
-                                                item
-                                                    .orderDetails!
-                                                    .restaurantInfo!
-                                                    .restaurantName,
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey),
+                                                item.orderDetails!.restaurantInfo!.restaurantName,
+                                                style: const TextStyle(fontSize: 12, color: Colors.grey),
                                               )
                                             ],
                                           ),
@@ -656,35 +666,27 @@ class HomePageState extends State<HomePage> {
                                           width: 5,
                                         ),
                                         Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              DateFormat("dd-mm-yy").format(
-                                                  DateTime.parse(DateTime
-                                                          .fromMillisecondsSinceEpoch(
-                                                              item.time)
-                                                      .toLocal()
-                                                      .toString())),
+                                              DateFormat("dd-mm-yy").format(DateTime.parse(
+                                                  DateTime.fromMillisecondsSinceEpoch(item.time).toLocal().toString())),
                                               style: const TextStyle(
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 12,
-                                                  color: Colors.grey),
+                                                  fontWeight: FontWeight.normal, fontSize: 12, color: Colors.grey),
                                             ),
                                             const SizedBox(
                                               height: 10,
                                             ),
                                             Text(
                                               '\$${item.total}',
-                                              style: const TextStyle(
-                                                  fontSize: 17,
-                                                  color: Color(0xff1A2E33)),
+                                              style: const TextStyle(fontSize: 17, color: Color(0xff1A2E33)),
                                             ),
                                           ],
                                         ),
-                                        SizedBox(width: 10,)
+                                        const SizedBox(
+                                          width: 10,
+                                        )
                                       ],
                                     ),
                                   ),
@@ -700,15 +702,11 @@ class HomePageState extends State<HomePage> {
               ]),
             )
           ]).appPaddingForScreen,
-        )
-    );
+        ));
   }
 
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {
-    return FirebaseFirestore.instance
-        .collection('dining_order')
-        .snapshots()
-        .map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('dining_order').snapshots().map((querySnapshot) {
       List<MyDiningOrderModel> diningorders = [];
       print(diningorders);
       try {
@@ -724,10 +722,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Stream<List<MyOrderModel>> getDeliveryOrdersStreamFromFirestore() {
-    return FirebaseFirestore.instance
-        .collection('order')
-        .snapshots()
-        .map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('order').snapshots().map((querySnapshot) {
       List<MyOrderModel> orders = [];
       print(orders);
       try {

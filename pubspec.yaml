@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   firebase_auth: ^4.10.1
   google_sign_in: ^6.1.5
-  firebase_core: ^2.17.0
+  firebase_core: ^2.24.2
   fluttertoast: ^8.2.2
   get: ^4.6.5
   fl_chart: ^0.63.0

@@ -31,38 +31,40 @@
 
   <title>resvago_admin</title>
   <link rel="manifest" href="manifest.json">
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
 
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-analytics.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-messaging.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.4.0/firebase-storage.js"></script>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
-
-  <script>
-
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
-
+  // Your web app's Firebase configuration
 const firebaseConfig = {
-   apiKey: "AIzaSyBN7-pBlJcY6p8stbdeDRgo-JVF6MO2K30",
+     apiKey: "AIzaSyBN7-pBlJcY6p8stbdeDRgo-JVF6MO2K30",
     authDomain: "resvago-ire.firebaseapp.com",
+    databaseURL: "https://resvago-ire-default-rtdb.firebaseio.com",
     projectId: "resvago-ire",
     storageBucket: "resvago-ire.appspot.com",
     messagingSenderId: "382013840274",
     appId: "1:382013840274:web:05b02bbef51966a4abff4b",
     measurementId: "G-M124HP6Z0D"
-};
+  };
 
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 
-  </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDl-_JOy_bj4MyQhYbKbGkZ0sfpbTZDNU"></script>
   <script type="text/javascript">
     window.flutterWebRenderer = "html";
 </script>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDl-_JOy_bj4MyQhYbKbGkZ0sfpbTZDNU"></script>
+
   <script>
     // The value below is injected by flutter build, do not touch.
     const serviceWorkerVersion = null;
@@ -71,7 +73,7 @@ const analytics = getAnalytics(app);
   <script src="flutter.js" defer></script>
 </head>
 <body>
-  <script>
+<script>
     window.addEventListener('load', function(ev) {
       // Download main.dart.js
       _flutter.loader.loadEntrypoint({

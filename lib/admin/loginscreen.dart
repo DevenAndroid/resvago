@@ -9,6 +9,7 @@ import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
+import '../Firebase_service/firebase_service.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 
@@ -24,25 +25,37 @@ final GoogleSignIn googleSignIn = GoogleSignIn();
 class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  Future<void> checkUserAuth() async {
+  Future<void> checkUserAuth1() async {
     FirebaseAuth auth = FirebaseAuth.instance;
     User? user = auth.currentUser;
     if (user != null) {
       Get.offAll(()=>const HomePage());
     }
   }
+  FirebaseService service = FirebaseService();
+  Future<void> checkUserAuth() async {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    User? user = _auth.currentUser;
+    if (user != null) {
+      Get.offAll(()=> const HomePage());
+    } else {
+      Get.offAll(()=> const HomePage());
+
+    }
+  }
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    //checkUserAuth();
+    Future.delayed(const Duration(microseconds: 500)).then((value){
+      checkUserAuth();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(

@@ -54,7 +54,8 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
               child: SvgPicture.asset('assets/images/arrowback.svg')),
         ),
         actions: [
-          InkWell(
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               setState(() {
                 isDescendingOrder = !isDescendingOrder;
@@ -86,7 +87,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
           IconButton(
             icon: const Icon(Icons.search,size: 30,),
             onPressed: toggleTextFieldVisibility,
-            color: Color(0xff3B5998),
+            color: const Color(0xff3B5998),
           )
         ],
         bottom: PreferredSize(
@@ -125,7 +126,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
               stream: getUsersStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(); // Show a loading indicator while data is being fetched
+                  return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
@@ -134,14 +135,10 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
 
                   return filteredUsers.isNotEmpty
                       ? ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
                       itemCount: filteredUsers.length,
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final item = filteredUsers[index];
-                        // if (item.deactivate) {
-                        //   return SizedBox.shrink();
-                        // }
                         return Container(
                           height: 90,
                           margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -154,13 +151,13 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                 color: Colors.grey.withOpacity(0.2),
                                 spreadRadius: 1,
                                 blurRadius: 2,
-                                offset: Offset(0, 1),
+                                offset: const Offset(0, 1),
                               ),
                             ],
                           ),
                           child: Center(
                               child: ListTile(
-                                  contentPadding: EdgeInsets.only(left: 15),
+                                  contentPadding: const EdgeInsets.only(left: 15),
                                   title: RichText(
                                     overflow: TextOverflow.clip,
                                     textAlign: TextAlign.end,
@@ -173,7 +170,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                       style: DefaultTextStyle.of(context).style,
                                     ),
                                   ),
-                                  leading: Container(
+                                  leading: const SizedBox(
                                     height: 80,
                                     width: 80,
                                    child: Icon(Icons.person),

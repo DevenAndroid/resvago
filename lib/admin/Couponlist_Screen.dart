@@ -76,7 +76,8 @@ class _CouponListScreenState extends State<CouponListScreen> {
                 child: SvgPicture.asset('assets/images/arrowback.svg')),
           ),
           actions: [
-            InkWell(
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
               onTap: () {
                 setState(() {
                   isDescendingOrder = !isDescendingOrder;
