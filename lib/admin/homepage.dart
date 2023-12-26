@@ -116,16 +116,16 @@ class HomePageState extends State<HomePage> {
                 scaffoldKey.currentState!.openDrawer();
               },
               child: const Icon(Icons.menu)),
-          title: const Column(
+          title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Hi Demo Admin..',
+              const Text(
+                'Hi Admin..',
                 style: TextStyle(color: Colors.black, fontSize: 20),
               ),
               Text(
-                'admin@gmail.com',
-                style: TextStyle(color: Colors.black, fontSize: 12),
+                FirebaseAuth.instance.currentUser!.email.toString(),
+                style: const TextStyle(color: Colors.black, fontSize: 12),
               ),
             ],
           ),
@@ -144,30 +144,30 @@ class HomePageState extends State<HomePage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-              const DrawerHeader(
-                decoration: BoxDecoration(
+               DrawerHeader(
+                decoration: const BoxDecoration(
                   color: Colors.black,
                 ),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                         minRadius: 35,
                         maxRadius: 40,
                         backgroundImage: AssetImage(
                           'assets/images/girl.jpg',
                         )),
                     Text(
-                      'Williams Jones',
-                      style: TextStyle(
+                      FirebaseAuth.instance.currentUser!.displayName.toString(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                       ),
                     ),
-                    Text(
-                      'williamsjones@gmail.com',
-                      style: TextStyle(
+                     Text(
+                      FirebaseAuth.instance.currentUser!.email.toString(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                       ),
