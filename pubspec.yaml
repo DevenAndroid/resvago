@@ -39,7 +39,7 @@ dependencies:
   google_sign_in: ^6.1.5
   firebase_core: ^2.24.2
   fluttertoast: ^8.2.2
-  get: ^4.6.5
+  get: ^4.6.6
   fl_chart: ^0.63.0
   cloud_firestore: ^4.9.3
   image_cropper: ^5.0.0

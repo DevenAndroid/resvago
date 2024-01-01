@@ -1,15 +1,10 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
-import '../Firebase_service/firebase_service.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
 
@@ -25,33 +20,10 @@ final GoogleSignIn googleSignIn = GoogleSignIn();
 class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-  // Future<void> checkUserAuth1() async {
-  //   FirebaseAuth auth = FirebaseAuth.instance;
-  //   User? user = auth.currentUser;
-  //   if (user != null) {
-  //     Get.offAll(() => const HomePage());
-  //   }
-  // }
-
-  FirebaseService service = FirebaseService();
-  Future<void> checkUserAuth() async {
-    FirebaseAuth _auth = FirebaseAuth.instance;
-    User? user = _auth.currentUser;
-    if (user != null) {
-      Get.offAll(() => const HomePage());
-    } else {
-      Get.offAll(() => const LogInScreen());
-    }
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    checkUserAuth();
-    // Future.delayed(const Duration(microseconds: 500)).then((value) {
-    //
-    // });
   }
 
   @override
@@ -172,17 +144,11 @@ class _LogInScreenState extends State<LogInScreen> {
                   OverlayEntry loader = Helper.overlayLoader(context);
                   Overlay.of(context).insert(loader);
                   FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
-                      .then((userCredential) {
-                    FirebaseFirestore.instance
-                        .collection('admin_login')
-                        .doc(FirebaseAuth.instance.currentUser!.uid)
-                        .set({'email': emailController.text.trim(), 'password': passwordController.text.trim()});
+                      .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
+                      .then((value) {
+                    Helper.hideLoader(loader);
+                    showToast('Login successfully');
                     Get.to(const HomePage());
-                    Helper.hideLoader(loader);
-                  }).catchError((error) {
-                    Helper.hideLoader(loader);
-                    Fluttertoast.showToast(msg: 'Failed to login up');
                   });
                 },
                 text: 'Log In',

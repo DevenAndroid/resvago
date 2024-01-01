@@ -4,11 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
-import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/admin/dining_order_list.dart';
 import 'package:resvago/admin/loginscreen.dart';
 import 'package:resvago/admin/order_list_screen.dart';
@@ -17,8 +15,6 @@ import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/helper.dart';
-import '../components/addsize.dart';
-import '../components/apptheme.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'productcategory_list_screen.dart';
@@ -329,8 +325,12 @@ class HomePageState extends State<HomePage> {
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
                 onTap: () async {
-                  await FirebaseAuth.instance.signOut();
-                  Get.offAll(const LogInScreen());
+                  Get.back();
+                  Get.to(const LogInScreen());
+                  // await FirebaseAuth.instance.signOut().then((value) {
+                  //   // Get.to(const LogInScreen());
+                  //
+                  // });
                 },
               ),
             ],
