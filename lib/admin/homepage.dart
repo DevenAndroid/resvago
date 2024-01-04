@@ -154,13 +154,6 @@ class HomePageState extends State<HomePage> {
                         backgroundImage: AssetImage(
                           'assets/images/girl.jpg',
                         )),
-                    Text(
-                      FirebaseAuth.instance.currentUser!.displayName.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                      ),
-                    ),
                      Text(
                       FirebaseAuth.instance.currentUser!.email.toString(),
                       style: const TextStyle(
@@ -443,7 +436,7 @@ class HomePageState extends State<HomePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        '\$${132}',
+                        '${0}',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
                       Text(

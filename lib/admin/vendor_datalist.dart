@@ -217,7 +217,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                       surfaceTintColor: Colors.white,
                                                       title: const Text("Delete Vendor Category"),
                                                       content: Column(mainAxisSize: MainAxisSize.min, children: [
-                                                        const Text("Are you sure you want to delete this Vendor"),
+                                                        const Text("Are you sure you want to delete this category"),
                                                         const SizedBox(
                                                           height: 20,
                                                         ),
@@ -241,6 +241,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                                                                 ),
                                                               ),
                                                             ),
+                                                            const SizedBox(width: 20),
                                                             Expanded(
                                                               child: GestureDetector(
                                                                 onTap: () {

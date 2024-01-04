@@ -38,7 +38,8 @@ class MyTextField extends StatelessWidget {
     this.validator,
     this.keyboardtype,
     this.maxLines,
-    this.minLines, this.inputFormatters,
+    this.minLines,
+    this.inputFormatters,
   });
 
   @override
@@ -46,7 +47,7 @@ class MyTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: TextFormField(
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
         controller: controller,
         validator: validator,
         maxLines: maxLines,
@@ -57,12 +58,10 @@ class MyTextField extends StatelessWidget {
         obscureText: obscureText,
         cursorColor: Colors.white,
         inputFormatters: [
-          if(inputFormatters != null)
-            ...inputFormatters!,
+          if (inputFormatters != null) ...inputFormatters!,
           LengthLimitingTextInputFormatter(length),
         ],
         decoration: InputDecoration(
-            border: InputBorder.none,
             errorStyle: const TextStyle(color: Colors.red),
             enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
@@ -70,14 +69,14 @@ class MyTextField extends StatelessWidget {
             focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
             ),
+            disabledBorder: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
+            border: const OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
             errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(
-                    color:
-                    Colors.red.shade800),
-                borderRadius:
-                const BorderRadius.all(
-                    Radius.circular(
-                        6.0))),
+                borderSide: BorderSide(color: Colors.red.shade800), borderRadius: const BorderRadius.all(Radius.circular(6.0))),
             fillColor: color,
             filled: true,
             hintText: hintText,
@@ -153,7 +152,6 @@ class RegisterTextFieldWidget extends StatelessWidget {
         LengthLimitingTextInputFormatter(length),
       ],
       decoration: InputDecoration(
-
           hintText: hint,
           focusColor: const Color(0xFF384953),
           hintStyle: GoogleFonts.poppins(
@@ -169,26 +167,21 @@ class RegisterTextFieldWidget extends StatelessWidget {
           ),
           filled: true,
           fillColor: Colors.white.withOpacity(.10),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 16),
           // .copyWith(top: maxLines! > 4 ? AddSize.size18 : 0),
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(color: Colors.black),
             borderRadius: BorderRadius.circular(6.0),
           ),
           enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-              borderRadius: BorderRadius.all(Radius.circular(6.0))),
+              borderSide: BorderSide(color: Colors.black), borderRadius: BorderRadius.all(Radius.circular(6.0))),
           border: OutlineInputBorder(
-              borderSide:
-              const BorderSide(color: Colors.black, width: 3.0),
-              borderRadius: BorderRadius.circular(6.0)),
+              borderSide: const BorderSide(color: Colors.black, width: 3.0), borderRadius: BorderRadius.circular(6.0)),
           suffixIcon: suffix,
           prefixIcon: prefix),
     );
   }
 }
-
 
 AppBar backAppBar(
     {required title,
@@ -207,8 +200,7 @@ AppBar backAppBar(
     surfaceTintColor: AppTheme.backgroundcolor,
     title: Text(
       title,
-      style: GoogleFonts.poppins(
-          color: Color(0xFF423E5E), fontWeight: FontWeight.w600, fontSize: 17),
+      style: GoogleFonts.poppins(color: Color(0xFF423E5E), fontWeight: FontWeight.w600, fontSize: 17),
     ),
     actions: [icon2 ?? SizedBox.shrink()],
     leading: Padding(

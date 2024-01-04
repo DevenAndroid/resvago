@@ -11,9 +11,7 @@ import 'package:resvago/components/helper.dart';
 class ProductCategoryScreen extends StatefulWidget {
   final CollectionReference collectionReference;
   final MenuItemData? menuItemData;
-  const ProductCategoryScreen(
-      {Key? key, required this.collectionReference, this.menuItemData})
-      : super(key: key);
+  const ProductCategoryScreen({Key? key, required this.collectionReference, this.menuItemData}) : super(key: key);
 
   @override
   State<ProductCategoryScreen> createState() => _ProductCategoryScreenState();
@@ -40,15 +38,13 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: Text(
-          widget.menuItemData != null
-              ? "${widget.menuItemData!.name} Sub Category"
-              : 'Product Category',
-          style: const TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
+          widget.menuItemData != null ? "${widget.menuItemData!.name} Sub Category" : 'Product Category',
+          style: const TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
           child: GestureDetector(
-              onTap: (){
+              onTap: () {
                 Get.back();
               },
               child: SvgPicture.asset('assets/images/arrowback.svg')),
@@ -106,16 +102,12 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
+                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.black), // Change the outline border color
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .black), // Change the outline border color when focused
+                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
                   ),
                 ),
                 onChanged: (value) {
@@ -150,8 +142,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                       // }
                       return Container(
                         height: 90,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         width: Get.width,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -161,39 +152,38 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                               color: Colors.grey.withOpacity(0.2),
                               spreadRadius: 1,
                               blurRadius: 2,
-                              offset: Offset(0, 1),
+                              offset: const Offset(0, 1),
                             ),
                           ],
                         ),
                         child: Center(
                             child: ListTile(
-                                contentPadding:
-                                    EdgeInsets.only(left: 15, right: 5),
+                                contentPadding: const EdgeInsets.only(left: 15, right: 5),
                                 title: Text(
                                   item.name.toString(),
-                                  style: const TextStyle(
-                                      color: Color(0xff384953),
-                                      fontWeight: FontWeight.bold),
+                                  style: const TextStyle(color: Color(0xff384953), fontWeight: FontWeight.bold),
                                 ),
                                 leading: Container(
                                   height: 80,
                                   width: 80,
                                   decoration: BoxDecoration(
                                       image: DecorationImage(
-                                        image: NetworkImage(
-                                            item.image.toString()),
+                                        image: NetworkImage(item.image.toString()),
                                         fit: BoxFit.cover,
                                       ),
                                       color: Colors.white,
-                                      borderRadius:
-                                          BorderRadius.circular(5)),
+                                      borderRadius: BorderRadius.circular(5)),
                                 ),
                                 subtitle: Text(item.description),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     item.deactivate
-                                        ? Image.asset('assets/images/deactivate.png',height: 20,width: 20,)
+                                        ? Image.asset(
+                                            'assets/images/deactivate.png',
+                                            height: 20,
+                                            width: 20,
+                                          )
                                         : const SizedBox(),
                                     PopupMenuButton<int>(
                                         icon: const Icon(
@@ -209,13 +199,9 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                                 Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            AddProductScreen(
-                                                              collectionReference:
-                                                                  widget
-                                                                      .collectionReference,
-                                                              menuItemData:
-                                                                  item,
+                                                        builder: (context) => AddProductScreen(
+                                                              collectionReference: widget.collectionReference,
+                                                              menuItemData: item,
                                                             )));
                                               },
                                               child: const Text("Edit"),
@@ -225,86 +211,67 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                               onTap: () {
                                                 showDialog(
                                                   context: context,
-                                                  builder: (ctx) =>
-                                                      AlertDialog(
-                                                    title: const Text(
-                                                        "Delete Product Category"),
-                                                    content: const Text(
-                                                        "Are you sure you want to delete this Product Categor"),
-                                                    actions: <Widget>[
-                                                      Expanded(
-                                                        child: TextButton(
-                                                          onPressed: () {
-                                                            Navigator.of(
-                                                                    ctx)
-                                                                .pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .red,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                        11)),
-                                                            width: 100,
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(
-                                                                    14),
-                                                            child:
-                                                                const Center(
-                                                                    child:
-                                                                        Text(
-                                                              "Cancel",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            )),
+                                                  builder: (ctx) => AlertDialog(
+                                                    title: const Text("Delete Product Category"),
+                                                    content: SizedBox(
+                                                      height: 140,
+                                                      child: Column(
+                                                        children: [
+                                                          const Text("Are you sure you want to delete this category"),
+                                                          const SizedBox(
+                                                            height: 20,
                                                           ),
-                                                        ),
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child: TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(ctx).pop();
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors.red,
+                                                                        borderRadius: BorderRadius.circular(11)),
+                                                                    // width: 100,
+                                                                    padding: const EdgeInsets.all(14),
+                                                                    child: const Center(
+                                                                        child: Text(
+                                                                      "Cancel",
+                                                                      style: TextStyle(color: Colors.white),
+                                                                    )),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: TextButton(
+                                                                  onPressed: () async {
+                                                                    widget.collectionReference
+                                                                        .doc(item.docid)
+                                                                        .delete()
+                                                                        .then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                    Navigator.of(ctx).pop();
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors.green,
+                                                                        borderRadius: BorderRadius.circular(11)),
+                                                                    width: 100,
+                                                                    padding: const EdgeInsets.all(14),
+                                                                    child: const Center(
+                                                                        child: Text(
+                                                                      "okay",
+                                                                      style: TextStyle(color: Colors.white),
+                                                                    )),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
                                                       ),
-                                                      Expanded(
-                                                        child: TextButton(
-                                                          onPressed: () {
-                                                            widget
-                                                                .collectionReference
-                                                                .doc(item
-                                                                    .docid)
-                                                                .delete()
-                                                                .then(
-                                                                    (value) {
-                                                              setState(
-                                                                  () {});
-                                                            });
-                                                            Navigator.of(
-                                                                    ctx)
-                                                                .pop();
-                                                          },
-                                                          child: Container(
-                                                            decoration: BoxDecoration(
-                                                                color: Colors
-                                                                    .green,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                        11)),
-                                                            width: 100,
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .all(
-                                                                    14),
-                                                            child:
-                                                                const Center(
-                                                                    child:
-                                                                        Text(
-                                                              "okay",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white),
-                                                            )),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 );
                                               },
@@ -313,20 +280,11 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                item.deactivate ? widget.collectionReference
-                                                    .doc(item.docid)
-                                                    .update({
-                                                  "deactivate": false
-                                                }) :
-                                                widget.collectionReference
-                                                    .doc(item.docid)
-                                                    .update({
-                                                  "deactivate": true
-                                                });
+                                                item.deactivate
+                                                    ? widget.collectionReference.doc(item.docid).update({"deactivate": false})
+                                                    : widget.collectionReference.doc(item.docid).update({"deactivate": true});
                                               },
-                                              child: Text(item.deactivate
-                                                  ? "Activate"
-                                                  : "Deactivate"),
+                                              child: Text(item.deactivate ? "Activate" : "Deactivate"),
                                             ),
                                             // PopupMenuItem(
                                             //   value: 1,
@@ -381,10 +339,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
   }
 
   Stream<List<MenuItemData>> getMenuItemStreamFromFirestore() {
-    return widget.collectionReference
-        .orderBy('time', descending: isDescendingOrder)
-        .snapshots()
-        .map((querySnapshot) {
+    return widget.collectionReference.orderBy('time', descending: isDescendingOrder).snapshots().map((querySnapshot) {
       List<MenuItemData> itemmenu = [];
       try {
         for (var doc in querySnapshot.docs) {

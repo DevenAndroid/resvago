@@ -164,12 +164,9 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    "Vendor Category Name",
-                                    style: TextStyle(color: Colors.black),
-                                  ),
+                                const Text(
+                                  "Vendor Category Name",
+                                  style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w500),
                                 ),
                                 const SizedBox(height: 5),
                                 MyTextField(
@@ -184,14 +181,10 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                   obscureText: false,
                                   color: Colors.white,
                                 ),
-
-                                const SizedBox(height: 20),
-                                const Padding(
-                                  padding: EdgeInsets.only(left: 25),
-                                  child: Text(
-                                    "Description",
-                                    style: TextStyle(color: Colors.black),
-                                  ),
+                                const SizedBox(height: 10),
+                                const Text(
+                                  "Description",
+                                  style: TextStyle(color: Colors.black,fontSize: 16,fontWeight: FontWeight.w500),
                                 ),
                                 const SizedBox(height: 5),
                                 MyTextField(
@@ -266,7 +259,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                           ),
                                           Text(
                                             'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
-                                            style: TextStyle(fontSize: 16, color: Colors.black54),
+                                            style: const TextStyle(fontSize: 16, color: Colors.black54),
                                             textAlign: TextAlign.center,
                                           ),
                                           const SizedBox(
@@ -327,7 +320,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                                           Text(
                                             'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
                                             style:
-                                            TextStyle(fontSize: 14, color: Color(0xff141C21), fontWeight: FontWeight.w300),
+                                            const TextStyle(fontSize: 14, color: Color(0xff141C21), fontWeight: FontWeight.w300),
                                             textAlign: TextAlign.center,
                                           ),
                                           const SizedBox(

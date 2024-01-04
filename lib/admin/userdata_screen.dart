@@ -6,8 +6,10 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/adduser_screen.dart';
+import 'package:resvago/admin/wallet_screen.dart';
 import 'package:resvago/components/helper.dart';
 
+import 'edit_vendor.dart';
 import 'model/user_model.dart';
 
 class UsersDataScreen extends StatefulWidget {
@@ -143,7 +145,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = filteredUsers[index];
-                            log(item.image.toString());
+                            log("fhfhfvh"+item.code.toString());
                             // if (item.deactivate) {
                             //   return SizedBox.shrink();
                             // }
@@ -201,6 +203,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                 )
                                               : const SizedBox(),
                                           PopupMenuButton<int>(
+                                            surfaceTintColor: Colors.white,
                                               padding: EdgeInsets.zero,
                                               icon: const Icon(
                                                 Icons.more_vert,
@@ -212,15 +215,21 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(AddUserScreen(
-                                                          isEditMode: true,
-                                                          documentId: item.docid,
-                                                          restaurantNamename: item.restaurantName,
-                                                          email: item.email,
-                                                          category: item.category,
-                                                          phoneNumber: item.mobileNumber,
-                                                          image: item.image,
-                                                          address: item.address));
+                                                      Get.to(UserProfileScreen(uid: item.docid));
+                                                      // Get.to(AddUserScreen(
+                                                      //   isEditMode: true,
+                                                      //   documentId: item.docid,
+                                                      //   restaurantNamename: item.restaurantName,
+                                                      //   email: item.email,
+                                                      //   category: item.category,
+                                                      //   phoneNumber: item.mobileNumber,
+                                                      //   image: item.image,
+                                                      //   address: item.address,
+                                                      //   code: item.code,
+                                                      //   country: item.country,
+                                                      //   latitude: item.latitude,
+                                                      //   longitude: item.longitude,
+                                                      // ));
                                                     },
                                                     child: const Text("Edit"),
                                                   ),
@@ -230,12 +239,12 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                       showDialog(
                                                         context: context,
                                                         builder: (ctx) => AlertDialog(
-                                                          title: const Text("Delete user"),
+                                                          title: const Text("Delete Vendor"),
                                                           content: SizedBox(
                                                             height: 140,
                                                             child: Column(
                                                               children: [
-                                                                const Text("Are you sure you want to delete this user"),
+                                                                const Text("Are you sure you want to delete this vendor"),
                                                                 const SizedBox(
                                                                   height: 20,
                                                                 ),
@@ -321,6 +330,13 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                     },
                                                     child: Text(item.deactivate == true ? "Activate" : "Deactivate"),
                                                   ),
+                                                  PopupMenuItem(
+                                                    value: 1,
+                                                    onTap: () {
+                                                      Get.to(()=>WalletScreen(uId: item.docid));
+                                                    },
+                                                    child: const Text("Wallet"),
+                                                  ),
                                                 ];
                                               }),
                                         ],
@@ -352,7 +368,6 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
       }).toList();
     }
   }
-
 
   Stream<List<UserData>> getUsersStreamFromFirestore() {
     return FirebaseFirestore.instance.collection('vendor_users').snapshots().map((querySnapshot) {

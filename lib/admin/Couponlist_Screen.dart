@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +7,6 @@ import 'package:get/get.dart';
 import 'package:resvago/admin/addcoupon_screen.dart';
 import 'package:resvago/admin/model/coupen_model.dart';
 import 'package:resvago/components/helper.dart';
-
 import 'model/vendor_register_model.dart';
 
 class CouponListScreen extends StatefulWidget {
@@ -255,7 +253,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                             discount: item.discount,
                                             code: item.code,
                                             startdate: item.startDate,
-                                            maxDiscount: item.maxDiscount,
+                                            maxDiscount: item.maxDiscount.toString(),
                                             enddate: item.endDate,
                                             resturentName: item.userName,
                                           ));
@@ -268,64 +266,68 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                           showDialog(
                                             context: context,
                                             builder: (ctx) => AlertDialog(
-                                              title:
-                                                  const Text("Delete Coupon"),
-                                              content: const Text(
-                                                  "Are you sure you want to delete this Coupon"),
-                                              actions: <Widget>[
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.of(ctx).pop();
-                                                  },
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.red,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(11)),
-                                                    width: 100,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            14),
-                                                    child: const Center(
-                                                        child: Text(
-                                                      "Cancel",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    )),
-                                                  ),
+                                              title: const Text("Delete Coupon"),
+                                              content: SizedBox(
+                                                height: 140,
+                                                child: Column(
+                                                  children: [
+                                                    const Text("Are you sure you want to delete this coupon"),
+                                                    const SizedBox(
+                                                      height: 20,
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: TextButton(
+                                                            onPressed: () {
+                                                              Navigator.of(ctx).pop();
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors.red,
+                                                                  borderRadius: BorderRadius.circular(11)),
+                                                              // width: 100,
+                                                              padding: const EdgeInsets.all(14),
+                                                              child: const Center(
+                                                                  child: Text(
+                                                                    "Cancel",
+                                                                    style: TextStyle(color: Colors.white),
+                                                                  )),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          child: TextButton(
+                                                            onPressed: () async {
+                                                              FirebaseFirestore.instance
+                                                                  .collection(
+                                                                  "Coupon_data")
+                                                                  .doc(item.docid)
+                                                                  .delete()
+                                                                  .then((value) {
+                                                                setState(() {});
+                                                              });
+                                                              Navigator.of(ctx).pop();
+                                                            },
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors.green,
+                                                                  borderRadius: BorderRadius.circular(11)),
+                                                              width: 100,
+                                                              padding: const EdgeInsets.all(14),
+                                                              child: const Center(
+                                                                  child: Text(
+                                                                    "okay",
+                                                                    style: TextStyle(color: Colors.white),
+                                                                  )),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )
+                                                  ],
                                                 ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    FirebaseFirestore.instance
-                                                        .collection(
-                                                            "Coupon_data")
-                                                        .doc(item.docid)
-                                                        .delete()
-                                                        .then((value) {
-                                                      setState(() {});
-                                                    });
-                                                    Navigator.of(ctx).pop();
-                                                  },
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.green,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(11)),
-                                                    width: 100,
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            14),
-                                                    child: const Center(
-                                                        child: Text(
-                                                      "okay",
-                                                      style: TextStyle(
-                                                          color: Colors.white),
-                                                    )),
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
                                             ),
                                           );
                                         },
@@ -351,7 +353,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
                                       ),
                                     ];
                                   }),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               )
                             ],

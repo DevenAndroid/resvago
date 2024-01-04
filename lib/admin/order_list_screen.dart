@@ -63,6 +63,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               labelColor: Color(0xFF454B5C),
               indicatorColor: Color(0xFF3B5998),
               indicatorWeight: 4,
+              isScrollable: true,
               tabs: [
                 Tab(
                   text: "Active",
