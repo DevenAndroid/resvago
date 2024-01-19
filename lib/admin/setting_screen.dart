@@ -1,10 +1,15 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:resvago/components/helper.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
+import 'model/admin_model.dart';
 
 class settingScreen extends StatefulWidget {
   final bool isEditMode;
@@ -32,17 +37,21 @@ class _settingScreenState extends State<settingScreen> {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
     try {
-      await FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).set({
-        'email': emailController.text,
-        'Password': passwordController.text,
-        "admin_commission": commissionPercentage.text.trim(),
-        "UserId": FirebaseAuth.instance.currentUser!.uid
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      User? user = userCredential.user;
+      await user!.updatePassword(passwordController.text.trim()).then((value) async {
+        FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).update({
+          'email': emailController.text,
+          'Password': passwordController.text,
+          "admin_commission": commissionPercentage.text.trim(),
+          "UserId": FirebaseAuth.instance.currentUser!.uid
+        });
+        Helper.hideLoader(loader);
+        showToast('Setting Updated');
       });
-      Helper.hideLoader(loader);
-      emailController.clear();
-      passwordController.clear();
-      commissionPercentage.clear();
-      showToast('Setting Updated');
     } catch (error) {
       print('Error updating settings: $error');
       Helper.hideLoader(loader);
@@ -50,9 +59,24 @@ class _settingScreenState extends State<settingScreen> {
     }
   }
 
+  AdminModel? adminModel;
+  void getAdminData() {
+    FirebaseFirestore.instance.collection("admin_login").get().then((value) {
+      adminModel = AdminModel.fromJson(value.docs.first.data());
+      log(jsonEncode(value.docs.first.data()).toString());
+      if (adminModel != null) {
+        emailController.text = adminModel!.email;
+        commissionPercentage.text = adminModel!.adminCommission;
+        passwordController.text = adminModel!.password;
+      }
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getAdminData();
   }
 
   @override

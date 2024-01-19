@@ -318,12 +318,8 @@ class HomePageState extends State<HomePage> {
                 leading: const Icon(Icons.logout),
                 title: const Text('Logout'),
                 onTap: () async {
-                  Get.back();
+                  FirebaseAuth.instance.signOut();
                   Get.to(const LogInScreen());
-                  // await FirebaseAuth.instance.signOut().then((value) {
-                  //   // Get.to(const LogInScreen());
-                  //
-                  // });
                 },
               ),
             ],

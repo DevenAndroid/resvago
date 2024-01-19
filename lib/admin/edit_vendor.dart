@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -17,6 +19,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:resvago/components/my_button.dart';
+
 import '../Firebase_service/firebase_service.dart';
 import '../components/addsize.dart';
 import '../components/apptheme.dart';
@@ -30,8 +33,8 @@ import 'model/goggle_places_model.dart';
 import 'model/user_model.dart';
 
 class UserProfileScreen extends StatefulWidget {
+  UserProfileScreen({super.key, required this.uid});
   String uid;
-   UserProfileScreen({super.key,required this.uid});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
@@ -50,7 +53,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   var obscureText5 = true;
   Rx<File> image = File("").obs;
   RxBool showValidation1 = false.obs;
-  String? _address = "";
 
   bool checkValidation(bool bool1, bool2) {
     if (bool1 == true && bool2 == true) {
@@ -80,6 +82,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   dynamic setDelivery;
   dynamic cancellation;
   dynamic menuSelection;
+  dynamic twoStepVerification;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   FirebaseService firebaseService = FirebaseService();
   String googleApikey = "AIzaSyDDl-_JOy_bj4MyQhYbKbGkZ0sfpbTZDNU";
@@ -101,12 +104,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     const cloudFunctionUrl = 'https://us-central1-resvago-ire.cloudfunctions.net/searchPlaces';
     FirebaseFunctions.instance.httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?query=$query')).call().then((value) {
       List<Places> places = [];
-      if (value.data != null) {
-        value.data.forEach((v) {
+      if (value.data != null && value.data['places'] != null) {
+        log("jhkgj${jsonEncode(value.data.toString())}");
+        List<dynamic> data = List.from(value.data['places']);
+
+        for (var v in data) {
           places.add(Places.fromJson(v));
-        });
+        }
       }
       googlePlacesModel = GooglePlacesModel(places: places);
+
+      log("fgfdh${jsonEncode(googlePlacesModel.toString())}");
       setState(() {});
     });
   }
@@ -135,16 +143,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> updateProfileToFirestore() async {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
+    String? fcm = "fcm";
+    // if (!kIsWeb) {
+    //   fcm = await FirebaseMessaging.instance.getToken();
+    // }
     try {
       List<String> imagesLink = [];
       List<String> menuPhotoLink = [];
       String? imageUrlProfile = kIsWeb ? null : controller.categoryFile.path;
       if (kIsWeb) {
         if (pickedFile != null) {
-          UploadTask uploadTask = FirebaseStorage.instance
-              .ref("profile_image/${widget.uid}")
-              .child("image")
-              .putData(pickedFile!);
+          UploadTask uploadTask = FirebaseStorage.instance.ref("profile_image/${widget.uid}").child("image").putData(pickedFile!);
           TaskSnapshot snapshot = await uploadTask;
           imageUrlProfile = await snapshot.ref.getDownloadURL();
         } else {
@@ -156,10 +165,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         //   await gg.delete();
         // }
         if (!controller.categoryFile.path.contains("http") && controller.categoryFile.path.isNotEmpty) {
-          UploadTask uploadTask = FirebaseStorage.instance
-              .ref("profileImage/${widget.uid}")
-              .child("image")
-              .putFile(controller.categoryFile);
+          UploadTask uploadTask =
+              FirebaseStorage.instance.ref("profileImage/${widget.uid}").child("image").putFile(controller.categoryFile);
           TaskSnapshot snapshot = await uploadTask;
           imageUrlProfile = await snapshot.ref.getDownloadURL();
         }
@@ -182,55 +189,46 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           if (element.value.path.contains("http")) {
             menuPhotoLink.add(element.value.path);
           } else {
-            UploadTask uploadMenuImage = FirebaseStorage.instance
-                .ref("menu_images/${widget.uid}")
-                .child("${element.key}image")
-                .putFile(element.value);
+            UploadTask uploadMenuImage =
+                FirebaseStorage.instance.ref("menu_images/${widget.uid}").child("${element.key}image").putFile(element.value);
 
             TaskSnapshot snapshot1 = await uploadMenuImage;
             String imageUrl1 = await snapshot1.ref.getDownloadURL();
             menuPhotoLink.add(imageUrl1);
           }
         }
-      }
-      else {
-        if (controller.galleryFiles.isNotEmpty) {
-          for (var element in controller.galleryFiles.asMap().entries) {
-            UploadTask uploadTask = FirebaseStorage.instance
-                .ref("menu_images/${widget.uid}")
-                .child("${element.key}image")
-                .putData(element.value!);
-
-            TaskSnapshot snapshot = await uploadTask;
-            String imageUrl = await snapshot.ref.getDownloadURL();
-            menuPhotoLink.add(imageUrl);
-          }
-        } else {
-          for (var element in controller.galleryFilesUrl.asMap().entries) {
-            menuPhotoLink.add(element.value.toString());
-          }
-        }
-
-        if (controller.galleryFiles1.isNotEmpty) {
-          for (var element in controller.galleryFiles1.asMap().entries) {
+      } else {
+        for (var element in controller.galleryImagesList1.asMap().entries) {
+          if (element.value.localImage != null) {
             UploadTask uploadTask = FirebaseStorage.instance
                 .ref("restaurant_images/${widget.uid}")
                 .child("${element.key}image")
-                .putData(element.value!);
+                .putData(element.value.localImage!);
 
             TaskSnapshot snapshot = await uploadTask;
             String imageUrl = await snapshot.ref.getDownloadURL();
             imagesLink.add(imageUrl);
+          } else {
+            imagesLink.add(element.value.imageUrl!);
           }
-        } else {
-          for (var element in controller.galleryFilesUrl1.asMap().entries) {
-            imagesLink.add(element.value.toString());
+        }
+
+        for (var element in controller.galleryImagesList2.asMap().entries) {
+          if (element.value.localImage != null) {
+            UploadTask uploadTask = FirebaseStorage.instance
+                .ref("menu_images/${widget.uid}")
+                .child("${element.key}image")
+                .putData(element.value.localImage!);
+
+            TaskSnapshot snapshot = await uploadTask;
+            String imageUrl = await snapshot.ref.getDownloadURL();
+            menuPhotoLink.add(imageUrl);
+          } else {
+            menuPhotoLink.add(element.value.imageUrl!);
           }
         }
       }
 
-      print("zbxcgxc${controller.galleryFiles1}");
-      print("zbxcgxc${controller.galleryFiles}");
       await FirebaseFirestore.instance.collection("vendor_users").doc(widget.uid).update({
         "restaurantName": restaurantController.text.trim(),
         "address": _searchController.text.trim(),
@@ -250,9 +248,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         "setDelivery": setDelivery,
         "cancellation": cancellation,
         "menuSelection": menuSelection,
+        "twoStepVerification": twoStepVerification,
         "latitude": latitude,
         "longitude": longitude,
-        "deactivate": deactivated
+        "fcm": fcm
       }).then((value) => Fluttertoast.showToast(msg: "Profile Updated"));
       fetchdata();
       Get.back();
@@ -271,7 +270,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (value.exists) {
         if (value.data() == null) return;
         profileData = ProfileData.fromJson(value.data()!);
-        print(profileData.toJson().toString());
         if (!kIsWeb) {
           controller.categoryFile = File(profileData.image ?? "");
         } else {
@@ -288,7 +286,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _searchController.text = (profileData.address ?? "").toString();
         preparationTime = (profileData.preparationTime ?? "").toString();
         averageMealForMember = (profileData.averageMealForMember ?? "").toString();
+        passwordController.text = profileData.password ?? "";
+        confirmPassController.text = profileData.confirmPassword ?? "";
         setDelivery = (profileData.setDelivery);
+        // twoStepVerification = (profileData.twoStepVerification);
         cancellation = (profileData.cancellation);
         menuSelection = (profileData.menuSelection);
         aboutUsController.text = (profileData.aboutUs ?? "").toString();
@@ -302,10 +303,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           }
         } else {
           for (var element in profileData.restaurantImage!) {
-            controller.galleryFilesUrl1.add(element);
-            controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
-            print("erfse${controller.galleryFiles1.length}");
+            controller.galleryImagesList1.add(ManageWebImages(imageUrl: element.toString()));
+            // controller.galleryFilesUrl1.add(element);
+            // controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
+            // print("erfse${controller.galleryFiles1.length}");
           }
+          controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
+          setState(() {});
         }
         profileData.menuGalleryImages ??= [];
         controller.menuGallery.clear();
@@ -316,10 +320,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           }
         } else {
           for (var element in profileData.menuGalleryImages!) {
-            controller.galleryFilesUrl.add(element);
-            controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
-            print("fuyguh${controller.galleryFiles.length}");
+            controller.galleryImagesList2.add(ManageWebImages(imageUrl: element.toString()));
+            // controller.galleryFilesUrl.add(element);
+            // controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
+            // print("fuyguh${controller.galleryFiles.length}");
           }
+          controller.refreshInt.value = DateTime.now().millisecondsSinceEpoch;
+          setState(() {});
         }
         kk++;
         setState(() {});
@@ -360,6 +367,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       ),
       extendBodyBehindAppBar: true,
       body: SingleChildScrollView(
+        // physics: const BouncingScrollPhysics(),
         child: Form(
           key: _formKeySignup,
           child: Column(
@@ -395,185 +403,185 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 width: 100,
                                 child: kIsWeb
                                     ? Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10000),
-                                      child: Container(
-                                          height: 100,
-                                          width: 100,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xffFAAF40),
-                                            border: Border.all(color: const Color(0xff3B5998), width: 6),
-                                            borderRadius: BorderRadius.circular(5000),
-                                            // color: Colors.brown
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(10000),
+                                            child: Container(
+                                                height: 100,
+                                                width: 100,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xffFAAF40),
+                                                  border: Border.all(color: const Color(0xff3B5998), width: 6),
+                                                  borderRadius: BorderRadius.circular(5000),
+                                                  // color: Colors.brown
+                                                ),
+                                                child: pickedFile != null
+                                                    ? Image.memory(
+                                                        pickedFile!,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: controller.categoryFile.path,
+                                                          height: AddSize.size30,
+                                                          width: AddSize.size30,
+                                                          errorWidget: (_, __, ___) => const Icon(
+                                                            Icons.person,
+                                                            size: 60,
+                                                          ),
+                                                          placeholder: (_, __) => const SizedBox(),
+                                                        ),
+                                                      )
+                                                    : Image.network(
+                                                        fileUrl,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: controller.categoryFile.path,
+                                                          height: AddSize.size30,
+                                                          width: AddSize.size30,
+                                                          errorWidget: (_, __, ___) => const Icon(
+                                                            Icons.person,
+                                                            size: 60,
+                                                          ),
+                                                          placeholder: (_, __) => const SizedBox(),
+                                                        ),
+                                                      )),
                                           ),
-                                          child: pickedFile != null
-                                              ? Image.memory(
-                                            pickedFile!,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: controller.categoryFile.path,
-                                              height: AddSize.size30,
-                                              width: AddSize.size30,
-                                              errorWidget: (_, __, ___) => const Icon(
-                                                Icons.person,
-                                                size: 60,
+                                          Positioned(
+                                            bottom: 0,
+                                            right: 0,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                Helper.addFilePicker().then((value) {
+                                                  pickedFile = value;
+                                                  setState(() {});
+                                                });
+                                              },
+                                              icon: Container(
+                                                height: 30,
+                                                width: 30,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xff04666E),
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child: const Icon(
+                                                  Icons.camera_alt,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ),
                                               ),
-                                              placeholder: (_, __) => const SizedBox(),
                                             ),
                                           )
-                                              : Image.network(
-                                            fileUrl,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: controller.categoryFile.path,
-                                              height: AddSize.size30,
-                                              width: AddSize.size30,
-                                              errorWidget: (_, __, ___) => const Icon(
-                                                Icons.person,
-                                                size: 60,
-                                              ),
-                                              placeholder: (_, __) => const SizedBox(),
-                                            ),
-                                          )),
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          Helper.addFilePicker().then((value) {
-                                            pickedFile = value;
-                                            setState(() {});
-                                          });
-                                        },
-                                        icon: Container(
-                                          height: 30,
-                                          width: 30,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xff04666E),
-                                            borderRadius: BorderRadius.circular(50),
-                                          ),
-                                          child: const Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                )
+                                        ],
+                                      )
                                     : Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(10000),
-                                      child: Container(
-                                          height: 100,
-                                          width: 100,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xffFAAF40),
-                                            border: Border.all(color: const Color(0xff3B5998), width: 6),
-                                            borderRadius: BorderRadius.circular(5000),
-                                            // color: Colors.brown
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(10000),
+                                            child: Container(
+                                                height: 100,
+                                                width: 100,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xffFAAF40),
+                                                  border: Border.all(color: const Color(0xff3B5998), width: 6),
+                                                  borderRadius: BorderRadius.circular(5000),
+                                                  // color: Colors.brown
+                                                ),
+                                                child: controller.categoryFile.path.contains("http") ||
+                                                        controller.categoryFile.path == ""
+                                                    ? Image.network(
+                                                        profileData.image.toString(),
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: profileData.image.toString(),
+                                                          height: AddSize.size30,
+                                                          width: AddSize.size30,
+                                                          errorWidget: (_, __, ___) => const Icon(
+                                                            Icons.person,
+                                                            size: 20,
+                                                            color: Colors.black,
+                                                          ),
+                                                          placeholder: (_, __) => const SizedBox(),
+                                                        ),
+                                                      )
+                                                    : Image.file(
+                                                        controller.categoryFile,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                          fit: BoxFit.cover,
+                                                          imageUrl: controller.categoryFile.path,
+                                                          height: AddSize.size30,
+                                                          width: AddSize.size30,
+                                                          errorWidget: (_, __, ___) => const Icon(
+                                                            Icons.person,
+                                                            size: 60,
+                                                          ),
+                                                          placeholder: (_, __) => const SizedBox(),
+                                                        ),
+                                                      )
+                                                // controller.categoryFile.path.contains("http") || controller.categoryFile.path == ""
+                                                //     ? Image.network(
+                                                //   controller.categoryFile.path,
+                                                //         fit: BoxFit.cover,
+                                                //         errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                //           fit: BoxFit.cover,
+                                                //           imageUrl: controller.categoryFile.path,
+                                                //           height: AddSize.size30,
+                                                //           width: AddSize.size30,
+                                                //           errorWidget: (_, __, ___) => const Icon(
+                                                //             Icons.person,
+                                                //             size: 60,
+                                                //           ),
+                                                //           placeholder: (_, __) => const SizedBox(),
+                                                //         ),
+                                                //       )
+                                                //     : Image.file(
+                                                //   controller.categoryFile,
+                                                //         fit: BoxFit.cover,
+                                                //         errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                //           fit: BoxFit.cover,
+                                                //           imageUrl: controller.categoryFile.path,
+                                                //           height: AddSize.size30,
+                                                //           width: AddSize.size30,
+                                                //           errorWidget: (_, __, ___) => const Icon(
+                                                //             Icons.person,
+                                                //             size: 60,
+                                                //           ),
+                                                //           placeholder: (_, __) => const SizedBox(),
+                                                //         ),
+                                                //       )
+                                                ),
                                           ),
-                                          child: controller.categoryFile.path.contains("http") ||
-                                              controller.categoryFile.path == ""
-                                              ? Image.network(
-                                            profileData.image.toString(),
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: profileData.image.toString(),
-                                              height: AddSize.size30,
-                                              width: AddSize.size30,
-                                              errorWidget: (_, __, ___) => const Icon(
-                                                Icons.person,
-                                                size: 20,
-                                                color: Colors.black,
+                                          Positioned(
+                                            bottom: 0,
+                                            right: 0,
+                                            child: GestureDetector(
+                                              behavior: HitTestBehavior.translucent,
+                                              onTap: () {
+                                                showActionSheet(context);
+                                              },
+                                              child: Container(
+                                                height: 30,
+                                                width: 30,
+                                                clipBehavior: Clip.antiAlias,
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xff04666E),
+                                                  borderRadius: BorderRadius.circular(50),
+                                                ),
+                                                child: const Icon(
+                                                  Icons.camera_alt,
+                                                  color: Colors.white,
+                                                  size: 15,
+                                                ),
                                               ),
-                                              placeholder: (_, __) => const SizedBox(),
                                             ),
                                           )
-                                              : Image.file(
-                                            controller.categoryFile,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: controller.categoryFile.path,
-                                              height: AddSize.size30,
-                                              width: AddSize.size30,
-                                              errorWidget: (_, __, ___) => const Icon(
-                                                Icons.person,
-                                                size: 60,
-                                              ),
-                                              placeholder: (_, __) => const SizedBox(),
-                                            ),
-                                          )
-                                        // controller.categoryFile.path.contains("http") || controller.categoryFile.path == ""
-                                        //     ? Image.network(
-                                        //   controller.categoryFile.path,
-                                        //         fit: BoxFit.cover,
-                                        //         errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                        //           fit: BoxFit.cover,
-                                        //           imageUrl: controller.categoryFile.path,
-                                        //           height: AddSize.size30,
-                                        //           width: AddSize.size30,
-                                        //           errorWidget: (_, __, ___) => const Icon(
-                                        //             Icons.person,
-                                        //             size: 60,
-                                        //           ),
-                                        //           placeholder: (_, __) => const SizedBox(),
-                                        //         ),
-                                        //       )
-                                        //     : Image.file(
-                                        //   controller.categoryFile,
-                                        //         fit: BoxFit.cover,
-                                        //         errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                        //           fit: BoxFit.cover,
-                                        //           imageUrl: controller.categoryFile.path,
-                                        //           height: AddSize.size30,
-                                        //           width: AddSize.size30,
-                                        //           errorWidget: (_, __, ___) => const Icon(
-                                        //             Icons.person,
-                                        //             size: 60,
-                                        //           ),
-                                        //           placeholder: (_, __) => const SizedBox(),
-                                        //         ),
-                                        //       )
+                                        ],
                                       ),
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                        behavior: HitTestBehavior.translucent,
-                                        onTap: () {
-                                          showActionSheet(context);
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          width: 30,
-                                          clipBehavior: Clip.antiAlias,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xff04666E),
-                                            borderRadius: BorderRadius.circular(50),
-                                          ),
-                                          child: const Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.white,
-                                            size: 15,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
                               ),
                             ],
                           ),
@@ -613,7 +621,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             controller: restaurantController,
                             validator: RequiredValidator(errorText: 'Please enter your Restaurant Name'.tr).call,
                             hint:
-                            profileData.restaurantName == null ? "restaurant name".tr : profileData.restaurantName.toString(),
+                                profileData.restaurantName == null ? "restaurant name".tr : profileData.restaurantName.toString(),
                           ),
                           const SizedBox(
                             height: 20,
@@ -777,32 +785,32 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           ),
                           googlePlacesModel != null
                               ? Container(
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                            child: ListView.builder(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              itemCount: googlePlacesModel!.places!.length,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                final item = googlePlacesModel!.places![index];
-                                return InkWell(
-                                    onTap: () {
-                                      _searchController.text = item.name ?? "";
-                                      selectedPlace = item;
-                                      googlePlacesModel = null;
-                                      latitude = selectedPlace!.geometry!.location!.lat;
-                                      longitude = selectedPlace!.geometry!.location!.lng;
-                                      log(selectedPlace!.geometry!.toJson().toString());
-                                      setState(() {});
-                                      // places = [];
-                                      // setState(() {});
+                                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                                  child: ListView.builder(
+                                    physics: const AlwaysScrollableScrollPhysics(),
+                                    itemCount: googlePlacesModel!.places!.length,
+                                    shrinkWrap: true,
+                                    itemBuilder: (BuildContext context, int index) {
+                                      final item = googlePlacesModel!.places![index];
+                                      return InkWell(
+                                          onTap: () {
+                                            _searchController.text = item.name ?? "";
+                                            selectedPlace = item;
+                                            googlePlacesModel = null;
+                                            latitude = selectedPlace!.geometry!.location!.lat;
+                                            longitude = selectedPlace!.geometry!.location!.lng;
+                                            log(selectedPlace!.geometry!.toJson().toString());
+                                            setState(() {});
+                                            // places = [];
+                                            // setState(() {});
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 10.0),
+                                            child: Text(item.name ?? ""),
+                                          ));
                                     },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                      child: Text(item.name ?? ""),
-                                    ));
-                              },
-                            ),
-                          )
+                                  ),
+                                )
                               : const SizedBox.shrink(),
                           // RegisterTextFieldWidget(
                           //   readOnly: true,
@@ -909,7 +917,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               Text(
                                 "Upload Restaurant Images or Videos".tr,
                                 style:
-                                GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                                    GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               const SizedBox(
                                 height: 10,
@@ -921,7 +929,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                               Text(
                                 "Upload Restaurant Menu Card".tr,
                                 style:
-                                GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                                    GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               const SizedBox(
                                 height: 10,
@@ -941,7 +949,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 setState(() {});
                               }
                             },
-                            text: 'Update'.tr, color: Colors.white, backgroundcolor: Colors.black,
+                            text: 'Save'.tr,
+                            backgroundcolor: Colors.black,
+                            color: Colors.white,
                           ),
                         ],
                       ),
@@ -1100,7 +1110,7 @@ class _ProductGalleryImagesState extends State<ProductGalleryImages> {
                                     .then((value) {
                                   if (value == null) return;
                                   Get.back();
-                                  if (controller.galleryImages.length < 5) {
+                                  if (controller.galleryImages.length < 20) {
                                     controller.galleryImages.add(value);
                                     setState(() {});
                                   }
@@ -1135,7 +1145,7 @@ class _ProductGalleryImagesState extends State<ProductGalleryImages> {
                                 )
                                     .then((value) {
                                   if (value == null) return;
-                                  if (controller.galleryImages.length < 5) {
+                                  if (controller.galleryImages.length < 20) {
                                     controller.galleryImages.add(value);
                                     setState(() {});
                                   }
@@ -1167,7 +1177,7 @@ class _ProductGalleryImagesState extends State<ProductGalleryImages> {
                                 NewHelper().multiImagePicker().then((value) {
                                   if (value == null) return;
                                   for (var element in value) {
-                                    if (controller.galleryImages.length < 5) {
+                                    if (controller.galleryImages.length < 20) {
                                       controller.galleryImages.add(element);
                                     } else {
                                       break;
@@ -1264,12 +1274,21 @@ class _ProductGalleryImagesState extends State<ProductGalleryImages> {
                       TextButton(
                         onPressed: () {
                           if (kIsWeb) {
-                            Helper.addFilePicker().then((value) {
+                            Helper.addFilePicker1().then((value) {
                               if (value == null) return;
-                              if (controller.galleryFiles1.length < 5) {
-                                controller.galleryFiles1.add(value);
-                                setState(() {});
+                              List<Uint8List?> item = value;
+                              for (var element in item) {
+                                if (controller.galleryImagesList1.length < 20) {
+                                  controller.galleryImagesList1.add(ManageWebImages(localImage: element));
+                                } else {
+                                  break;
+                                }
                               }
+                              setState(() {});
+                              // if (controller.galleryFiles1.length < 5) {
+                              //   controller.galleryFiles1.addAll(value);
+                              //   setState(() {});
+                              // }
                             });
                           } else {
                             showImagesBottomSheet();
@@ -1277,135 +1296,123 @@ class _ProductGalleryImagesState extends State<ProductGalleryImages> {
                         },
                         child: kIsWeb
                             ? Text(
-                            'Choose From Gallery ${controller.galleryFiles1.isNotEmpty ? "${controller.galleryFiles1.length}/5" : ""}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.orange,
-                              fontWeight: FontWeight.w600,
-                            ))
+                                'Choose From Gallery ${controller.galleryImagesList1.isNotEmpty ? "${controller.galleryImagesList1.length}/20" : "${controller.galleryImagesList1.length}/20"}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ))
                             : Text(
-                          'Choose From Gallery ${controller.galleryImages.isNotEmpty ? "${controller.galleryImages.length}/5" : ""}',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                                'Choose From Gallery ${controller.galleryImages.isNotEmpty ? "${controller.galleryImages.length}/20" : ""}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ],
                   ),
                 ),
                 kIsWeb
-                    ? controller.galleryFiles1.isNotEmpty
                     ? SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.galleryFiles1
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              Helper.addFilePicker().then((value) {
-                                controller.galleryFiles1[e.key] = value;
-                                setState(() {});
-                              });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.memory(
-                                e.value!,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.video_collection_rounded,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                )
+                        height: 125,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Row(
+                            children: controller.galleryImagesList1
+                                .asMap()
+                                .entries
+                                .map((e) => Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: PopupMenuButton(
+                                          key: ValueKey(e.value.imageUrl.toString()),
+                                          itemBuilder: (BuildContext context) {
+                                            return [
+                                              PopupMenuItem(
+                                                child: const Text("Add"),
+                                                onTap: () {
+                                                  Helper.addFilePicker1(singleFile: true).then((value) {
+                                                    e.value.localImage = value;
+                                                    e.value.imageUrl = null;
+
+                                                    setState(() {});
+                                                  });
+                                                },
+                                              ),
+                                              PopupMenuItem(
+                                                child: const Text("Remove"),
+                                                onTap: () {
+                                                  controller.galleryImagesList1.remove(e.value);
+                                                  setState(() {});
+                                                },
+                                              )
+                                            ];
+                                          },
+                                          child: Container(
+                                            constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
+                                            child: Image.network(
+                                              controller.galleryImagesList1[e.key].imageUrl.toString(),
+                                              errorBuilder: (_, __, ___) => e.value.localImage != null
+                                                  ? Image.memory(
+                                                      e.value.localImage!,
+                                                      errorBuilder: (_, __, ___) => const Icon(
+                                                        Icons.video_collection_rounded,
+                                                        color: Colors.blue,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                            ),
+                                          )),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      )
                     : SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.galleryFilesUrl1
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              Helper.addFilePicker().then((value) {
-                                controller.galleryFilesUrl1[e.key] = value;
-                                setState(() {});
-                              });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.network(
-                                e.value,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.video_collection_rounded,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                )
-                    :controller.galleryImages.isNotEmpty ? SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.galleryImages
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              NewHelper.showImagePickerSheet(
-                                  gotImage: (value) {
-                                    controller.galleryImages[e.key] = value;
-                                    setState(() {});
-                                  },
-                                  context: context,
-                                  removeOption: true,
-                                  removeImage: (fg) {
-                                    controller.galleryImages.removeAt(e.key);
-                                    setState(() {});
-                                  });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.file(
-                                e.value,
-                                errorBuilder: (_, __, ___) => Image.network(
-                                  e.value.path,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.video_collection_rounded,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                ):const SizedBox(),
+                        height: 125,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Row(
+                            children: controller.galleryImages
+                                .asMap()
+                                .entries
+                                .map((e) => Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: GestureDetector(
+                                          onTap: () {
+                                            NewHelper.showImagePickerSheet(
+                                                gotImage: (value) {
+                                                  controller.galleryImages[e.key] = value;
+                                                  setState(() {});
+                                                },
+                                                context: context,
+                                                removeOption: true,
+                                                removeImage: (fg) {
+                                                  controller.galleryImages.removeAt(e.key);
+                                                  setState(() {});
+                                                });
+                                          },
+                                          child: Container(
+                                            constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
+                                            child: Image.file(
+                                              e.value,
+                                              errorBuilder: (_, __, ___) => Image.network(
+                                                e.value.path,
+                                                errorBuilder: (_, __, ___) => const Icon(
+                                                  Icons.video_collection_rounded,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                          )),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      ),
                 const SizedBox(
                   height: 12,
                 ),
@@ -1461,7 +1468,7 @@ class _ProductMenuImagesState extends State<ProductMenuImages> {
                                 )
                                     .then((value) {
                                   if (value == null) return;
-                                  if (controller.menuGallery.length < 5) {
+                                  if (controller.menuGallery.length < 20) {
                                     controller.menuGallery.add(value);
                                     setState(() {});
                                   }
@@ -1493,7 +1500,7 @@ class _ProductMenuImagesState extends State<ProductMenuImages> {
                                 NewHelper().multiImagePicker().then((value) {
                                   if (value == null) return;
                                   for (var element in value) {
-                                    if (controller.menuGallery.length < 5) {
+                                    if (controller.menuGallery.length < 20) {
                                       controller.menuGallery.add(element);
                                     } else {
                                       break;
@@ -1590,12 +1597,21 @@ class _ProductMenuImagesState extends State<ProductMenuImages> {
                       TextButton(
                         onPressed: () {
                           if (kIsWeb) {
-                            Helper.addFilePicker().then((value) {
+                            Helper.addFilePicker1().then((value) {
                               if (value == null) return;
-                              if (controller.galleryFiles.length < 5) {
-                                controller.galleryFiles.add(value);
-                                setState(() {});
+                              List<Uint8List?> item = value;
+                              for (var element in item) {
+                                if (controller.galleryImagesList2.length < 20) {
+                                  controller.galleryImagesList2.add(ManageWebImages(localImage: element));
+                                } else {
+                                  break;
+                                }
                               }
+                              setState(() {});
+                              // if (controller.galleryFiles1.length < 5) {
+                              //   controller.galleryFiles1.addAll(value);
+                              //   setState(() {});
+                              // }
                             });
                           } else {
                             showImagesBottomSheet();
@@ -1603,137 +1619,125 @@ class _ProductMenuImagesState extends State<ProductMenuImages> {
                         },
                         child: kIsWeb
                             ? Text(
-                            'Choose From Gallery ${controller.galleryFiles.isNotEmpty ? "${controller.galleryFiles.length}/5" : ""}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: Colors.orange,
-                              fontWeight: FontWeight.w600,
-                            ))
+                                'Choose From Gallery ${controller.galleryImagesList2.isNotEmpty ? "${controller.galleryImagesList2.length}/20" : "${controller.galleryImagesList2.length}/20"}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ))
                             : Text(
-                          'Choose From Gallery ${controller.menuGallery.isNotEmpty ? "${controller.menuGallery.length}/5" : ""}',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                                'Choose From Gallery ${controller.menuGallery.isNotEmpty ? "${controller.menuGallery.length}/20" : ""}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ],
                   ),
                 ),
                 kIsWeb
-                    ? controller.galleryFiles.isNotEmpty
                     ? SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.galleryFiles
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              Helper.addFilePicker().then((value) {
-                                controller.galleryFiles[e.key] = value;
-                                setState(() {});
-                              });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.memory(
-                                e.value!,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                )
-                    : SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.galleryFilesUrl
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              Helper.addFilePicker().then((value) {
-                                controller.galleryFilesUrl[e.key] = value;
-                                setState(() {});
-                              });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.network(
-                                e.value,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.error_outline,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                )
+                        height: 125,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Row(
+                            children: controller.galleryImagesList2
+                                .asMap()
+                                .entries
+                                .map((e) => Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: PopupMenuButton(
+                                          key: ValueKey(e.value.imageUrl.toString()),
+                                          itemBuilder: (BuildContext context) {
+                                            return [
+                                              PopupMenuItem(
+                                                child: Text("Add"),
+                                                onTap: () {
+                                                  Helper.addFilePicker1(singleFile: true).then((value) {
+                                                    e.value.localImage = value;
+                                                    e.value.imageUrl = null;
+
+                                                    setState(() {});
+                                                  });
+                                                },
+                                              ),
+                                              PopupMenuItem(
+                                                child: Text("Remove"),
+                                                onTap: () {
+                                                  controller.galleryImagesList2.remove(e.value);
+                                                  setState(() {});
+                                                },
+                                              )
+                                            ];
+                                          },
+                                          child: Container(
+                                            constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
+                                            child: Image.network(
+                                              controller.galleryImagesList2[e.key].imageUrl.toString(),
+                                              errorBuilder: (_, __, ___) => e.value.localImage != null
+                                                  ? Image.memory(
+                                                      e.value.localImage!,
+                                                      errorBuilder: (_, __, ___) => const Icon(
+                                                        Icons.video_collection_rounded,
+                                                        color: Colors.blue,
+                                                      ),
+                                                    )
+                                                  : const SizedBox(),
+                                            ),
+                                          )),
+                                    ))
+                                .toList(),
+                          ),
+                        ),
+                      )
                     : controller.menuGallery.isNotEmpty
-                    ? SizedBox(
-                  height: 125,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: controller.menuGallery
-                          .asMap()
-                          .entries
-                          .map((e) => Padding(
-                        padding: const EdgeInsets.only(right: 18),
-                        child: GestureDetector(
-                            onTap: () {
-                              NewHelper.showImagePickerSheet(
-                                  gotImage: (value) {
-                                    controller.menuGallery[e.key] = value;
-                                    setState(() {});
-                                  },
-                                  context: context,
-                                  removeOption: true,
-                                  removeImage: (fg) {
-                                    controller.menuGallery.removeAt(e.key);
-                                    setState(() {});
-                                  });
-                            },
-                            child: Container(
-                              constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
-                              child: Image.file(
-                                e.value,
-                                errorBuilder: (_, __, ___) => Image.network(
-                                  e.value.path,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red,
-                                  ),
-                                ),
+                        ? SizedBox(
+                            height: 125,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Row(
+                                children: controller.menuGallery
+                                    .asMap()
+                                    .entries
+                                    .map((e) => Padding(
+                                          padding: const EdgeInsets.only(right: 18),
+                                          child: GestureDetector(
+                                              onTap: () {
+                                                NewHelper.showImagePickerSheet(
+                                                    gotImage: (value) {
+                                                      controller.menuGallery[e.key] = value;
+                                                      setState(() {});
+                                                    },
+                                                    context: context,
+                                                    removeOption: true,
+                                                    removeImage: (fg) {
+                                                      controller.menuGallery.removeAt(e.key);
+                                                      setState(() {});
+                                                    });
+                                              },
+                                              child: Container(
+                                                constraints: const BoxConstraints(minWidth: 50, minHeight: 125),
+                                                child: Image.file(
+                                                  e.value,
+                                                  errorBuilder: (_, __, ___) => Image.network(
+                                                    e.value.path,
+                                                    errorBuilder: (_, __, ___) => const Icon(
+                                                      Icons.error_outline,
+                                                      color: Colors.red,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )),
+                                        ))
+                                    .toList(),
                               ),
-                            )),
-                      ))
-                          .toList(),
-                    ),
-                  ),
-                )
-                    : const SizedBox(),
+                            ),
+                          )
+                        : const SizedBox(),
                 const SizedBox(
                   height: 12,
                 ),
@@ -1742,4 +1746,10 @@ class _ProductMenuImagesState extends State<ProductMenuImages> {
       );
     });
   }
+}
+
+class ManageWebImages {
+  Uint8List? localImage;
+  String? imageUrl;
+  ManageWebImages({this.imageUrl, this.localImage});
 }

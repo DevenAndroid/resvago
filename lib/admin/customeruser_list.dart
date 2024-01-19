@@ -6,9 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/components/helper.dart';
-
+import '../edit_customer.dart';
 import 'model/customer_register_model.dart';
-
 class CustomeruserListScreen extends StatefulWidget {
   const CustomeruserListScreen({Key? key}) : super(key: key);
 
@@ -138,11 +137,12 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
 
                   return filteredUsers.isNotEmpty
                       ? ListView.builder(
+                          physics: const BouncingScrollPhysics(),
                           itemCount: filteredUsers.length,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = filteredUsers[index];
-                            log("dydfyhf"+item.code.toString());
+                            log("dydfyhf${item.code}");
                             return Container(
                               height: 90,
                               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -202,15 +202,16 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(AddCustomerUserScreen(
-                                                        isEditMode: true,
-                                                        documentId: item.docid,
-                                                        userName: item.userName,
-                                                        email: item.email,
-                                                        phonenumber: item.mobileNumber,
-                                                        code: item.code,
-                                                        country: item.country,
-                                                      ));
+                                                      Get.to(()=>EditCustomer(uid: item.docid,));
+                                                      // Get.to(AddCustomerUserScreen(
+                                                      //   isEditMode: true,
+                                                      //   documentId: item.docid,
+                                                      //   userName: item.userName,
+                                                      //   email: item.email,
+                                                      //   phonenumber: item.mobileNumber,
+                                                      //   code: item.code,
+                                                      //   country: item.country,
+                                                      // ));
                                                     },
                                                     child: const Text("Edit"),
                                                   ),

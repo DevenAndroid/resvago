@@ -94,6 +94,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
     }
   }
 
+  bool passwordSecure = true;
+  bool confirmPasswordSecure = true;
   TextEditingController restaurantNameController = TextEditingController();
   TextEditingController categoryController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -166,7 +168,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
         FirebaseAuth.instance
             .createUserWithEmailAndPassword(
           email: emailController.text.trim(),
-          password: "123456",
+          password: passwordController.text.trim(),
         )
             .then((UserCredential userCredential) {
           uid = userCredential.user!.uid;
@@ -190,11 +192,10 @@ class _AddUserScreenState extends State<AddUserScreen> {
           "address": _searchController.text.trim(),
           "latitude": latitude.toString(),
           "longitude": longitude.toString(),
-          'password': "123456",
           'image': imageUrlProfile,
           "time": DateTime.now(),
           "userID": mobileNumberController.text.trim(),
-          "deactivate": false
+          "deactivate": false,
         });
       } else {
         CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
@@ -210,13 +211,22 @@ class _AddUserScreenState extends State<AddUserScreen> {
           "address": _searchController.text.trim(),
           "latitude": selectedPlace!.geometry!.location!.lat.toString(),
           "longitude": selectedPlace!.geometry!.location!.lng.toString(),
-          'password': "123456",
           'image': imageUrlProfile,
           "time": DateTime.now(),
           "userID": mobileNumberController.text.trim(),
-          "deactivate": false
+          "deactivate": false,
+          "password": passwordController.text.trim(),
+          "confirmPassword": confirmPasswordController.text.trim(),
         });
       }
+      FirebaseFirestore.instance.collection("send_mail").add({
+        "to": emailController.text.trim(),
+        "message": {
+          "subject": "This is a otp email",
+          "html": "Your account has been created",
+          "text": "asdfgwefddfgwefwn",
+        }
+      });
       Get.back();
     } catch (e) {
       Helper.hideLoader(loader);
@@ -474,6 +484,87 @@ class _AddUserScreenState extends State<AddUserScreen> {
                             )
                           : const SizedBox(),
 
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      if (widget.isEditMode == false)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Password".tr,
+                              style: const TextStyle(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            RegisterTextFieldWidget(
+                              controller: passwordController,
+                              // length: 10,
+                              obscureText: passwordSecure,
+                              suffix: GestureDetector(
+                                  onTap: () {
+                                    passwordSecure = !passwordSecure;
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    passwordSecure ? Icons.visibility_off : Icons.visibility,
+                                    size: 20,
+                                    color: Colors.black,
+                                  )),
+                              validator: MultiValidator([
+                                RequiredValidator(errorText: 'Please enter your password'),
+                                MinLengthValidator(8,
+                                    errorText: 'Password must be at least 8 characters, with 1 special character & 1 numerical'),
+                                PatternValidator(r"(?=.*\W)(?=.*?[#?!@$%^&*-])(?=.*[0-9])",
+                                    errorText: "Password must be at least with 1 special character & 1 numerical"),
+                              ]).call,
+                              keyboardType: TextInputType.emailAddress,
+                              // textInputAction: TextInputAction.next,
+                              hint: 'Enter your password',
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Confirm Password".tr,
+                              style: const TextStyle(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            RegisterTextFieldWidget(
+                              controller: confirmPasswordController,
+                              // length: 10,
+                              obscureText: confirmPasswordSecure,
+                              suffix: GestureDetector(
+                                  onTap: () {
+                                    confirmPasswordSecure = !confirmPasswordSecure;
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    confirmPasswordSecure ? Icons.visibility_off : Icons.visibility,
+                                    size: 20,
+                                    color: Colors.black,
+                                  )),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your confirm password';
+                                }
+                                if (value.toString() == passwordController.text) {
+                                  return null;
+                                }
+                                return "Confirm password not matching with password";
+                              },
+                              keyboardType: TextInputType.emailAddress,
+                              // textInputAction: TextInputAction.next,
+                              hint: 'Enter your confirm password',
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       Text(
                         "Address",
                         style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),

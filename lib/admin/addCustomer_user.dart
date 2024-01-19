@@ -11,6 +11,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:resvago/components/my_button.dart';
 import 'package:resvago/components/my_textfield.dart';
 import 'package:resvago/firebase_service/firebase_userSerivce.dart';
+import '../components/apptheme.dart';
 import '../components/helper.dart';
 import '../firebase_service/firebase_service.dart';
 import 'controller/logincontroller.dart';
@@ -45,7 +46,10 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
-
+  TextEditingController passwordController = TextEditingController();
+  TextEditingController confirmPasswordController = TextEditingController();
+  bool passwordSecure = true;
+  bool confirmPasswordSecure = true;
   final _formKey = GlobalKey<FormState>();
   late GeoFlutterFire geo;
   String code = "+353";
@@ -64,7 +68,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
       FirebaseAuth.instance
           .createUserWithEmailAndPassword(
         email: emailController.text.trim(),
-        password: "123456",
+        password: passwordController.text,
       )
           .then((UserCredential userCredential) {
         uid = userCredential.user!.uid;
@@ -87,10 +91,12 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
           "country": country,
           "code": code,
           "profile_image": "",
-          "password": "123456",
+          "password": passwordController.text,
           "deactivate": false,
         }).then((value) {
-          log("country $country",);
+          log(
+            "country $country",
+          );
           Get.to(const CustomeruserListScreen());
           Helper.hideLoader(loader);
         });
@@ -106,10 +112,18 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
           "country": country,
           "code": code,
           "profile_image": "",
-          "password": "123456",
+          "password": passwordController.text,
           "deactivate": false,
         }).then((value) {
-          Get.to(const CustomeruserListScreen());
+          Get.back();
+          FirebaseFirestore.instance.collection("send_mail").add({
+            "to": emailController.text.trim(),
+            "message": {
+              "subject": "This is a otp email",
+              "html": "Your account has been created",
+              "text": "asdfgwefddfgwefwn",
+            }
+          });
           Helper.hideLoader(loader);
         });
       }
@@ -136,8 +150,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
     addUserToFirestore();
   }
 
-
-  getData(){
+  getData() {
     if (widget.isEditMode == true) {
       kk++;
       setState(() {
@@ -216,9 +229,6 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
                       RegisterTextFieldWidget(
                           controller: emailController,
                           textInputAction: TextInputAction.next,
@@ -229,53 +239,137 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                             RequiredValidator(errorText: "Email is required")
                           ]).call),
                       const SizedBox(
-                        height: 15,
+                        height: 10,
                       ),
-                      Text(
-                        'Enter Mobile number',
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      IntlPhoneField(
-                        key: ValueKey(kk),
-                        flagsButtonPadding: const EdgeInsets.all(8),
-                        dropdownIconPosition: IconPosition.trailing,
-                        cursorColor: Colors.black,
-                        dropdownIcon: const Icon(
-                          Icons.arrow_drop_down_rounded,
-                          color: Colors.black,
-                        ),
-                        dropdownTextStyle: const TextStyle(color: Colors.black),
-                        style: const TextStyle(color: Colors.black),
-                        controller: phoneNumberController,
-                        decoration: const InputDecoration(
-                            hintStyle: TextStyle(color: Colors.black),
-                            labelText: 'Phone Number',
-                            labelStyle: TextStyle(color: Colors.black),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(),
+                      if (widget.isEditMode == false)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Password".tr,
+                              style: const TextStyle(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                             ),
-                            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black))),
-                        initialCountryCode: country,
-                        onCountryChanged: (phone) {
-                          setState(() {
-                            code = "+${phone.dialCode}";
-                            country = phone.code;
-                            log(code.toString());
-                            log(country.toString());
-                          });
-                        },
-                        onChanged: (phone) {
-                          code = phone.countryCode.toString();
-                        },
-                      ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            RegisterTextFieldWidget(
+                              controller: passwordController,
+                              // length: 10,
+                              obscureText: passwordSecure,
+                              suffix: GestureDetector(
+                                  onTap: () {
+                                    passwordSecure = !passwordSecure;
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    passwordSecure ? Icons.visibility_off : Icons.visibility,
+                                    size: 20,
+                                    color: Colors.black,
+                                  )),
+                              validator: MultiValidator([
+                                RequiredValidator(errorText: 'Please enter your password'),
+                                MinLengthValidator(8,
+                                    errorText: 'Password must be at least 8 characters, with 1 special character & 1 numerical'),
+                                PatternValidator(r"(?=.*\W)(?=.*?[#?!@$%^&*-])(?=.*[0-9])",
+                                    errorText: "Password must be at least with 1 special character & 1 numerical"),
+                              ]).call,
+                              keyboardType: TextInputType.emailAddress,
+                              // textInputAction: TextInputAction.next,
+                              hint: 'Enter your password',
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Confirm Password".tr,
+                              style: const TextStyle(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            RegisterTextFieldWidget(
+                              controller: confirmPasswordController,
+                              // length: 10,
+                              obscureText: confirmPasswordSecure,
+                              suffix: GestureDetector(
+                                  onTap: () {
+                                    confirmPasswordSecure = !confirmPasswordSecure;
+                                    setState(() {});
+                                  },
+                                  child: Icon(
+                                    confirmPasswordSecure ? Icons.visibility_off : Icons.visibility,
+                                    size: 20,
+                                    color: Colors.black,
+                                  )),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Please enter your confirm password';
+                                }
+                                if (value.toString() == passwordController.text) {
+                                  return null;
+                                }
+                                return "Confirm password not matching with password";
+                              },
+                              keyboardType: TextInputType.emailAddress,
+                              // textInputAction: TextInputAction.next,
+                              hint: 'Enter your confirm password',
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
+                      if (widget.isEditMode)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Enter Mobile number',
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 15,
+                            ),
+                            IntlPhoneField(
+                              key: ValueKey(kk),
+                              flagsButtonPadding: const EdgeInsets.all(8),
+                              dropdownIconPosition: IconPosition.trailing,
+                              cursorColor: Colors.black,
+                              dropdownIcon: const Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: Colors.black,
+                              ),
+                              dropdownTextStyle: const TextStyle(color: Colors.black),
+                              style: const TextStyle(color: Colors.black),
+                              controller: phoneNumberController,
+                              decoration: const InputDecoration(
+                                  hintStyle: TextStyle(color: Colors.black),
+                                  labelText: 'Phone Number',
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black))),
+                              initialCountryCode: country,
+                              onCountryChanged: (phone) {
+                                setState(() {
+                                  code = "+${phone.dialCode}";
+                                  country = phone.code;
+                                  log(code.toString());
+                                  log(country.toString());
+                                });
+                              },
+                              onChanged: (phone) {
+                                code = phone.countryCode.toString();
+                              },
+                            ),
+                          ],
+                        ),
                       const SizedBox(
                         height: 20,
                       ),

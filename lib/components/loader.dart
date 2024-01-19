@@ -18,7 +18,6 @@ import 'dart:io';
 // import 'package:file_picker/file_picker.dart';
 
 class NewHelper {
-
   static String countryCodeToEmoji(String countryCode) {
     // 0x41 is Letter A
     // 0x1F1E6 is Regional Indicator Symbol Letter A
@@ -34,9 +33,9 @@ class NewHelper {
   static String getDiscountPercentage({
     required String sellingPrice,
     required String actualPrice,
-  }){
-    double percent = (((actualPrice.toNum - sellingPrice.toNum)/actualPrice.toNum) * 100);
-    if(percent == 0 || percent > 100){
+  }) {
+    double percent = (((actualPrice.toNum - sellingPrice.toNum) / actualPrice.toNum) * 100);
+    if (percent == 0 || percent > 100) {
       return "";
     }
     return percent.toStringAsFixed(2);
@@ -90,7 +89,9 @@ class NewHelper {
 
   Future<File?> videoPicker({ImageSource imageSource = ImageSource.gallery, int imageQuality = 80}) async {
     try {
-      final item = await ImagePicker().pickVideo(source: imageSource,);
+      final item = await ImagePicker().pickVideo(
+        source: imageSource,
+      );
       if (item == null) {
         return null;
       } else {
@@ -104,7 +105,7 @@ class NewHelper {
   Future<List<File>?> multiImagePicker({int imageQuality = 80}) async {
     try {
       final item = await ImagePicker().pickMultiImage(imageQuality: imageQuality);
-      return List.generate(min(5, item.length), (index) => File(item[index].path));
+      return List.generate(min(20, item.length), (index) => File(item[index].path));
     } on PlatformException catch (e) {
       throw Exception(e);
     }
@@ -178,7 +179,6 @@ class NewHelper {
       ),
     );
   }
-
 }
 
 class Helpers {
@@ -260,16 +260,16 @@ class Helpers {
                         Obx(() {
                           return Center(
                               child: Text(
-                                progress.value,
-                                style: GoogleFonts.poppins(),
-                              )
-                            // AddText(
-                            //   text: "${progress.value}",
-                            //   fontWeight: FontWeight.bold,
-                            //   fontSize: AddSize.font18,
-                            //   color: Colors.black,
-                            // ),
-                          );
+                            progress.value,
+                            style: GoogleFonts.poppins(),
+                          )
+                              // AddText(
+                              //   text: "${progress.value}",
+                              //   fontWeight: FontWeight.bold,
+                              //   fontSize: AddSize.font18,
+                              //   color: Colors.black,
+                              // ),
+                              );
                         }),
                         const SizedBox(
                           height: 30,
@@ -365,21 +365,19 @@ class Helpers {
 }
 
 extension ConvertToNum on String {
-
-  Duration get durationTime{
+  Duration get durationTime {
     return Duration(
       hours: split(":").first.toNum.toInt(),
       minutes: split(":")[1].toNum.toInt(),
     );
   }
 
-  String get normalTime{
-    if(split(":").length > 1){
+  String get normalTime {
+    if (split(":").length > 1) {
       return "${split(":").first}:${split(":")[1]}";
     }
     return this;
   }
-
 
   num? get convertToNum {
     return num.tryParse(this);
@@ -436,15 +434,14 @@ extension GetTotal on List<num> {
 
 extension Spacing on num {
   SizedBox get spaceX => SizedBox(
-    width: toDouble(),
-  );
+        width: toDouble(),
+      );
   SizedBox get spaceY => SizedBox(
-    height: toDouble(),
-  );
+        height: toDouble(),
+      );
 }
 
 extension GetContext on BuildContext {
-
   Size get getSize => MediaQuery.of(this).size;
 
   Future get navigate async {
@@ -525,8 +522,9 @@ extension WidgetExtensions on Widget {
   //   );
   // }
 
-  SliverToBoxAdapter get toBoxAdapter => SliverToBoxAdapter(child: this,);
-
+  SliverToBoxAdapter get toBoxAdapter => SliverToBoxAdapter(
+        child: this,
+      );
 }
 
 extension ConvertToDateon on Duration {

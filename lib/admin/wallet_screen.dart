@@ -55,22 +55,22 @@ class _WalletScreenState extends State<WalletScreen> {
     });
   }
 
-  Future<void> updateWithdrawStatus(String docId) async {
-    try {
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('withDrawMoney').doc(docId).get();
-      if (documentSnapshot.exists) {
-        await FirebaseFirestore.instance.collection('withDrawMoney').doc(docId).update({
-          "userId": widget.uId,
-          "status": "Reject",
-        });
-        print("Withdrawal status updated successfully.");
-      } else {
-        print("Document with ID $docId does not exist.");
-      }
-    } catch (e) {
-      print("Error updating withdrawal status: $e");
-    }
-  }
+  // Future<void> updateWithdrawStatus(String docId) async {
+  //   try {
+  //     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('withDrawMoney').doc(docId).get();
+  //     if (documentSnapshot.exists) {
+  //       await FirebaseFirestore.instance.collection('withDrawMoney').doc(docId).update({
+  //         "userId": widget.uId,
+  //         "status": "Reject",
+  //       });
+  //       print("Withdrawal status updated successfully.");
+  //     } else {
+  //       print("Document with ID $docId does not exist.");
+  //     }
+  //   } catch (e) {
+  //     print("Error updating withdrawal status: $e");
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +141,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           GestureDetector(
                             onTap: () {
                               if (walletItem.status == "Processing") {
-                                _showPopup1(docid: walletItem.docid, status: walletItem.status);
+                                _showPopup1(docid: walletItem.docid, status: walletItem.status,);
                               } else {
                                 null;
                               }

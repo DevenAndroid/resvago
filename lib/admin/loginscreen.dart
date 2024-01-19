@@ -1,7 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/instance_manager.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/route_manager.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
@@ -79,7 +80,7 @@ class _LogInScreenState extends State<LogInScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25),
                 child: TextFormField(
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   controller: emailController,
                   obscureText: false,
                   decoration: const InputDecoration(
@@ -116,7 +117,7 @@ class _LogInScreenState extends State<LogInScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 25, right: 25),
                 child: TextFormField(
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                   controller: passwordController,
                   obscureText: false,
                   decoration: const InputDecoration(
@@ -138,18 +139,52 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               const SizedBox(height: 35),
               MyButton(
-                color: Color(0xff3B5998),
+                color: const Color(0xff3B5998),
                 backgroundcolor: Colors.white,
-                onTap: () {
+                onTap: () async {
+                  // await FirebaseAuth.instance
+                  //     .createUserWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text);
                   OverlayEntry loader = Helper.overlayLoader(context);
                   Overlay.of(context).insert(loader);
-                  FirebaseAuth.instance
-                      .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
-                      .then((value) {
+                  try {
+                   await FirebaseAuth.instance
+                        .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
+                        .then((value) {
+                      Helper.hideLoader(loader);
+                      FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).set({
+                        'email': emailController.text,
+                        'Password': passwordController.text,
+                        "UserId": FirebaseAuth.instance.currentUser!.uid
+                      });
+                      Helper.hideLoader(loader);
+                      emailController.clear();
+                      passwordController.clear();
+                      showToast('Login successfully');
+                      Get.to(const HomePage());
+                    });
+                  } catch (e) {
                     Helper.hideLoader(loader);
-                    showToast('Login successfully');
-                    Get.to(const HomePage());
-                  });
+                    if (!kIsWeb) {
+                      if (e.toString() ==
+                          "[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
+                        Fluttertoast.showToast(msg: "Credential is incorrect");
+                      } else {
+                        Fluttertoast.showToast(msg: e.toString());
+                      }
+                    }
+                    else {
+                      if (e.toString() == "[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text("Credential is incorrect"),
+                        ));
+                      }
+                      else{
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(e.toString()),
+                        ));
+                      }
+                    }
+                  }
                 },
                 text: 'Log In',
               ),
