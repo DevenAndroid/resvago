@@ -8,6 +8,7 @@ import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/components/helper.dart';
 import '../edit_customer.dart';
 import 'model/customer_register_model.dart';
+
 class CustomeruserListScreen extends StatefulWidget {
   const CustomeruserListScreen({Key? key}) : super(key: key);
 
@@ -202,7 +203,9 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(()=>EditCustomer(uid: item.docid,));
+                                                      Get.to(() => EditCustomer(
+                                                            uid: item.docid,
+                                                          ));
                                                       // Get.to(AddCustomerUserScreen(
                                                       //   isEditMode: true,
                                                       //   documentId: item.docid,
@@ -337,7 +340,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
   }
 
   Stream<List<CustomerRegisterData>> getUsersStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('customer_users').snapshots().map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('customer_users').orderBy("time",descending: true).snapshots().map((querySnapshot) {
       List<CustomerRegisterData> users = [];
       try {
         for (var doc in querySnapshot.docs) {

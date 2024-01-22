@@ -70,63 +70,37 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
         email: emailController.text.trim(),
         password: passwordController.text,
       )
-          .then((UserCredential userCredential) {
-        uid = userCredential.user!.uid;
+          .then((value) {
+        uid = value.user!.uid;
         print("User UID: $uid");
         log(uid.toString());
+        if (FirebaseAuth.instance.currentUser != null) {
+          CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
+          var DocumentReference = collection.doc(uid);
+          DocumentReference.set({
+            "userName": userNameController.text,
+            "email": emailController.text,
+            "docid": uid,
+            "password": passwordController.text,
+            "deactivate": false,
+            "time": DateTime.now(),
+          }).then((value) {
+            log("fghgfkjhgjfk"+uid.toString());
+            Get.back();
+            FirebaseFirestore.instance.collection("send_mail").add({
+              "to": emailController.text.trim(),
+              "message": {
+                "subject": "This is a otp email",
+                "html": "Your account has been created",
+                "text": "asdfgwefddfgwefwn",
+              }
+            });
+            Helper.hideLoader(loader);
+          });
+        }
       }).catchError((e) {
         print("Error creating user: $e");
       });
-    }
-    if (FirebaseAuth.instance.currentUser != null) {
-      if (widget.isEditMode) {
-        CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
-        var DocumentReference = collection.doc(widget.documentId);
-        DocumentReference.update({
-          "userName": userNameController.text,
-          "email": emailController.text,
-          "docid": uid,
-          "mobileNumber": phoneNumberController.text,
-          "userID": phoneNumberController.text,
-          "country": country,
-          "code": code,
-          "profile_image": "",
-          "password": passwordController.text,
-          "deactivate": false,
-        }).then((value) {
-          log(
-            "country $country",
-          );
-          Get.to(const CustomeruserListScreen());
-          Helper.hideLoader(loader);
-        });
-      } else {
-        CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
-        var DocumentReference = collection.doc(uid);
-        DocumentReference.set({
-          "userName": userNameController.text,
-          "email": emailController.text,
-          "docid": uid,
-          "mobileNumber": phoneNumberController.text,
-          "userID": phoneNumberController.text,
-          "country": country,
-          "code": code,
-          "profile_image": "",
-          "password": passwordController.text,
-          "deactivate": false,
-        }).then((value) {
-          Get.back();
-          FirebaseFirestore.instance.collection("send_mail").add({
-            "to": emailController.text.trim(),
-            "message": {
-              "subject": "This is a otp email",
-              "html": "Your account has been created",
-              "text": "asdfgwefddfgwefwn",
-            }
-          });
-          Helper.hideLoader(loader);
-        });
-      }
     }
   }
 

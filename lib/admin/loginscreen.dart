@@ -151,7 +151,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
                         .then((value) {
                       Helper.hideLoader(loader);
-                      FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).set({
+                      FirebaseFirestore.instance.collection('admin_login').doc(value.user!.uid).set({
                         'email': emailController.text,
                         'Password': passwordController.text,
                         "UserId": FirebaseAuth.instance.currentUser!.uid

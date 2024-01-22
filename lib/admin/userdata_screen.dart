@@ -145,7 +145,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = filteredUsers[index];
-                            log("fhfhfvh"+item.code.toString());
+                            log("fhfhfvh" + item.code.toString());
                             // if (item.deactivate) {
                             //   return SizedBox.shrink();
                             // }
@@ -203,7 +203,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                 )
                                               : const SizedBox(),
                                           PopupMenuButton<int>(
-                                            surfaceTintColor: Colors.white,
+                                              surfaceTintColor: Colors.white,
                                               padding: EdgeInsets.zero,
                                               icon: const Icon(
                                                 Icons.more_vert,
@@ -333,7 +333,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(()=>WalletScreen(uId: item.docid));
+                                                      Get.to(() => WalletScreen(uId: item.docid));
                                                     },
                                                     child: const Text("Wallet"),
                                                   ),
@@ -370,7 +370,11 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
   }
 
   Stream<List<UserData>> getUsersStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('vendor_users').snapshots().map((querySnapshot) {
+    return FirebaseFirestore.instance
+        .collection('vendor_users')
+        .orderBy("time", descending: true)
+        .snapshots()
+        .map((querySnapshot) {
       List<UserData> users = [];
       try {
         for (var doc in querySnapshot.docs) {

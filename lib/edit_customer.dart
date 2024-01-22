@@ -21,20 +21,19 @@ import 'components/helper.dart';
 import 'components/my_textfield.dart';
 
 class EditCustomer extends StatefulWidget {
-  EditCustomer({super.key,required this.uid});
-String uid;
+  EditCustomer({super.key, required this.uid});
+  String uid;
   @override
   State<EditCustomer> createState() => _EditCustomerState();
 }
 
 class _EditCustomerState extends State<EditCustomer> {
-
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController mobileController = TextEditingController();
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
- CustomerModel profileData = CustomerModel();
+  CustomerModel profileData = CustomerModel();
   String code = "+353";
   String country = "IE";
   int kk = 0;
@@ -48,6 +47,7 @@ class _EditCustomerState extends State<EditCustomer> {
         if (value.data() == null) return;
         profileData = CustomerModel.fromJson(value.data()!);
         log("profile data${profileData.mobileNumber}");
+        log("profile data${profileData.toJson()}");
         categoryFile = File(profileData.profile_image.toString());
         mobileController.text = (profileData.mobileNumber ?? "").toString();
         code = (profileData.code ?? "").toString();
@@ -101,10 +101,7 @@ class _EditCustomerState extends State<EditCustomer> {
     String? imageUrlProfile = kIsWeb ? null : categoryFile.path;
     if (kIsWeb) {
       if (pickedFile != null) {
-        UploadTask uploadTask = FirebaseStorage.instance
-            .ref("profile_image/${widget.uid}")
-            .child("image")
-            .putData(pickedFile!);
+        UploadTask uploadTask = FirebaseStorage.instance.ref("profile_image/${widget.uid}").child("image").putData(pickedFile!);
         TaskSnapshot snapshot = await uploadTask;
         imageUrlProfile = await snapshot.ref.getDownloadURL();
       } else {
@@ -112,10 +109,7 @@ class _EditCustomerState extends State<EditCustomer> {
       }
     } else {
       if (!categoryFile.path.contains("http") && categoryFile.path.isNotEmpty) {
-        UploadTask uploadTask = FirebaseStorage.instance
-            .ref("profileImage/${widget.uid}")
-            .child("image")
-            .putFile(categoryFile);
+        UploadTask uploadTask = FirebaseStorage.instance.ref("profileImage/${widget.uid}").child("image").putFile(categoryFile);
         TaskSnapshot snapshot = await uploadTask;
         imageUrlProfile = await snapshot.ref.getDownloadURL();
       }
@@ -166,6 +160,7 @@ class _EditCustomerState extends State<EditCustomer> {
           surfaceTintColor: Colors.transparent,
           elevation: 0,
         ),
+        extendBodyBehindAppBar: true,
         body: SingleChildScrollView(
           // physics: BouncingScrollPhysics(),
           child: Form(
@@ -207,152 +202,152 @@ class _EditCustomerState extends State<EditCustomer> {
                                     width: 100,
                                     child: kIsWeb
                                         ? Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(10000),
-                                          child: Container(
-                                              height: 100,
-                                              width: 100,
-                                              clipBehavior: Clip.antiAlias,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xffFAAF40),
-                                                border: Border.all(color: const Color(0xff3B5998), width: 6),
-                                                borderRadius: BorderRadius.circular(5000),
-                                                // color: Colors.brown
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(10000),
+                                                child: Container(
+                                                    height: 100,
+                                                    width: 100,
+                                                    clipBehavior: Clip.antiAlias,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xffFAAF40),
+                                                      border: Border.all(color: const Color(0xff3B5998), width: 6),
+                                                      borderRadius: BorderRadius.circular(5000),
+                                                      // color: Colors.brown
+                                                    ),
+                                                    child: pickedFile != null
+                                                        ? Image.memory(
+                                                            pickedFile!,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: categoryFile.path,
+                                                              height: AddSize.size30,
+                                                              width: AddSize.size30,
+                                                              errorWidget: (_, __, ___) => const Icon(
+                                                                Icons.person,
+                                                                size: 60,
+                                                              ),
+                                                              placeholder: (_, __) => const SizedBox(),
+                                                            ),
+                                                          )
+                                                        : Image.network(
+                                                            fileUrl,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: categoryFile.path,
+                                                              height: AddSize.size30,
+                                                              width: AddSize.size30,
+                                                              errorWidget: (_, __, ___) => const Icon(
+                                                                Icons.person,
+                                                                size: 60,
+                                                              ),
+                                                              placeholder: (_, __) => const SizedBox(),
+                                                            ),
+                                                          )),
                                               ),
-                                              child: pickedFile != null
-                                                  ? Image.memory(
-                                                pickedFile!,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: categoryFile.path,
-                                                  height: AddSize.size30,
-                                                  width: AddSize.size30,
-                                                  errorWidget: (_, __, ___) => const Icon(
-                                                    Icons.person,
-                                                    size: 60,
+                                              Positioned(
+                                                bottom: 0,
+                                                right: 0,
+                                                child: GestureDetector(
+                                                  behavior: HitTestBehavior.translucent,
+                                                  onTap: () {
+                                                    Helper.addFilePicker().then((value) {
+                                                      pickedFile = value;
+                                                      print(pickedFile);
+                                                      setState(() {});
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    height: 30,
+                                                    width: 30,
+                                                    clipBehavior: Clip.antiAlias,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xff04666E),
+                                                      borderRadius: BorderRadius.circular(50),
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.camera_alt,
+                                                      color: Colors.white,
+                                                      size: 15,
+                                                    ),
                                                   ),
-                                                  placeholder: (_, __) => const SizedBox(),
                                                 ),
                                               )
-                                                  : Image.network(
-                                                fileUrl,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: categoryFile.path,
-                                                  height: AddSize.size30,
-                                                  width: AddSize.size30,
-                                                  errorWidget: (_, __, ___) => const Icon(
-                                                    Icons.person,
-                                                    size: 60,
-                                                  ),
-                                                  placeholder: (_, __) => const SizedBox(),
-                                                ),
-                                              )),
-                                        ),
-                                        Positioned(
-                                          bottom: 0,
-                                          right: 0,
-                                          child: GestureDetector(
-                                            behavior: HitTestBehavior.translucent,
-                                            onTap: () {
-                                              Helper.addFilePicker().then((value) {
-                                                pickedFile = value;
-                                                print(pickedFile);
-                                                setState(() {});
-                                              });
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 30,
-                                              clipBehavior: Clip.antiAlias,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xff04666E),
-                                                borderRadius: BorderRadius.circular(50),
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.white,
-                                                size: 15,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    )
+                                            ],
+                                          )
                                         : Stack(
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(10000),
-                                          child: Container(
-                                              height: 100,
-                                              width: 100,
-                                              clipBehavior: Clip.antiAlias,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xffFAAF40),
-                                                border: Border.all(color: const Color(0xff3B5998), width: 6),
-                                                borderRadius: BorderRadius.circular(5000),
-                                                // color: Colors.brown
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius: BorderRadius.circular(10000),
+                                                child: Container(
+                                                    height: 100,
+                                                    width: 100,
+                                                    clipBehavior: Clip.antiAlias,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xffFAAF40),
+                                                      border: Border.all(color: const Color(0xff3B5998), width: 6),
+                                                      borderRadius: BorderRadius.circular(5000),
+                                                      // color: Colors.brown
+                                                    ),
+                                                    child: categoryFile.path.contains("http") || categoryFile.path.isEmpty
+                                                        ? Image.network(
+                                                            categoryFile.path,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: categoryFile.path,
+                                                              height: AddSize.size30,
+                                                              width: AddSize.size30,
+                                                              errorWidget: (_, __, ___) => const Icon(
+                                                                Icons.person,
+                                                                size: 60,
+                                                              ),
+                                                              placeholder: (_, __) => const SizedBox(),
+                                                            ),
+                                                          )
+                                                        : Image.memory(
+                                                            categoryFile.readAsBytesSync(),
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (_, __, ___) => CachedNetworkImage(
+                                                              fit: BoxFit.cover,
+                                                              imageUrl: categoryFile.path,
+                                                              height: AddSize.size30,
+                                                              width: AddSize.size30,
+                                                              errorWidget: (_, __, ___) => const Icon(
+                                                                Icons.person,
+                                                                size: 60,
+                                                              ),
+                                                              placeholder: (_, __) => const SizedBox(),
+                                                            ),
+                                                          )),
                                               ),
-                                              child: categoryFile.path.contains("http") || categoryFile.path.isEmpty
-                                                  ? Image.network(
-                                                categoryFile.path,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: categoryFile.path,
-                                                  height: AddSize.size30,
-                                                  width: AddSize.size30,
-                                                  errorWidget: (_, __, ___) => const Icon(
-                                                    Icons.person,
-                                                    size: 60,
+                                              Positioned(
+                                                bottom: 0,
+                                                right: 0,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    showActionSheet(context);
+                                                  },
+                                                  child: Container(
+                                                    height: 30,
+                                                    width: 30,
+                                                    clipBehavior: Clip.antiAlias,
+                                                    decoration: BoxDecoration(
+                                                      color: const Color(0xff04666E),
+                                                      borderRadius: BorderRadius.circular(50),
+                                                    ),
+                                                    child: const Icon(
+                                                      Icons.camera_alt,
+                                                      color: Colors.white,
+                                                      size: 15,
+                                                    ),
                                                   ),
-                                                  placeholder: (_, __) => const SizedBox(),
                                                 ),
                                               )
-                                                  : Image.memory(
-                                                categoryFile.readAsBytesSync(),
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => CachedNetworkImage(
-                                                  fit: BoxFit.cover,
-                                                  imageUrl: categoryFile.path,
-                                                  height: AddSize.size30,
-                                                  width: AddSize.size30,
-                                                  errorWidget: (_, __, ___) => const Icon(
-                                                    Icons.person,
-                                                    size: 60,
-                                                  ),
-                                                  placeholder: (_, __) => const SizedBox(),
-                                                ),
-                                              )),
-                                        ),
-                                        Positioned(
-                                          bottom: 0,
-                                          right: 0,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              showActionSheet(context);
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 30,
-                                              clipBehavior: Clip.antiAlias,
-                                              decoration: BoxDecoration(
-                                                color: const Color(0xff04666E),
-                                                borderRadius: BorderRadius.circular(50),
-                                              ),
-                                              child: const Icon(
-                                                Icons.camera_alt,
-                                                color: Colors.white,
-                                                size: 15,
-                                              ),
-                                            ),
+                                            ],
                                           ),
-                                        )
-                                      ],
-                                    ),
                                   ),
                                 ],
                               ),
@@ -384,7 +379,7 @@ class _EditCustomerState extends State<EditCustomer> {
                               Text(
                                 'Name',
                                 style:
-                                GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                                    GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               const SizedBox(
                                 height: 10,
@@ -399,7 +394,7 @@ class _EditCustomerState extends State<EditCustomer> {
                               Text(
                                 "Email",
                                 style:
-                                GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                                    GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               const SizedBox(
                                 height: 10,
@@ -421,7 +416,7 @@ class _EditCustomerState extends State<EditCustomer> {
                               Text(
                                 "Mobile Number".tr,
                                 style:
-                                GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                                    GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
                               const SizedBox(
                                 height: 10,

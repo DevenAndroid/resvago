@@ -120,14 +120,14 @@ class _AddUserScreenState extends State<AddUserScreen> {
       Fluttertoast.showToast(msg: 'Email already exits');
       return;
     }
-    final QuerySnapshot phoneResult = await FirebaseFirestore.instance
-        .collection('vendor_users')
-        .where('mobileNumber', isEqualTo: code + mobileNumberController.text)
-        .get();
-    if (phoneResult.docs.isNotEmpty) {
-      Fluttertoast.showToast(msg: 'Mobile Number already exits');
-      return;
-    }
+    // final QuerySnapshot phoneResult = await FirebaseFirestore.instance
+    //     .collection('vendor_users')
+    //     .where('mobileNumber', isEqualTo: code + mobileNumberController.text)
+    //     .get();
+    // if (phoneResult.docs.isNotEmpty) {
+    //   Fluttertoast.showToast(msg: 'Mobile Number already exits');
+    //   return;
+    // }
     addUserToFirestore();
   }
 
@@ -141,28 +141,28 @@ class _AddUserScreenState extends State<AddUserScreen> {
       geo = Geoflutterfire();
       GeoFirePoint geoFirePoint =
           geo!.point(latitude: double.tryParse(latitude.toString()) ?? 0, longitude: double.tryParse(longitude.toString()) ?? 0);
-      String? imageUrlProfile = kIsWeb ? null : categoryFile.path;
-      if (kIsWeb) {
-        if (pickedFile != null) {
-          UploadTask uploadTask = FirebaseStorage.instance
-              .ref("profile_image/${FirebaseAuth.instance.currentUser!.uid}")
-              .child("image")
-              .putData(pickedFile!);
-          TaskSnapshot snapshot = await uploadTask;
-          imageUrlProfile = await snapshot.ref.getDownloadURL();
-        } else {
-          imageUrlProfile = fileUrl;
-        }
-      } else {
-        if (!categoryFile.path.contains("http") && categoryFile.path.isNotEmpty) {
-          UploadTask uploadTask = FirebaseStorage.instance
-              .ref("profileImage/${FirebaseAuth.instance.currentUser!.uid}")
-              .child("image")
-              .putFile(categoryFile);
-          TaskSnapshot snapshot = await uploadTask;
-          imageUrlProfile = await snapshot.ref.getDownloadURL();
-        }
-      }
+      // String? imageUrlProfile = kIsWeb ? null : categoryFile.path;
+      // if (kIsWeb) {
+      //   if (pickedFile != null) {
+      //     UploadTask uploadTask = FirebaseStorage.instance
+      //         .ref("profile_image/${FirebaseAuth.instance.currentUser!.uid}")
+      //         .child("image")
+      //         .putData(pickedFile!);
+      //     TaskSnapshot snapshot = await uploadTask;
+      //     imageUrlProfile = await snapshot.ref.getDownloadURL();
+      //   } else {
+      //     imageUrlProfile = fileUrl;
+      //   }
+      // } else {
+      //   if (!categoryFile.path.contains("http") && categoryFile.path.isNotEmpty) {
+      //     UploadTask uploadTask = FirebaseStorage.instance
+      //         .ref("profileImage/${FirebaseAuth.instance.currentUser!.uid}")
+      //         .child("image")
+      //         .putFile(categoryFile);
+      //     TaskSnapshot snapshot = await uploadTask;
+      //     imageUrlProfile = await snapshot.ref.getDownloadURL();
+      //   }
+      // }
       String? uid;
       if (!widget.isEditMode) {
         FirebaseAuth.instance
@@ -170,64 +170,43 @@ class _AddUserScreenState extends State<AddUserScreen> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         )
-            .then((UserCredential userCredential) {
-          uid = userCredential.user!.uid;
+            .then((value) {
+          uid = value.user!.uid;
           print("User UID: $uid");
           log(uid.toString());
+          CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
+          var documentReference = collection.doc(uid);
+          documentReference.set({
+            "restaurantName": restaurantNameController.text.trim(),
+            // "category": categoryController.text.trim(),
+            "email": emailController.text.trim(),
+            "docid": uid,
+            // "mobileNumber": mobileNumberController.text.trim(),
+            // "country": country,
+            // "code": code,
+            "address": _searchController.text.trim(),
+            "latitude": selectedPlace!.geometry!.location!.lat.toString(),
+            "longitude": selectedPlace!.geometry!.location!.lng.toString(),
+            // 'image': imageUrlProfile,
+            "time": DateTime.now(),
+            "userID": mobileNumberController.text.trim(),
+            "deactivate": false,
+            "password": passwordController.text.trim(),
+            "confirmPassword": confirmPasswordController.text.trim(),
+          });
+          FirebaseFirestore.instance.collection("send_mail").add({
+            "to": emailController.text.trim(),
+            "message": {
+              "subject": "This is a otp email",
+              "html": "Your account has been created",
+              "text": "asdfgwefddfgwefwn",
+            }
+          });
+          Get.back();
         }).catchError((e) {
           print("Error creating user: $e");
         });
       }
-      if (widget.isEditMode) {
-        CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
-        var documentReference = collection.doc(widget.documentId);
-        documentReference.set({
-          "restaurantName": restaurantNameController.text.trim(),
-          "category": categoryController.text.trim(),
-          "email": emailController.text.trim(),
-          "docid": widget.documentId,
-          "mobileNumber": mobileNumberController.text.trim(),
-          "country": country,
-          "code": code,
-          "address": _searchController.text.trim(),
-          "latitude": latitude.toString(),
-          "longitude": longitude.toString(),
-          'image': imageUrlProfile,
-          "time": DateTime.now(),
-          "userID": mobileNumberController.text.trim(),
-          "deactivate": false,
-        });
-      } else {
-        CollectionReference collection = FirebaseFirestore.instance.collection('vendor_users');
-        var documentReference = collection.doc(uid);
-        documentReference.set({
-          "restaurantName": restaurantNameController.text.trim(),
-          "category": categoryController.text.trim(),
-          "email": emailController.text.trim(),
-          "docid": uid,
-          "mobileNumber": mobileNumberController.text.trim(),
-          "country": country,
-          "code": code,
-          "address": _searchController.text.trim(),
-          "latitude": selectedPlace!.geometry!.location!.lat.toString(),
-          "longitude": selectedPlace!.geometry!.location!.lng.toString(),
-          'image': imageUrlProfile,
-          "time": DateTime.now(),
-          "userID": mobileNumberController.text.trim(),
-          "deactivate": false,
-          "password": passwordController.text.trim(),
-          "confirmPassword": confirmPasswordController.text.trim(),
-        });
-      }
-      FirebaseFirestore.instance.collection("send_mail").add({
-        "to": emailController.text.trim(),
-        "message": {
-          "subject": "This is a otp email",
-          "html": "Your account has been created",
-          "text": "asdfgwefddfgwefwn",
-        }
-      });
-      Get.back();
     } catch (e) {
       Helper.hideLoader(loader);
       throw Exception(e);
@@ -254,24 +233,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if (widget.isEditMode == true) {
-        getVendorCategories();
-        restaurantNameController.text = widget.restaurantNamename ?? "";
-        emailController.text = widget.email ?? "";
-        categoryController.text = widget.category ?? "";
-        mobileNumberController.text = widget.phoneNumber ?? "";
-        code = widget.code ?? "";
-        country = widget.country ?? "";
-        latitude = widget.latitude ?? "";
-        longitude = widget.longitude ?? "";
-        _searchController.text = widget.address ?? "";
-        kk++;
-        if (!kIsWeb) {
-          categoryFile = File(widget.image ?? "");
-        } else {
-          fileUrl = widget.image ?? "";
-        }
-      }
       getVendorCategories();
     });
   }
@@ -284,10 +245,11 @@ class _AddUserScreenState extends State<AddUserScreen> {
     const cloudFunctionUrl = 'https://us-central1-resvago-ire.cloudfunctions.net/searchPlaces';
     FirebaseFunctions.instance.httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?query=$query')).call().then((value) {
       List<Places> places = [];
-      if (value.data != null) {
-        value.data.forEach((v) {
+      if (value.data != null && value.data['places'] != null) {
+        List<dynamic> data = List.from(value.data['places']);
+        for (var v in data) {
           places.add(Places.fromJson(v));
-        });
+        }
       }
       googlePlacesModel = GooglePlacesModel(places: places);
       setState(() {});
@@ -348,60 +310,60 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Text(
-                        "Category",
-                        style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      if (categoryList != [])
-                        RegisterTextFieldWidget(
-                          readOnly: true,
-                          controller: categoryController,
-                          // length: 10,
-                          validator: MultiValidator([
-                            RequiredValidator(errorText: 'Please enter your category'),
-                          ]).call,
-                          keyboardType: TextInputType.emailAddress,
-                          hint: 'Select category',
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                surfaceTintColor: Colors.white,
-                                content: SizedBox(
-                                  height: 400,
-                                  width: double.maxFinite,
-                                  child: ListView.builder(
-                                    physics: const AlwaysScrollableScrollPhysics(),
-                                    itemCount: categoryList!.length,
-                                    shrinkWrap: true,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      return GestureDetector(
-                                          onTap: () {
-                                            categoryController.text = categoryList![index].name;
-                                            Get.back();
-                                            setState(() {});
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                            child: Text(categoryList![index].name),
-                                          ));
-                                    },
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      else
-                        const Center(
-                          child: Text("No Category Available"),
-                        ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      // Text(
+                      //   "Category",
+                      //   style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
+                      // ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
+                      // if (categoryList != [])
+                      //   RegisterTextFieldWidget(
+                      //     readOnly: true,
+                      //     controller: categoryController,
+                      //     // length: 10,
+                      //     validator: MultiValidator([
+                      //       RequiredValidator(errorText: 'Please enter your category'),
+                      //     ]).call,
+                      //     keyboardType: TextInputType.emailAddress,
+                      //     hint: 'Select category',
+                      //     onTap: () {
+                      //       showDialog(
+                      //         context: context,
+                      //         builder: (ctx) => AlertDialog(
+                      //           surfaceTintColor: Colors.white,
+                      //           content: SizedBox(
+                      //             height: 400,
+                      //             width: double.maxFinite,
+                      //             child: ListView.builder(
+                      //               physics: const AlwaysScrollableScrollPhysics(),
+                      //               itemCount: categoryList!.length,
+                      //               shrinkWrap: true,
+                      //               itemBuilder: (BuildContext context, int index) {
+                      //                 return GestureDetector(
+                      //                     onTap: () {
+                      //                       categoryController.text = categoryList![index].name;
+                      //                       Get.back();
+                      //                       setState(() {});
+                      //                     },
+                      //                     child: Padding(
+                      //                       padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      //                       child: Text(categoryList![index].name),
+                      //                     ));
+                      //               },
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       );
+                      //     },
+                      //   )
+                      // else
+                      //   const Center(
+                      //     child: Text("No Category Available"),
+                      //   ),
+                      // const SizedBox(
+                      //   height: 10,
+                      // ),
 
                       Text(
                         "Email",
