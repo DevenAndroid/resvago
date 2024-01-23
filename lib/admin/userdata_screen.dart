@@ -3,12 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/adduser_screen.dart';
 import 'package:resvago/admin/wallet_screen.dart';
 import 'package:resvago/components/helper.dart';
-
 import 'edit_vendor.dart';
 import 'model/user_model.dart';
 

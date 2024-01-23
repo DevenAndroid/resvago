@@ -112,13 +112,10 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
       Fluttertoast.showToast(msg: 'Email already exits');
       return;
     }
-    final QuerySnapshot phoneResult = await FirebaseFirestore.instance
-        .collection('customer_users')
-        .where('mobileNumber', isEqualTo: code + phoneNumberController.text.trim())
-        .get();
-
-    if (phoneResult.docs.isNotEmpty) {
-      Fluttertoast.showToast(msg: 'Mobile Number already exits');
+    final QuerySnapshot result1 =
+    await FirebaseFirestore.instance.collection('vendor_users').where('email', isEqualTo: emailController.text).get();
+    if (result1.docs.isNotEmpty) {
+      Fluttertoast.showToast(msg: 'Email already used in vendor please use another account');
       return;
     }
     addUserToFirestore();

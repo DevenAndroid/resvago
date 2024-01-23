@@ -120,14 +120,12 @@ class _AddUserScreenState extends State<AddUserScreen> {
       Fluttertoast.showToast(msg: 'Email already exits');
       return;
     }
-    // final QuerySnapshot phoneResult = await FirebaseFirestore.instance
-    //     .collection('vendor_users')
-    //     .where('mobileNumber', isEqualTo: code + mobileNumberController.text)
-    //     .get();
-    // if (phoneResult.docs.isNotEmpty) {
-    //   Fluttertoast.showToast(msg: 'Mobile Number already exits');
-    //   return;
-    // }
+    final QuerySnapshot result1 =
+    await FirebaseFirestore.instance.collection('customer_users').where('email', isEqualTo: emailController.text).get();
+    if (result1.docs.isNotEmpty) {
+      Fluttertoast.showToast(msg: 'Email already used in customer please use another account');
+      return;
+    }
     addUserToFirestore();
   }
 
@@ -208,6 +206,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
         });
       }
     } catch (e) {
+      showToast(e);
       Helper.hideLoader(loader);
       throw Exception(e);
     } finally {
