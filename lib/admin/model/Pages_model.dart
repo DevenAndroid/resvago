@@ -1,5 +1,5 @@
 class PagesData {
-  final dynamic? docid;
+  final dynamic docid;
   final dynamic title;
   final dynamic longdescription;
   final dynamic searchName;

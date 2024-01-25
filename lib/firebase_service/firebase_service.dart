@@ -50,12 +50,13 @@ class FirebaseService {
         "menuSelection": menuSelection,
         "time": DateTime.now(),
         "userID": mobileNumber,
-        "deactivate":false
+        "deactivate": false
       });
     } catch (e) {
       throw Exception(e);
     }
   }
+
   Future manageCategoryProduct({
     required DocumentReference documentReference,
     dynamic name,
@@ -68,7 +69,6 @@ class FirebaseService {
   }) async {
     try {
       if (time != null) {
-
         await documentReference.set({
           "name": name,
           "image": image,
@@ -77,9 +77,9 @@ class FirebaseService {
           "deactivate": deactivate,
           "time": time,
           "searchName": searchName,
-        }).then((value) => (){
-          showToast('Category Added');
-        });
+        }).then((value) => () {
+              showToast('Category Added');
+            });
       } else {
         await documentReference.update({
           "name": name,
@@ -87,12 +87,10 @@ class FirebaseService {
           "description": description,
           "docid": docid,
           "searchName": searchName,
-        }).then((value) => (){
-          showToast('Category updated');
-        });
+        }).then((value) => () {
+              showToast('Category updated');
+            });
       }
-
-
     } catch (e) {
       throw Exception(e);
     }
@@ -127,6 +125,35 @@ class FirebaseService {
           "docid": docid,
           "searchName": searchName,
         });
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  Future manageFaq({
+    required DocumentReference documentReference,
+    dynamic question,
+    dynamic answer,
+    dynamic docid,
+    dynamic deactivate,
+    dynamic time,
+  }) async {
+    try {
+      if (time != null) {
+        await documentReference.set({
+          "question": question,
+          "answer": answer,
+          "docid": docid,
+          "deactivate": deactivate,
+          "time": time,
+        }).then((value) => showToast("FAQ added successfully"));
+      } else {
+        await documentReference.update({
+          "question": question,
+          "answer": answer,
+          "docid": docid,
+        }).then((value) => showToast("FAQ updated successfully"));
       }
     } catch (e) {
       throw Exception(e);

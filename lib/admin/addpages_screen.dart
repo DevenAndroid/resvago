@@ -32,7 +32,7 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
   void addUserToFirestore() {
     String title = titleController.text;
     String longdescription = longdescriptionController.text;
-    Timestamp currenttime = Timestamp.now();
+    DateTime currenttime = DateTime.now();
 
     List<String> arrangeNumbers = [];
     String? userNumber = (title ?? "");

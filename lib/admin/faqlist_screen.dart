@@ -1,22 +1,21 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addpages_screen.dart';
+import 'package:resvago/admin/faq_screen.dart';
 import 'package:resvago/components/helper.dart';
-
 import 'model/Pages_model.dart';
+import 'model/faq_model.dart';
 
-class PagesListScreen extends StatefulWidget {
-  const PagesListScreen({Key? key}) : super(key: key);
-
+class FaqListScreen extends StatefulWidget {
+  const FaqListScreen({super.key, required this.collectionReference});
+  final CollectionReference collectionReference;
   @override
-  State<PagesListScreen> createState() => _PagesListScreenState();
+  State<FaqListScreen> createState() => _FaqListScreenState();
 }
 
-class _PagesListScreenState extends State<PagesListScreen> {
+class _FaqListScreenState extends State<FaqListScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -41,9 +40,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: const Text(
-          'Pages List',
-          style:
-              TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
+          'FAQ List',
+          style: TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
@@ -71,85 +69,42 @@ class _PagesListScreenState extends State<PagesListScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(const AddPagesScreen(
-                  isEditMode: false,
-                ));
+                Get.to(AddFAQScreen(collectionReference: widget.collectionReference));
               },
               child: const Padding(
-                padding: EdgeInsets.only(right: 0),
+                padding: EdgeInsets.only(right: 10),
                 child: Icon(
                   Icons.add_circle_outline,
                   size: 30,
                   color: Color(0xff3B5998),
                 ),
               )),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: toggleTextFieldVisibility,
-            color: const Color(0xff3B5998),
-          )
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
-          child: Visibility(
-            visible: isTextFieldVisible,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black)),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.black), // Change the outline border color
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .black), // Change the outline border color when focused
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-            ),
-          ),
-        ),
       ),
-      body: StreamBuilder<List<PagesData>>(
+      body: StreamBuilder<List<FAQModel>>(
         stream: getPagesStream(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<PagesData>> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<List<FAQModel>> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text("No Pages Found"));
+            return const Center(child: Text("FAQ Not Found"));
           } else {
-            List<PagesData>? pages = snapshot.data;
-            final filteredPages = filterUsers(pages!, searchQuery);
-
-            return filteredPages.isNotEmpty
+            List<FAQModel>? pages = snapshot.data;
+            return pages!.isNotEmpty
                 ? ListView.builder(
-                    itemCount: filteredPages.length,
+                    itemCount: pages.length,
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      final item = filteredPages[index];
+                      final item = pages[index];
 
                       // if (item.deactivate) {
                       //   return SizedBox.shrink();
                       // }
                       return Container(
                         height: 90,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 10),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                         width: Get.width,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -165,16 +120,13 @@ class _PagesListScreenState extends State<PagesListScreen> {
                         ),
                         child: Center(
                             child: ListTile(
-                                contentPadding:
-                                    const EdgeInsets.only(left: 15, right: 5),
+                                contentPadding: const EdgeInsets.only(left: 15, right: 5),
                                 title: Text(
-                                  item.title.toString(),
-                                  style: const TextStyle(
-                                      color: Color(0xff384953),
-                                      fontWeight: FontWeight.bold),
+                                  item.answer.toString(),
+                                  style: const TextStyle(color: Color(0xff384953), fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Text(
-                                  item.longdescription.toString(),
+                                  item.question.toString(),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 2,
                                 ),
@@ -199,12 +151,9 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                             PopupMenuItem(
                                               value: 1,
                                               onTap: () {
-                                                Get.to(AddPagesScreen(
-                                                  isEditMode: true,
-                                                  documentId: item.docid,
-                                                  title: item.title,
-                                                  longdescription:
-                                                      item.longdescription,
+                                                Get.to(AddFAQScreen(
+                                                  collectionReference: widget.collectionReference,
+                                                  menuItemData: item,
                                                 ));
                                               },
                                               child: const Text("Edit"),
@@ -214,71 +163,46 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                               onTap: () {
                                                 showDialog(
                                                   context: context,
-                                                  builder: (ctx) =>
-                                                      AlertDialog(
-                                                    title: const Text(
-                                                        "Delete Page"),
-                                                    content: const Text(
-                                                        "Are you sure you want to delete this Page"),
+                                                  builder: (ctx) => AlertDialog(
+                                                    title: const Text("Delete Page"),
+                                                    content: const Text("Are you sure you want to delete this Page"),
                                                     actions: <Widget>[
                                                       TextButton(
                                                         onPressed: () {
-                                                          Navigator.of(ctx)
-                                                              .pop();
+                                                          Navigator.of(ctx).pop();
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.red,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
+                                                              color: Colors.red, borderRadius: BorderRadius.circular(11)),
                                                           width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
+                                                          padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(
                                                             "Cancel",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                            style: TextStyle(color: Colors.white),
                                                           )),
                                                         ),
                                                       ),
                                                       TextButton(
                                                         onPressed: () {
-                                                          FirebaseFirestore
-                                                              .instance
-                                                              .collection(
-                                                                  "Pages")
+                                                          FirebaseFirestore.instance
+                                                              .collection("Pages")
                                                               .doc(item.docid)
                                                               .delete()
                                                               .then((value) {
                                                             setState(() {});
                                                           });
-                                                          Navigator.of(ctx)
-                                                              .pop();
+                                                          Navigator.of(ctx).pop();
                                                         },
                                                         child: Container(
                                                           decoration: BoxDecoration(
-                                                              color: Colors
-                                                                  .green,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          11)),
+                                                              color: Colors.green, borderRadius: BorderRadius.circular(11)),
                                                           width: 100,
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(14),
+                                                          padding: const EdgeInsets.all(14),
                                                           child: const Center(
                                                               child: Text(
                                                             "okay",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                            style: TextStyle(color: Colors.white),
                                                           )),
                                                         ),
                                                       ),
@@ -292,25 +216,17 @@ class _PagesListScreenState extends State<PagesListScreen> {
                                               value: 1,
                                               onTap: () {
                                                 item.deactivate
-                                                    ? FirebaseFirestore
-                                                        .instance
+                                                    ? FirebaseFirestore.instance
                                                         .collection('Pages')
                                                         .doc(item.docid)
-                                                        .update({
-                                                        "deactivate": false
-                                                      })
-                                                    : FirebaseFirestore
-                                                        .instance
+                                                        .update({"deactivate": false})
+                                                    : FirebaseFirestore.instance
                                                         .collection('Pages')
                                                         .doc(item.docid)
-                                                        .update({
-                                                        "deactivate": true
-                                                      });
+                                                        .update({"deactivate": true});
                                                 setState(() {});
                                               },
-                                              child: Text(item.deactivate
-                                                  ? "Activate"
-                                                  : "Deactivate"),
+                                              child: Text(item.deactivate ? "Activate" : "Deactivate"),
                                             ),
                                           ];
                                         }),
@@ -319,7 +235,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
                       ).appPaddingForScreen;
                     })
                 : const Center(
-                    child: Text("No Pages Found"),
+                    child: Text("FAQ not found"),
                   );
           }
           return const Center(child: CircularProgressIndicator());
@@ -328,29 +244,12 @@ class _PagesListScreenState extends State<PagesListScreen> {
     );
   }
 
-  List<PagesData> filterUsers(List<PagesData> users, String query) {
-    if (query.isEmpty) {
-      return users; // Return all users if the search query is empty
-    } else {
-      // Filter the users based on the search query
-      return users.where((user) {
-        if (user.title is String) {
-          return user.title.toLowerCase().contains(query.toLowerCase());
-        }
-        return false;
-      }).toList();
-    }
-  }
-
-  Stream<List<PagesData>> getPagesStream() {
-    return FirebaseFirestore.instance
-        .collection('Pages')
-        .orderBy('time', descending: isDescendingOrder)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => PagesData(
-                title: doc.data()['title'],
-                longdescription: doc.data()['longdescription'],
+  Stream<List<FAQModel>> getPagesStream() {
+    return FirebaseFirestore.instance.collection('FAQ').orderBy('time', descending: isDescendingOrder).snapshots().map(
+        (snapshot) => snapshot.docs
+            .map((doc) => FAQModel(
+                answer: doc.data()['answer'],
+                question: doc.data()['question'],
                 deactivate: doc.data()['deactivate'] ?? false,
                 docid: doc.id))
             .toList());

@@ -17,6 +17,8 @@ import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/helper.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
+import 'faq_screen.dart';
+import 'faqlist_screen.dart';
 import 'productcategory_list_screen.dart';
 import 'model/deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
@@ -249,6 +251,23 @@ class HomePageState extends State<HomePage> {
                 title: const Text('Pages List'),
                 onTap: () {
                   Get.to(const PagesListScreen()); // Closes the drawer
+                },
+              ),
+              Divider(
+                thickness: 1,
+                color: Colors.grey.shade300,
+              ),
+              ListTile(
+                leading: const Icon(Icons.pages),
+                title: const Text('FAQ'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FaqListScreen(
+                            collectionReference: FirebaseFirestore.instance.collection("FAQ"),
+                            key: ValueKey(DateTime.now().millisecondsSinceEpoch),
+                          )));
                 },
               ),
               Divider(

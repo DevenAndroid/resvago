@@ -43,7 +43,7 @@ class _settingScreenState extends State<settingScreen> {
       );
       User? user = userCredential.user;
       await user!.updatePassword(passwordController.text.trim()).then((value) async {
-        FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).update({
+        FirebaseFirestore.instance.collection('admin_login').doc(user.uid).update({
           'email': emailController.text,
           'Password': passwordController.text,
           "admin_commission": commissionPercentage.text.trim(),

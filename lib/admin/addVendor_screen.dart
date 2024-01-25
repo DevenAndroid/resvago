@@ -88,8 +88,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
 
       if (resturentData != null) {
         await firebaseService.manageCategoryProduct(
-          documentReference:
-              widget.collectionReference.doc(resturentData!.docid),
+          documentReference: widget.collectionReference.doc(resturentData!.docid),
           deactivate: resturentData!.deactivate,
           description: descriptionController.text.trim(),
           docid: resturentData!.docid,
