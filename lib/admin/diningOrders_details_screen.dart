@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -60,7 +61,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
   Widget build(BuildContext context) {
     widget.myDiningOrderModel.fcmToken;
     return Scaffold(
-      appBar: backAppBar(title: "Orders Details", context: context),
+      appBar: backAppBar(title: "Orders Details".tr, context: context),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -85,7 +86,11 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       // mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
-                          "Order ID: ${myDiningOrderModel!.orderId.toString()}",
+                          "Order ID".tr,
+                          style: GoogleFonts.poppins(color: const Color(0xFF423E5E), fontWeight: FontWeight.w600, fontSize: 15),
+                        ),
+                        Text(
+                          ": ${myDiningOrderModel!.orderId.toString()}",
                           style: GoogleFonts.poppins(color: const Color(0xFF423E5E), fontWeight: FontWeight.w600, fontSize: 15),
                         ),
                         Text(
@@ -114,139 +119,6 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                 ),
               ),
             ),
-            // Padding(
-            //     padding: const EdgeInsets.all(10.0),
-            //     child: Container(
-            //         padding: const EdgeInsets.all(14),
-            //         decoration: BoxDecoration(
-            //             color: Colors.white,
-            //             borderRadius: BorderRadius.circular(10)),
-            //         child: Row(
-            //           mainAxisAlignment: MainAxisAlignment.start,
-            //           crossAxisAlignment: CrossAxisAlignment.start,
-            //           children: [
-            //         if (myDiningOrderModel != null &&
-            //         myDiningOrderModel!.restaurantInfo != null &&
-            //         myDiningOrderModel!.restaurantInfo!.restaurantImage != null &&
-            //         myDiningOrderModel!.restaurantInfo!.restaurantImage!.isNotEmpty)
-            //           Image.network(myDiningOrderModel!.restaurantInfo!.restaurantImage.toString(),height: 50,width: 50,
-            //             fit: BoxFit.fill,),
-            //
-            //             const SizedBox(
-            //               width: 15,
-            //             ),
-            //             Column(
-            //               mainAxisAlignment: MainAxisAlignment.start,
-            //               crossAxisAlignment: CrossAxisAlignment.start,
-            //               children: [
-            //                 Text(
-            //                   "jack",
-            //                   style: GoogleFonts.poppins(
-            //                       color: const Color(0xFF1A2E33),
-            //                       fontWeight: FontWeight.w600,
-            //                       fontSize: 15),
-            //                 ),
-            //                 const SizedBox(
-            //                   height: 10,
-            //                 ),
-            //                 Row(
-            //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                   children: [
-            //                     Column(
-            //                       mainAxisAlignment: MainAxisAlignment.start,
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: [
-            //                         Text(
-            //                           "Date",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w300,
-            //                               fontSize: 15),
-            //                         ),
-            //                         Text(
-            //                           "24 Oct 23",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w500,
-            //                               fontSize: 13),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                     const SizedBox(
-            //                       width: 15,
-            //                     ),
-            //                     Column(
-            //                       mainAxisAlignment: MainAxisAlignment.start,
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: [
-            //                         Text(
-            //                           "Time",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w300,
-            //                               fontSize: 15),
-            //                         ),
-            //                         Text(
-            //                           "6:30PM",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w500,
-            //                               fontSize: 13),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                     const SizedBox(
-            //                       width: 15,
-            //                     ),
-            //                     Column(
-            //                       mainAxisAlignment: MainAxisAlignment.start,
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: [
-            //                         Text(
-            //                           "Guest",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w300,
-            //                               fontSize: 15),
-            //                         ),
-            //                         Text(
-            //                           "12",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w500,
-            //                               fontSize: 13),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                     const SizedBox(
-            //                       width: 15,
-            //                     ),
-            //                     Column(
-            //                       mainAxisAlignment: MainAxisAlignment.start,
-            //                       crossAxisAlignment: CrossAxisAlignment.start,
-            //                       children: [
-            //                         Text(
-            //                           "Offer",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w300,
-            //                               fontSize: 15),
-            //                         ),
-            //                         Text(
-            //                           "-20%",
-            //                           style: GoogleFonts.poppins(
-            //                               color: const Color(0xFF384953),
-            //                               fontWeight: FontWeight.w500,
-            //                               fontSize: 13),
-            //                         ),
-            //                       ],
-            //                     ),
-            //                   ],
-            //                 )
-            //               ],
-            //             )
-            //           ],
-            //         ))),
             Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Container(
@@ -257,7 +129,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Selected Items",
+                        "Selected Items".tr,
                         style: GoogleFonts.poppins(color: const Color(0xFF1A2E33), fontWeight: FontWeight.w600, fontSize: 16),
                       ),
                       const SizedBox(
@@ -354,7 +226,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Customer Details",
+                          "Customer Details".tr,
                           style: GoogleFonts.poppins(color: const Color(0xFF1A2E33), fontWeight: FontWeight.w500, fontSize: 16),
                         ),
                         const SizedBox(
@@ -376,7 +248,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Customer Name",
+                                    "Customer Name".tr,
                                     style: GoogleFonts.poppins(
                                         color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                   ),
@@ -411,7 +283,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Customer Number",
+                                    "Customer Number".tr,
                                     style: GoogleFonts.poppins(
                                         color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                   ),
@@ -490,7 +362,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Subtotal",
+                              "Subtotal".tr,
                               style:
                                   GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
                             ),
@@ -508,7 +380,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Service Fees",
+                              "Service Fees".tr,
                               style:
                                   GoogleFonts.poppins(color: const Color(0xFF1E2538), fontWeight: FontWeight.w300, fontSize: 14),
                             ),
@@ -548,7 +420,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Total",
+                              "Total".tr,
                               style:
                                   GoogleFonts.poppins(color: const Color(0xFF3A3A3A), fontWeight: FontWeight.w500, fontSize: 16),
                             ),
@@ -576,7 +448,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     child: Text(
-                      "Order Completed",
+                      "Order Completed".tr,
                       style: Theme.of(context)
                           .textTheme
                           .headlineSmall!
@@ -611,7 +483,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     child: Text(
-                      "Complete Order",
+                      "Complete Order".tr,
                       style: Theme.of(context)
                           .textTheme
                           .headlineSmall!
@@ -630,7 +502,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                     child: Text(
-                      "Order Rejected",
+                      "Order Rejected".tr,
                       style: Theme.of(context)
                           .textTheme
                           .headline5!
@@ -670,7 +542,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           child: Text(
-                            "Accept Order",
+                            "Accept Order".tr,
                             style: Theme.of(context)
                                 .textTheme
                                 .headline5!
@@ -706,7 +578,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             child: Text(
-                              "Reject Order",
+                              "Reject Order".tr,
                               style: Theme.of(context).textTheme.headline5!.copyWith(
                                   color: AppTheme.backgroundcolor, fontWeight: FontWeight.w500, fontSize: AddSize.font18),
                             )))

@@ -21,7 +21,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
-  bool isDescendingOrder = true;
+  bool isDescendingOrder = false;
   void toggleTextFieldVisibility() {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
@@ -41,8 +41,8 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text(
-          'Vendor Users List',
+        title: Text(
+          'Vendor Users List'.tr,
           style: TextStyle(color: Color(0xFF423E5E), fontSize: 20, fontWeight: FontWeight.bold),
         ),
         leading: Padding(
@@ -57,8 +57,8 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
           GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
+              // isDescendingOrder = !isDescendingOrder;
               setState(() {
-                isDescendingOrder = !isDescendingOrder;
               });
             },
             child: const Padding(
@@ -84,47 +84,79 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                   color: Color(0xff3B5998),
                 ),
               )),
-          IconButton(
-            icon: const Icon(
-              Icons.search,
-              size: 30,
-            ),
-            onPressed: toggleTextFieldVisibility,
-            color: const Color(0xff3B5998),
-          )
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
-          child: Visibility(
-            visible: isTextFieldVisible,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
+          GestureDetector(
+            onTap: (){
+              isDescendingOrder = !isDescendingOrder;
+              setState(() {
+
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(
+                Icons.search,
+                size: 30,
+                color: Color(0xff3B5998),
               ),
             ),
-          ),
-        ),
+          )
+        ],
+        // bottom: PreferredSize(
+        //   preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
+        //   child: Visibility(
+        //     visible: isTextFieldVisible,
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(8.0),
+        //       child: TextFormField(
+        //         style: const TextStyle(color: Colors.black),
+        //         decoration: const InputDecoration(
+        //           hintText: 'Search...',
+        //           hintStyle: TextStyle(color: Colors.black),
+        //           border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+        //           enabledBorder: OutlineInputBorder(
+        //             borderSide: BorderSide(color: Colors.black), // Change the outline border color
+        //           ),
+        //           focusedBorder: OutlineInputBorder(
+        //             borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
+        //           ),
+        //         ),
+        //         onChanged: (value) {
+        //           setState(() {
+        //             searchQuery = value;
+        //           });
+        //         },
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
+           isDescendingOrder == true ?
+              Padding(
+                key: ValueKey(isDescendingOrder),
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                ),
+              ):const SizedBox(),
             StreamBuilder<List<UserData>>(
               stream: getUsersStreamFromFirestore(),
               builder: (context, snapshot) {

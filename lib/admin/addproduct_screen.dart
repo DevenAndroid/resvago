@@ -129,7 +129,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Add product category', context: context),
+        appBar: backAppBar(title: 'Add product category'.tr, context: context),
         body: Form(
             key: formKey,
             child: SizedBox(
@@ -149,12 +149,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const SizedBox(height: 10),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  "Title",
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                               Text(
+                                "Title".tr,
+                                style: const TextStyle(color: Colors.black),
                               ),
                               const SizedBox(height: 5),
                               MyTextField(
@@ -165,18 +162,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   return null;
                                 },
                                 controller: nameController,
-                                hintText: 'Title',
+                                hintText: 'Title'.tr,
                                 obscureText: false,
                                 color: Colors.white,
                               ),
 
                               const SizedBox(height: 20),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 25),
-                                child: Text(
-                                  "Description",
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                               Text(
+                                "Description".tr,
+                                style: const TextStyle(color: Colors.black),
                               ),
                               const SizedBox(height: 5),
                               MyTextField(
@@ -187,7 +181,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                   return null;
                                 },
                                 controller: descriptionController,
-                                hintText: 'Description',
+                                hintText: 'Description'.tr,
                                 obscureText: false,
                                 minLines: 5,
                                 maxLines: 5,
@@ -251,7 +245,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                                     ),
                                                     Text(
                                                       'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
-                                                      style: TextStyle(fontSize: 16, color: Colors.black54),
+                                                      style: const TextStyle(fontSize: 16, color: Colors.black54),
                                                       textAlign: TextAlign.center,
                                                     ),
                                                     const SizedBox(
@@ -311,7 +305,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                                     ),
                                                     Text(
                                                       'Accepted file types: JPEG, Doc, PDF, PNG'.tr,
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontSize: 14, color: Color(0xff141C21), fontWeight: FontWeight.w300),
                                                       textAlign: TextAlign.center,
                                                     ),
@@ -342,7 +336,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     showToast('Please add data');
                                   }
                                 },
-                                text: menuItemData != null ? 'Update' : 'Add',
+                                text: menuItemData != null ? 'Update'.tr : 'Add'.tr,
                               ),
 
                               const SizedBox(height: 50),
@@ -359,9 +353,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
-        title: const Text(
-          'Select Picture from',
-          style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
+        title: Text(
+          'Select Picture From'.tr,
+          style: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: <CupertinoActionSheetAction>[
           CupertinoActionSheetAction(
@@ -375,7 +369,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 Get.back();
               });
             },
-            child: const Text("Camera"),
+            child: Text("Camera".tr),
           ),
           CupertinoActionSheetAction(
             onPressed: () {
@@ -388,14 +382,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                 Get.back();
               });
             },
-            child: const Text('Gallery'),
+            child: Text('Gallery'.tr),
           ),
           CupertinoActionSheetAction(
             isDestructiveAction: true,
             onPressed: () {
               Get.back();
             },
-            child: const Text('Cancel'),
+            child: Text('Cancel'.tr),
           ),
         ],
       ),

@@ -20,7 +20,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
-  bool isDescendingOrder = true;
+  bool isDescendingOrder = false;
   void toggleTextFieldVisibility() {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
@@ -41,8 +41,8 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text(
-          'Customer Users List',
+        title:  Text(
+          'Customer Users List'.tr,
           style: TextStyle(color: Color(0xFF423E5E), fontSize: 20, fontWeight: FontWeight.bold),
         ),
         leading: Padding(
@@ -58,7 +58,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
             behavior: HitTestBehavior.translucent,
             onTap: () {
               setState(() {
-                isDescendingOrder = !isDescendingOrder;
+                // isDescendingOrder = !isDescendingOrder;
               });
             },
             child: const Padding(
@@ -84,20 +84,30 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                   color: Color(0xff3B5998),
                 ),
               )),
-          IconButton(
-            icon: const Icon(
-              Icons.search,
-              size: 30,
+          GestureDetector(
+            onTap: (){
+              isDescendingOrder = !isDescendingOrder;
+              setState(() {
+
+              });
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(
+                Icons.search,
+                size: 30,
+                color: Color(0xff3B5998),
+              ),
             ),
-            onPressed: toggleTextFieldVisibility,
-            color: const Color(0xff3B5998),
           )
         ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
-          child: Visibility(
-            visible: isTextFieldVisible,
-            child: Padding(
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if(isDescendingOrder == true)
+            Padding(
+              key: ValueKey(isDescendingOrder),
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
                 style: const TextStyle(color: Colors.black),
@@ -119,12 +129,6 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                 },
               ),
             ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
             StreamBuilder<List<CustomerRegisterData>>(
               stream: getUsersStreamFromFirestore(),
               builder: (context, snapshot) {

@@ -269,7 +269,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
-      appBar: backAppBar(title: "Restaurant Registration", context: context, backgroundColor: Colors.white),
+      appBar: backAppBar(title: "Restaurant Registration".tr, context: context, backgroundColor: Colors.white),
       body: SingleChildScrollView(
         child: Form(
           key: formKey,
@@ -292,7 +292,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Restaurant Name",
+                        "Restaurant Name".tr,
                         style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       const SizedBox(
@@ -304,7 +304,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         validator: RequiredValidator(errorText: 'Please enter your Restaurant Name ').call,
                         // keyboardType: TextInputType.none,
                         // textInputAction: TextInputAction.next,
-                        hint: 'Mac Restaurant',
+                        hint: 'Mac Restaurant'.tr,
                       ),
                       const SizedBox(
                         height: 10,
@@ -365,7 +365,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                       // ),
 
                       Text(
-                        "Email",
+                        "Email".tr,
                         style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       const SizedBox(
@@ -380,7 +380,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         ]).call,
                         keyboardType: TextInputType.emailAddress,
                         // textInputAction: TextInputAction.next,
-                        hint: 'Enter your email',
+                        hint: 'Enter your email'.tr,
                       ),
                       const SizedBox(
                         height: 10,
@@ -391,7 +391,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Mobile Number",
+                                  "Mobile Number".tr,
                                   style: GoogleFonts.poppins(
                                       color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                                 ),
@@ -425,7 +425,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                         // fontFamily: 'poppins',
                                         fontWeight: FontWeight.w300,
                                       ),
-                                      hintText: 'Phone Number',
+                                      hintText: 'Phone Number'.tr,
                                       border: const OutlineInputBorder(
                                         borderSide: BorderSide(),
                                       ),
@@ -482,7 +482,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                               ]).call,
                               keyboardType: TextInputType.emailAddress,
                               // textInputAction: TextInputAction.next,
-                              hint: 'Enter your password',
+                              hint: 'Enter your password'.tr,
                             ),
                             const SizedBox(
                               height: 10,
@@ -519,7 +519,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                               },
                               keyboardType: TextInputType.emailAddress,
                               // textInputAction: TextInputAction.next,
-                              hint: 'Enter your confirm password',
+                              hint: 'Enter your confirm password'.tr,
                             ),
                             const SizedBox(
                               height: 10,
@@ -527,7 +527,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           ],
                         ),
                       Text(
-                        "Address",
+                        "Address".tr,
                         style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                       ),
                       const SizedBox(
@@ -539,7 +539,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                           RequiredValidator(errorText: 'Please enter your location'.tr),
                         ]).call,
                         keyboardType: TextInputType.emailAddress,
-                        hint: 'Search your location',
+                        hint: 'Search your location'.tr,
                         onChanged: (value) {
                           makeDelay(delay: () {
                             _searchPlaces(value);
@@ -728,7 +728,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                             setState(() {});
                           }
                         },
-                        text: 'Save',
+                        text: 'Save'.tr,
                         color: Colors.white,
                         backgroundcolor: Colors.black,
                       ),

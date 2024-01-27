@@ -8,7 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/components/helper.dart';
 
-import 'model/deliveryOrder_details_screen.dart';
+import 'deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
 
 class OrderListScreen extends StatefulWidget {

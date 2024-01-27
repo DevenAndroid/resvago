@@ -4,7 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/loginscreen.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'components/local_string.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,11 +28,38 @@ Future<void> main() async {
 
 
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  updateLanguage() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? appLanguage = sharedPreferences.getString("app_language");
+    if (appLanguage == null || appLanguage == "English") {
+      Get.updateLocale(const Locale('en', 'US'));
+    } else if (appLanguage == "Spanish") {
+      Get.updateLocale(const Locale('es', 'ES'));
+    } else if (appLanguage == "French") {
+      Get.updateLocale(const Locale('fr', 'FR'));
+    } else if (appLanguage == "Arabic") {
+      Get.updateLocale(const Locale('ar', 'AE'));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    updateLanguage();
+  }
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      translations: LocaleString(),
+      locale: const Locale('en', 'US'),
       title: 'Resvago Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(

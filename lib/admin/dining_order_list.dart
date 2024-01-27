@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/admin/diningOrders_details_screen.dart';
 import 'package:resvago/components/helper.dart';
-import 'model/deliveryOrder_details_screen.dart';
+import 'deliveryOrder_details_screen.dart';
 import 'model/dining_order_model.dart';
 
 class DiningorderListScreen extends StatefulWidget {

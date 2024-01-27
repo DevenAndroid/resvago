@@ -3,11 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get/route_manager.dart';
+import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:resvago/admin/homepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../components/apptheme.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
+import '../main.dart';
+import 'language_screen.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -29,6 +33,9 @@ class _LogInScreenState extends State<LogInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialogLanguage(context);
+    });
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
@@ -53,22 +60,22 @@ class _LogInScreenState extends State<LogInScreen> {
               const SizedBox(
                 height: 150,
               ),
-              const Align(
+              Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Welcome back to\'LogIn',
-                  style: TextStyle(
+                  'Welcome back to\'LogIn'.tr,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
                 ),
               ),
               const SizedBox(height: 25),
-              const Padding(
-                padding: EdgeInsets.only(left: 25),
+              Padding(
+                padding: const EdgeInsets.only(left: 25),
                 child: Text(
-                  'Enter Your Email',
-                  style: TextStyle(
+                  'Enter Your Email'.tr,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
@@ -83,29 +90,29 @@ class _LogInScreenState extends State<LogInScreen> {
                   style: const TextStyle(color: Colors.white),
                   controller: emailController,
                   obscureText: false,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       border: InputBorder.none,
-                      errorStyle: TextStyle(color: Colors.red),
-                      enabledBorder: OutlineInputBorder(
+                      errorStyle: const TextStyle(color: Colors.red),
+                      enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
                       ),
-                      focusedBorder: OutlineInputBorder(
+                      focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
                       ),
                       fillColor: Colors.transparent,
                       filled: true,
-                      hintText: 'Email',
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: Colors.white),
-                      hintStyle: TextStyle(color: Colors.white)),
+                      hintText: 'Email'.tr,
+                      labelText: 'Email'.tr,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      hintStyle: const TextStyle(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.only(left: 25),
+              Padding(
+                padding: const EdgeInsets.only(left: 25),
                 child: Text(
-                  'Password',
-                  style: TextStyle(
+                  'Password'.tr,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
@@ -120,21 +127,21 @@ class _LogInScreenState extends State<LogInScreen> {
                   style: const TextStyle(color: Colors.white),
                   controller: passwordController,
                   obscureText: false,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       border: InputBorder.none,
-                      errorStyle: TextStyle(color: Colors.red),
-                      enabledBorder: OutlineInputBorder(
+                      errorStyle: const TextStyle(color: Colors.red),
+                      enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
                       ),
-                      focusedBorder: OutlineInputBorder(
+                      focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
                       ),
                       fillColor: Colors.transparent,
                       filled: true,
-                      hintText: 'Password',
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      hintStyle: TextStyle(color: Colors.white)),
+                      hintText: 'Password'.tr,
+                      labelText: 'Password'.tr,
+                      labelStyle: const TextStyle(color: Colors.white),
+                      hintStyle: const TextStyle(color: Colors.white)),
                 ),
               ),
               const SizedBox(height: 35),
@@ -147,7 +154,7 @@ class _LogInScreenState extends State<LogInScreen> {
                   OverlayEntry loader = Helper.overlayLoader(context);
                   Overlay.of(context).insert(loader);
                   try {
-                   await FirebaseAuth.instance
+                    await FirebaseAuth.instance
                         .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
                         .then((value) {
                       Helper.hideLoader(loader);
@@ -171,14 +178,13 @@ class _LogInScreenState extends State<LogInScreen> {
                       } else {
                         Fluttertoast.showToast(msg: e.toString());
                       }
-                    }
-                    else {
-                      if (e.toString() == "[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
+                    } else {
+                      if (e.toString() ==
+                          "[firebase_auth/invalid-credential] The supplied auth credential is incorrect, malformed or has expired.") {
                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           content: Text("Credential is incorrect"),
                         ));
-                      }
-                      else{
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(e.toString()),
                         ));
@@ -186,7 +192,7 @@ class _LogInScreenState extends State<LogInScreen> {
                     }
                   }
                 },
-                text: 'Log In',
+                text: 'Log In'.tr,
               ),
               const SizedBox(height: 50),
             ],
@@ -194,5 +200,126 @@ class _LogInScreenState extends State<LogInScreen> {
         ),
       ).appPaddingForScreen),
     );
+  }
+
+  updateLanguage(String gg) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setString("app_language", gg);
+  }
+
+  RxString selectedLAnguage = "English".obs;
+  checkLanguage() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? appLanguage = sharedPreferences.getString("app_language");
+    if (appLanguage == null || appLanguage == "English") {
+      Get.updateLocale(const Locale('en', 'US'));
+      selectedLAnguage.value = "English";
+    } else if (appLanguage == "French") {
+      Get.updateLocale(const Locale('fr', 'FR'));
+      selectedLAnguage.value = "French";
+    }
+  }
+
+  final keyIsFirstLoaded = 'is_first_loaded';
+
+  Future<void> showDialogLanguage(context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? isFirstLoaded = prefs.getBool(keyIsFirstLoaded);
+    if (isFirstLoaded == null) {
+      return showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          child: const Icon(
+                            Icons.clear_rounded,
+                            color: Colors.black,
+                          ),
+                          onTap: () {
+                            Get.back();
+                            Get.back();
+                            Get.back();
+                            Get.back();
+                            prefs.setBool(keyIsFirstLoaded, false);
+                          },
+                        )
+                      ],
+                    ),
+                    RadioListTile(
+                        value: "English",
+                        groupValue: selectedLAnguage.value,
+                        title: const Text(
+                          "English",
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xff000000)),
+                        ),
+                        onChanged: (value) {
+                          locale = const Locale('en', 'US');
+                          Get.updateLocale(locale);
+                          selectedLAnguage.value = value!;
+                          // updateLanguage("English");
+                          Get.back();
+                          setState(() {});
+                          if (kDebugMode) {
+                            print(selectedLAnguage);
+                          }
+                        }),
+                    RadioListTile(
+                        value: "French",
+                        groupValue: selectedLAnguage.value,
+                        title: const Text(
+                          "French",
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xff000000)),
+                        ),
+                        onChanged: (value) {
+                          locale = const Locale('fr', 'FR');
+                          Get.updateLocale(locale);
+                          selectedLAnguage.value = value!;
+                          // updateLanguage("French");
+                          Get.back();
+                          setState(() {});
+                          if (kDebugMode) {
+                            print(selectedLAnguage);
+                          }
+                        }),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Get.back();
+                            Get.back();
+                            Get.back();
+                            Get.back();
+                            updateLanguage(selectedLAnguage.value);
+                            prefs.setBool(keyIsFirstLoaded, false);
+                          },
+                          child: Container(
+                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: AppTheme.primaryColor),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  "Update".tr,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              )),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            );
+          });
+    }
   }
 }

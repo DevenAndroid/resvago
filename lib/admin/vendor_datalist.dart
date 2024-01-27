@@ -21,7 +21,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
-  bool isDescendingOrder = true;
+  bool isDescendingOrder = false;
 
   void toggleTextFieldVisibility() {
     setState(() {
@@ -38,7 +38,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
         title: Text(
-          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category" : 'Vendor Category',
+          widget.resturentData != null ? "${widget.resturentData!.name} Sub Category".tr : 'Vendor Category'.tr,
           style: const TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
@@ -53,7 +53,7 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
           GestureDetector(
             onTap: () {
               setState(() {
-                isDescendingOrder = !isDescendingOrder;
+                // isDescendingOrder = !isDescendingOrder;
               });
             },
             child: const Padding(
@@ -82,239 +82,254 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
                   color: Color(0xff3B5998),
                 ),
               )),
-          IconButton(
-            icon: const Icon(
-              Icons.search,
-              color: Color(0xff3B5998),
-            ),
-            onPressed: toggleTextFieldVisibility,
-          )
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(isTextFieldVisible ? 60.0 : 0.0),
-          child: Visibility(
-            visible: isTextFieldVisible,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
-                  ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
+          GestureDetector(
+            onTap: () {
+              isDescendingOrder = !isDescendingOrder;
+              setState(() {});
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
+              child: Icon(
+                Icons.search,
+                size: 30,
+                color: Color(0xff3B5998),
               ),
             ),
-          ),
-        ),
+          )
+        ],
       ),
-      body: StreamBuilder<List<ResturentData>>(
-        stream: getResturentStreamFromFirestore(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            List<ResturentData> resturent = snapshot.data ?? [];
-            final filteredUsers = filterUsers(resturent, searchQuery);
-            // List<ResturentData> users = snapshot.data ?? [];
-            return filteredUsers.isNotEmpty
-                ? ListView.builder(
-                    itemCount: filteredUsers.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      final item = filteredUsers[index];
-                      log(item.image.toString());
-                      // if (item.deactivate) {
-                      //   return SizedBox.shrink();
-                      // }
-                      return Container(
-                        height: 90,
-                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                        width: Get.width,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(11),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 2,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: ListTile(
-                              contentPadding: const EdgeInsets.only(right: 0, left: 10),
-                              title: Text(
-                                item.name.toString(),
-                                style: const TextStyle(color: Color(0xff384953), fontWeight: FontWeight.bold),
-                              ),
-                              leading: Container(
-                                height: 80,
-                                width: 80,
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: NetworkImage(item.image.toString()),
-                                      fit: BoxFit.cover,
-                                    ),
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(5)),
-                              ),
-                              subtitle: Text(item.description.toString(),
-                                  style: const TextStyle(color: Color(0xff384953), fontSize: 12, fontWeight: FontWeight.normal)),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  item.deactivate
-                                      ? Image.asset(
-                                          'assets/images/deactivate.png',
-                                          height: 20,
-                                          width: 20,
-                                        )
-                                      : const SizedBox(),
-                                  PopupMenuButton<int>(
-                                      icon: const Icon(
-                                        Icons.more_vert,
-                                        color: Colors.black,
-                                      ),
-                                      color: Colors.white,
-                                      itemBuilder: (context) {
-                                        return [
-                                          PopupMenuItem(
-                                            value: 1,
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) => AddVendorScreen(
-                                                            collectionReference: widget.collectionReference,
-                                                            resturentData: item,
-                                                          )));
-                                            },
-                                            child: const Text("Edit"),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 1,
-                                            onTap: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return AlertDialog(
-                                                      surfaceTintColor: Colors.white,
-                                                      title: const Text("Delete Vendor Category"),
-                                                      content: Column(mainAxisSize: MainAxisSize.min, children: [
-                                                        const Text("Are you sure you want to delete this category"),
-                                                        const SizedBox(
-                                                          height: 20,
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Expanded(
-                                                              child: GestureDetector(
-                                                                onTap: () {
-                                                                  Navigator.of(context).pop();
-                                                                },
-                                                                child: Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: Colors.red, borderRadius: BorderRadius.circular(11)),
-                                                                  // width: 100,
-                                                                  padding: const EdgeInsets.all(14),
-                                                                  child: const Center(
-                                                                      child: Text(
-                                                                        "Cancel",
-                                                                        style: TextStyle(color: Colors.white),
-                                                                      )),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            const SizedBox(width: 20),
-                                                            Expanded(
-                                                              child: GestureDetector(
-                                                                onTap: () {
-                                                                  widget.collectionReference.doc(item.docid).delete().then((value) {
-                                                                    setState(() {});
-                                                                  });
-                                                                  Navigator.of(context).pop();
-                                                                },
-                                                                child: Container(
-                                                                  decoration: BoxDecoration(
-                                                                      color: Colors.green, borderRadius: BorderRadius.circular(11)),
-                                                                  // width: 100,
-                                                                  padding: const EdgeInsets.all(14),
-                                                                  child: const Center(
-                                                                      child: Text(
-                                                                        "okay",
-                                                                        style: TextStyle(color: Colors.white),
-                                                                      )),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        )
-                                                      ]));
-                                                },
-                                              );
-                                            },
-                                            child: const Text("Delete"),
-                                          ),
-                                          PopupMenuItem(
-                                            value: 1,
-                                            onTap: () {
-                                              item.deactivate
-                                                  ? widget.collectionReference.doc(item.docid).update({"deactivate": false})
-                                                  : widget.collectionReference.doc(item.docid).update({"deactivate": true});
-                                              setState(() {});
-                                            },
-                                            child: Text(item.deactivate ? "Activate" : "Deactivate"),
-                                          ),
-                                          // PopupMenuItem(
-                                          //   value: 1,
-                                          //   onTap: () {
-                                          //     Navigator.push(
-                                          //         context,
-                                          //         MaterialPageRoute(
-                                          //             builder: (context) => VendorDataScreen(
-                                          //                 collectionReference: widget
-                                          //                     .collectionReference
-                                          //                     .doc(item
-                                          //                         .docid)
-                                          //                     .collection(
-                                          //                         "sub_category"),
-                                          //                 resturentData:
-                                          //                     item,
-                                          //                 key: ValueKey(
-                                          //                     DateTime.now()
-                                          //                         .millisecondsSinceEpoch))));
-                                          //   },
-                                          //   child: const Text(
-                                          //       'View SubCategory'),
-                                          // ),
-                                        ];
-                                      }),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (isDescendingOrder == true)
+              Padding(
+                key: ValueKey(isDescendingOrder),
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
+                    ),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
+                ),
+              ),
+            StreamBuilder<List<ResturentData>>(
+              stream: getResturentStreamFromFirestore(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  List<ResturentData> resturent = snapshot.data ?? [];
+                  final filteredUsers = filterUsers(resturent, searchQuery);
+                  // List<ResturentData> users = snapshot.data ?? [];
+                  return filteredUsers.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: filteredUsers.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final item = filteredUsers[index];
+                            log(item.image.toString());
+                            // if (item.deactivate) {
+                            //   return SizedBox.shrink();
+                            // }
+                            return Container(
+                              height: 90,
+                              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                              width: Get.width,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(11),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 2,
+                                    offset: const Offset(0, 1),
+                                  ),
                                 ],
-                              )),
-                        ),
-                      ).appPaddingForScreen;
-                    })
-                : const Center(
-                    child: Text("No SubCategory Found"),
-                  );
-          }
-        },
+                              ),
+                              child: Center(
+                                child: ListTile(
+                                    contentPadding: const EdgeInsets.only(right: 0, left: 10),
+                                    title: Text(
+                                      item.name.toString(),
+                                      style: const TextStyle(color: Color(0xff384953), fontWeight: FontWeight.bold),
+                                    ),
+                                    leading: Container(
+                                      height: 80,
+                                      width: 80,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: NetworkImage(item.image.toString()),
+                                            fit: BoxFit.cover,
+                                          ),
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(5)),
+                                    ),
+                                    subtitle: Text(item.description.toString(),
+                                        style: const TextStyle(
+                                            color: Color(0xff384953), fontSize: 12, fontWeight: FontWeight.normal)),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        item.deactivate
+                                            ? Image.asset(
+                                                'assets/images/deactivate.png',
+                                                height: 20,
+                                                width: 20,
+                                              )
+                                            : const SizedBox(),
+                                        PopupMenuButton<int>(
+                                            icon: const Icon(
+                                              Icons.more_vert,
+                                              color: Colors.black,
+                                            ),
+                                            color: Colors.white,
+                                            itemBuilder: (context) {
+                                              return [
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) => AddVendorScreen(
+                                                                  collectionReference: widget.collectionReference,
+                                                                  resturentData: item,
+                                                                )));
+                                                  },
+                                                  child: const Text("Edit"),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                            surfaceTintColor: Colors.white,
+                                                            title: const Text("Delete Vendor Category"),
+                                                            content: Column(mainAxisSize: MainAxisSize.min, children: [
+                                                              const Text("Are you sure you want to delete this category"),
+                                                              const SizedBox(
+                                                                height: 20,
+                                                              ),
+                                                              Row(
+                                                                children: [
+                                                                  Expanded(
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                            color: Colors.red,
+                                                                            borderRadius: BorderRadius.circular(11)),
+                                                                        // width: 100,
+                                                                        padding: const EdgeInsets.all(14),
+                                                                        child: const Center(
+                                                                            child: Text(
+                                                                          "Cancel",
+                                                                          style: TextStyle(color: Colors.white),
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  const SizedBox(width: 20),
+                                                                  Expanded(
+                                                                    child: GestureDetector(
+                                                                      onTap: () {
+                                                                        widget.collectionReference
+                                                                            .doc(item.docid)
+                                                                            .delete()
+                                                                            .then((value) {
+                                                                          setState(() {});
+                                                                        });
+                                                                        Navigator.of(context).pop();
+                                                                      },
+                                                                      child: Container(
+                                                                        decoration: BoxDecoration(
+                                                                            color: Colors.green,
+                                                                            borderRadius: BorderRadius.circular(11)),
+                                                                        // width: 100,
+                                                                        padding: const EdgeInsets.all(14),
+                                                                        child: const Center(
+                                                                            child: Text(
+                                                                          "okay",
+                                                                          style: TextStyle(color: Colors.white),
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ]));
+                                                      },
+                                                    );
+                                                  },
+                                                  child: const Text("Delete"),
+                                                ),
+                                                PopupMenuItem(
+                                                  value: 1,
+                                                  onTap: () {
+                                                    item.deactivate
+                                                        ? widget.collectionReference.doc(item.docid).update({"deactivate": false})
+                                                        : widget.collectionReference.doc(item.docid).update({"deactivate": true});
+                                                    setState(() {});
+                                                  },
+                                                  child: Text(item.deactivate ? "Activate" : "Deactivate"),
+                                                ),
+                                                // PopupMenuItem(
+                                                //   value: 1,
+                                                //   onTap: () {
+                                                //     Navigator.push(
+                                                //         context,
+                                                //         MaterialPageRoute(
+                                                //             builder: (context) => VendorDataScreen(
+                                                //                 collectionReference: widget
+                                                //                     .collectionReference
+                                                //                     .doc(item
+                                                //                         .docid)
+                                                //                     .collection(
+                                                //                         "sub_category"),
+                                                //                 resturentData:
+                                                //                     item,
+                                                //                 key: ValueKey(
+                                                //                     DateTime.now()
+                                                //                         .millisecondsSinceEpoch))));
+                                                //   },
+                                                //   child: const Text(
+                                                //       'View SubCategory'),
+                                                // ),
+                                              ];
+                                            }),
+                                      ],
+                                    )),
+                              ),
+                            ).appPaddingForScreen;
+                          })
+                      : const Center(
+                          child: Text("No SubCategory Found"),
+                        );
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -13,12 +13,7 @@ class AddPagesScreen extends StatefulWidget {
   final String? title;
   final String? longdescription;
 
-  const AddPagesScreen(
-      {super.key,
-      required this.isEditMode,
-      this.documentId,
-      this.title,
-      this.longdescription});
+  const AddPagesScreen({super.key, required this.isEditMode, this.documentId, this.title, this.longdescription});
 
   @override
   State<AddPagesScreen> createState() => _AddPagesScreenState();
@@ -42,16 +37,9 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
     }
     if (title.isNotEmpty && longdescription.isNotEmpty) {
       PagesData pages = PagesData(
-          title: title,
-          searchName: arrangeNumbers,
-          longdescription: longdescription,
-          deactivate: false,
-          time: currenttime);
+          title: title, searchName: arrangeNumbers, longdescription: longdescription, deactivate: false, time: currenttime);
       if (widget.isEditMode) {
-        FirebaseFirestore.instance
-            .collection('Pages')
-            .doc(widget.documentId)
-            .update(pages.toMap());
+        FirebaseFirestore.instance.collection('Pages').doc(widget.documentId).update(pages.toMap());
       } else {
         FirebaseFirestore.instance.collection('Pages').add(pages.toMap());
       }
@@ -69,12 +57,12 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: widget.isEditMode ? 'Edit pages' : 'Add pages', context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit Pages'.tr : 'Add Pages'.tr, context: context),
         body: Form(
             key: formKey,
             child: SizedBox(
-              height: size.height,
-              width: size.width,
+                height: size.height,
+                width: size.width,
                 child: Column(
                   children: [
                     Expanded(
@@ -83,85 +71,77 @@ class _AddPagesScreenState extends State<AddPagesScreen> {
                           color: Colors.white,
                         ),
                         child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: size.width * .04,
-                              vertical: size.height * .01)
-                              .copyWith(bottom: 0),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: size.width * .04, vertical: size.height * .01).copyWith(bottom: 0),
                           child: SingleChildScrollView(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 25),
-                                    child: Text("Title",style: TextStyle(color: Colors.black),),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter your Title';
-                                      }
-                                    },
-                                    controller: titleController,
-                                    hintText: 'Title',
-                                    obscureText: false,
-                                    color: Colors.white,
-                                  ),
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Title".tr,
+                                style: const TextStyle(color: Colors.black),
+                              ),
+                              const SizedBox(height: 5),
+                              MyTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter your Title';
+                                  }
+                                  return null;
+                                },
+                                controller: titleController,
+                                hintText: 'Title'.tr,
+                                obscureText: false,
+                                color: Colors.white,
+                              ),
 
-                                  const SizedBox(height: 10),
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 25),
-                                    child: Text("Long Description",style: TextStyle(color: Colors.black),),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  MyTextField(
-                                    validator: (value) {
-                                      if (value!.isEmpty) {
-                                        return 'Please enter Long Description';
-                                      }
-                                    },
-                                    controller: longdescriptionController,
-                                    hintText: 'Long Description',
-                                    obscureText: false,
-                                    maxLines: 5,
-                                    minLines: 5,
-                                    color: Colors.white,
-                                  ),
+                              const SizedBox(height: 10),
+                               Text(
+                                 "Long Description".tr,
+                                 style: const TextStyle(color: Colors.black),
+                               ),
+                              const SizedBox(height: 5),
+                              MyTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter Long Description';
+                                  }
+                                  return null;
+                                },
+                                controller: longdescriptionController,
+                                hintText: 'Long Description'.tr,
+                                obscureText: false,
+                                maxLines: 5,
+                                minLines: 5,
+                                color: Colors.white,
+                              ),
 
-                                  SizedBox(
-                                    height: size.height * .35,
-                                  ),
+                              SizedBox(
+                                height: size.height * .35,
+                              ),
 
-                                  // sign in button
-                                  MyButton(
-                                    color: Colors.white,
-                                    backgroundcolor: Colors.black,
-                                    onTap: () {
-                                      if (formKey.currentState!
-                                          .validate()) {
-                                        addUserToFirestore();
-                                        titleController.clear();
-                                        longdescriptionController.clear();
-                                        Get.back();
-                                      }
-                                    },
-                                    text: widget.isEditMode
-                                        ? 'Update Pages'
-                                        : 'Add Pages',
-                                  ),
-                                ]),
+                              // sign in button
+                              MyButton(
+                                color: Colors.white,
+                                backgroundcolor: Colors.black,
+                                onTap: () {
+                                  if (formKey.currentState!.validate()) {
+                                    addUserToFirestore();
+                                    titleController.clear();
+                                    longdescriptionController.clear();
+                                    Get.back();
+                                  }
+                                },
+                                text: widget.isEditMode ? 'Update Pages'.tr : 'Add Pages'.tr,
+                              ),
+                            ]),
                           ),
                         ),
                       ),
                     ),
                   ],
-                ).appPaddingForScreen
-
-            )));
+                ).appPaddingForScreen)));
   }
 }

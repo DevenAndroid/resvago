@@ -19,8 +19,9 @@ import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'faq_screen.dart';
 import 'faqlist_screen.dart';
+import 'language_screen.dart';
 import 'productcategory_list_screen.dart';
-import 'model/deliveryOrder_details_screen.dart';
+import 'deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
 import 'model/dining_order_model.dart';
 
@@ -43,21 +44,19 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<int> totalSoldItem() async {
-    final item1 = await FirebaseFirestore.instance.collection('order').where("order_status", isEqualTo: "Order Completed").count().get();
-    final item2 = await FirebaseFirestore.instance.collection('dining_order').where("order_status", isEqualTo: "Order Completed").count().get();
+    final item1 =
+        await FirebaseFirestore.instance.collection('order').where("order_status", isEqualTo: "Order Completed").count().get();
+    final item2 = await FirebaseFirestore.instance
+        .collection('dining_order')
+        .where("order_status", isEqualTo: "Order Completed")
+        .count()
+        .get();
     return item1.count + item2.count;
   }
 
-
   Future<int> totalItem() async {
-    final item1 = await FirebaseFirestore.instance
-        .collection('order')
-        .count()
-        .get();
-    final item2 = await FirebaseFirestore.instance
-        .collection('dining_order')
-        .count()
-        .get();
+    final item1 = await FirebaseFirestore.instance.collection('order').count().get();
+    final item2 = await FirebaseFirestore.instance.collection('dining_order').count().get();
     return item1.count + item2.count;
   }
 
@@ -117,9 +116,9 @@ class HomePageState extends State<HomePage> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Hi Admin..',
-                style: TextStyle(color: Colors.black, fontSize: 20),
+              Text(
+                'Hi Admin..'.tr,
+                style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
               Text(
                 FirebaseAuth.instance.currentUser!.email.toString(),
@@ -142,7 +141,7 @@ class HomePageState extends State<HomePage> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: <Widget>[
-               DrawerHeader(
+              DrawerHeader(
                 decoration: const BoxDecoration(
                   color: Colors.black,
                 ),
@@ -156,7 +155,7 @@ class HomePageState extends State<HomePage> {
                         backgroundImage: AssetImage(
                           'assets/images/girl.jpg',
                         )),
-                     Text(
+                    Text(
                       FirebaseAuth.instance.currentUser!.email.toString(),
                       style: const TextStyle(
                         color: Colors.white,
@@ -168,7 +167,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('User List'),
+                title: Text('User List'.tr),
                 trailing: const Icon(
                   Icons.arrow_drop_down,
                   size: 30,
@@ -183,13 +182,13 @@ class HomePageState extends State<HomePage> {
                   child: Column(
                     children: <Widget>[
                       ListTile(
-                        title: const Text('Customers'),
+                        title: Text('Customers'.tr),
                         onTap: () {
                           Get.to(const CustomeruserListScreen());
                         },
                       ),
                       ListTile(
-                        title: const Text('Vendors'),
+                        title: Text('Vendors'.tr),
                         onTap: () {
                           Get.to(const UsersDataScreen());
                         },
@@ -203,7 +202,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.countertops_outlined),
-                title: const Text('Coupons List'),
+                title: Text('Coupons List'.tr),
                 onTap: () {
                   Get.to(CouponListScreen()); // Closes the drawer
                 },
@@ -214,7 +213,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.food_bank),
-                title: const Text('Vendor Category'),
+                title: Text('Vendor Category'.tr),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -231,7 +230,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.menu_book),
-                title: const Text('Product Category'),
+                title: Text('Product Category'.tr),
                 onTap: () {
                   Navigator.push(
                       context,
@@ -248,7 +247,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.pages),
-                title: const Text('Pages List'),
+                title: Text('Pages List'.tr),
                 onTap: () {
                   Get.to(const PagesListScreen()); // Closes the drawer
                 },
@@ -258,16 +257,16 @@ class HomePageState extends State<HomePage> {
                 color: Colors.grey.shade300,
               ),
               ListTile(
-                leading: const Icon(Icons.pages),
-                title: const Text('FAQ'),
+                leading: const Icon(Icons.question_answer),
+                title: Text('FAQ'.tr),
                 onTap: () {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) => FaqListScreen(
-                            collectionReference: FirebaseFirestore.instance.collection("FAQ"),
-                            key: ValueKey(DateTime.now().millisecondsSinceEpoch),
-                          )));
+                                collectionReference: FirebaseFirestore.instance.collection("FAQ"),
+                                key: ValueKey(DateTime.now().millisecondsSinceEpoch),
+                              )));
                 },
               ),
               Divider(
@@ -276,7 +275,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.person),
-                title: const Text('Orders'),
+                title: Text('Orders'.tr),
                 trailing: const Icon(
                   Icons.arrow_drop_down,
                   size: 30,
@@ -291,13 +290,13 @@ class HomePageState extends State<HomePage> {
                   child: Column(
                     children: <Widget>[
                       ListTile(
-                        title: const Text('Delivery'),
+                        title: Text('Delivery'.tr),
                         onTap: () {
                           Get.to(const OrderListScreen());
                         },
                       ),
                       ListTile(
-                        title: const Text('Dining'),
+                        title: Text('Dining'.tr),
                         onTap: () {
                           Get.to(const DiningorderListScreen());
                         },
@@ -310,8 +309,19 @@ class HomePageState extends State<HomePage> {
                 color: Colors.grey.shade300,
               ),
               ListTile(
+                leading: const Icon(Icons.language_rounded),
+                title: Text('Change Language'.tr),
+                onTap: () {
+                  Get.to(const LanguageChangeScreen());
+                },
+              ),
+              Divider(
+                thickness: 1,
+                color: Colors.grey.shade300,
+              ),
+              ListTile(
                 leading: const Icon(Icons.settings),
-                title: const Text('Settings'),
+                title: Text('Settings'.tr),
                 onTap: () {
                   Get.to(const settingScreen(
                     isEditMode: false,
@@ -324,7 +334,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.image),
-                title: const Text('Image Slider'),
+                title: Text('Image Slider'.tr),
                 onTap: () {
                   Get.to(const SliderImagesScreen());
                 },
@@ -335,7 +345,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.logout),
-                title: const Text('Logout'),
+                title: Text('Logout'.tr),
                 onTap: () async {
                   FirebaseAuth.instance.signOut();
                   Get.to(const LogInScreen());
@@ -377,9 +387,9 @@ class HomePageState extends State<HomePage> {
                           );
                         },
                       ),
-                      const Text(
-                        'Total Sale',
-                        style: TextStyle(fontSize: 17, color: Colors.white),
+                      Text(
+                        'Total Sale'.tr,
+                        style: const TextStyle(fontSize: 17, color: Colors.white),
                       )
                     ],
                   ),
@@ -408,9 +418,9 @@ class HomePageState extends State<HomePage> {
                           );
                         },
                       ),
-                      const Text(
-                        'Total Orders  ',
-                        style: TextStyle(fontSize: 17, color: Colors.white),
+                      Text(
+                        'Total Orders'.tr,
+                        style: const TextStyle(fontSize: 17, color: Colors.white),
                       )
                     ],
                   ),
@@ -435,9 +445,9 @@ class HomePageState extends State<HomePage> {
                         "\$${totalEarnings.toString()}",
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
-                      const Text(
-                        'Total Profit',
-                        style: TextStyle(fontSize: 17, color: Colors.white),
+                      Text(
+                        'Total Profit'.tr,
+                        style: const TextStyle(fontSize: 17, color: Colors.white),
                       )
                     ],
                   ),
@@ -446,29 +456,29 @@ class HomePageState extends State<HomePage> {
                   height: 100,
                   width: 160,
                   decoration: BoxDecoration(color: const Color(0xff8676FE), borderRadius: BorderRadius.circular(20)),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         '${0}',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
                       Text(
-                        'Total Products',
-                        style: TextStyle(fontSize: 17, color: Colors.white),
+                        'Total Products'.tr,
+                        style: const TextStyle(fontSize: 17, color: Colors.white),
                       )
                     ],
                   ),
                 ),
               ],
             ),
-            const TabBar(labelColor: Color(0xFF454B5C), indicatorColor: Color(0xFF3B5998), indicatorWeight: 4, tabs: [
+            TabBar(labelColor: const Color(0xFF454B5C), indicatorColor: const Color(0xFF3B5998), indicatorWeight: 4, tabs: [
               Tab(
-                text: "Dining",
+                text: "Dining".tr,
               ),
               Tab(
-                text: "Delivery",
+                text: "Delivery".tr,
               ),
             ]),
             Expanded(
@@ -716,13 +726,11 @@ class HomePageState extends State<HomePage> {
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {
     return FirebaseFirestore.instance.collection('dining_order').snapshots().map((querySnapshot) {
       List<MyDiningOrderModel> diningorders = [];
-      print(diningorders);
       try {
         for (var doc in querySnapshot.docs) {
           diningorders.add(MyDiningOrderModel.fromJson(doc.data(), doc.id));
         }
       } catch (e) {
-        print(e.toString());
         throw Exception(e.toString());
       }
       return diningorders;
@@ -732,13 +740,11 @@ class HomePageState extends State<HomePage> {
   Stream<List<MyOrderModel>> getDeliveryOrdersStreamFromFirestore() {
     return FirebaseFirestore.instance.collection('order').snapshots().map((querySnapshot) {
       List<MyOrderModel> orders = [];
-      print(orders);
       try {
         for (var doc in querySnapshot.docs) {
           orders.add(MyOrderModel.fromJson(doc.data(), doc.id));
         }
       } catch (e) {
-        print(e.toString());
         throw Exception(e.toString());
       }
       return orders;

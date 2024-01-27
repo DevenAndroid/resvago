@@ -24,7 +24,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
-  bool isDescendingOrder = true;
+  bool isDescendingOrder = false;
   void toggleTextFieldVisibility() {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
@@ -60,9 +60,9 @@ class _CouponListScreenState extends State<CouponListScreen> {
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
-          title: const Text(
-            'Coupon List',
-            style: TextStyle(
+          title:  Text(
+            'Coupon List'.tr,
+            style: const TextStyle(
                 color: Color(0xff423E5E), fontWeight: FontWeight.bold),
           ),
           leading: Padding(
@@ -78,7 +78,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
               behavior: HitTestBehavior.translucent,
               onTap: () {
                 setState(() {
-                  isDescendingOrder = !isDescendingOrder;
+                  // isDescendingOrder = !isDescendingOrder;
                 });
               },
               child: const Padding(
@@ -92,7 +92,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
             ),
             GestureDetector(
                 onTap: () {
-                  Get.to(const AddCouponScreen(
+                  Get.to( AddCouponScreen(
                     isEditMode: false,
                   ));
                 },
@@ -104,12 +104,21 @@ class _CouponListScreenState extends State<CouponListScreen> {
                     color: Color(0xff3B5998),
                   ),
                 )),
-            IconButton(
-              icon: const Icon(
-                Icons.search,
-                color: Color(0xff3B5998),
+            GestureDetector(
+              onTap: (){
+                isDescendingOrder = !isDescendingOrder;
+                setState(() {
+
+                });
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(
+                  Icons.search,
+                  size: 30,
+                  color: Color(0xff3B5998),
+                ),
               ),
-              onPressed: toggleTextFieldVisibility,
             )
           ],
           bottom: PreferredSize(
@@ -146,226 +155,256 @@ class _CouponListScreenState extends State<CouponListScreen> {
             ),
           ),
         ),
-        body: StreamBuilder<List<CouponData>>(
-          stream: getCouponStream(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<CouponData>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return const Center(child: Text("No Coupon Found"));
-            } else {
-              List<CouponData>? users = snapshot.data;
-              final filteredUsers = filterUsers(users!, searchQuery);
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              if(isDescendingOrder == true)
+                Padding(
+                  key: ValueKey(isDescendingOrder),
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    style: const TextStyle(color: Colors.black),
+                    decoration: const InputDecoration(
+                      hintText: 'Search...',
+                      hintStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black), // Change the outline border color
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                  ),
+                ),
+              StreamBuilder<List<CouponData>>(
+                stream: getCouponStream(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<List<CouponData>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No Coupon Found"));
+                  } else {
+                    List<CouponData>? users = snapshot.data;
+                    final filteredUsers = filterUsers(users!, searchQuery);
 
-              return filteredUsers.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: filteredUsers.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        final item = filteredUsers[index];
-                        log(item.promoCodeName.toString());
-                        // if (item.deactivate) {
-                        //   return SizedBox.shrink();
-                        // }
-                        return Container(
-                          height: 90,
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 10),
-                          width: Get.width,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(11),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 2,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                  height: 100,
-                                  width: 100,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Image.asset(
-                                        'assets/images/couponimage.png'),
-                                  )),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      item.promoCodeName.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      item.code,
-                                      style: const TextStyle(
-                                          fontSize: 17,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      "${item.discount.toString()}%",
-                                      style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.normal),
+                    return filteredUsers.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: filteredUsers.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              final item = filteredUsers[index];
+                              log(item.promoCodeName.toString());
+                              // if (item.deactivate) {
+                              //   return SizedBox.shrink();
+                              // }
+                              return Container(
+                                height: 90,
+                                margin: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 10),
+                                width: Get.width,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(11),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 2,
+                                      offset: const Offset(0, 1),
                                     ),
                                   ],
                                 ),
-                              ),
-                              item.deactivate
-                                  ? Image.asset(
-                                      'assets/images/deactivate.png',
-                                      height: 20,
-                                      width: 20,
-                                    )
-                                  : const SizedBox(),
-                              Spacer(),
-                              PopupMenuButton<int>(
-                                  icon: const Icon(
-                                    Icons.more_vert,
-                                    color: Colors.black,
-                                  ),
-                                  color: Colors.white,
-                                  itemBuilder: (context) {
-                                    return [
-                                      PopupMenuItem(
-                                        value: 1,
-                                        onTap: () {
-                                          Get.to(AddCouponScreen(
-                                            isEditMode: true,
-                                            documentId: item.docid,
-                                            promocode: item.promoCodeName,
-                                            discount: item.discount,
-                                            code: item.code,
-                                            startdate: item.startDate,
-                                            maxDiscount: item.maxDiscount.toString(),
-                                            enddate: item.endDate,
-                                            resturentName: item.userName,
-                                          ));
-                                        },
-                                        child: const Text("Edit"),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                        height: 100,
+                                        width: 100,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Image.asset(
+                                              'assets/images/couponimage.png'),
+                                        )),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            item.promoCodeName.toString(),
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            item.code,
+                                            style: const TextStyle(
+                                                fontSize: 17,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            "${item.discount.toString()}%",
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                        ],
                                       ),
-                                      PopupMenuItem(
-                                        value: 2,
-                                        onTap: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (ctx) => AlertDialog(
-                                              title: const Text("Delete Coupon"),
-                                              content: SizedBox(
-                                                height: 140,
-                                                child: Column(
-                                                  children: [
-                                                    const Text("Are you sure you want to delete this coupon"),
-                                                    const SizedBox(
-                                                      height: 20,
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child: TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(ctx).pop();
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors.red,
-                                                                  borderRadius: BorderRadius.circular(11)),
-                                                              // width: 100,
-                                                              padding: const EdgeInsets.all(14),
-                                                              child: const Center(
-                                                                  child: Text(
-                                                                    "Cancel",
-                                                                    style: TextStyle(color: Colors.white),
-                                                                  )),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Expanded(
-                                                          child: TextButton(
-                                                            onPressed: () async {
-                                                              FirebaseFirestore.instance
-                                                                  .collection(
-                                                                  "Coupon_data")
-                                                                  .doc(item.docid)
-                                                                  .delete()
-                                                                  .then((value) {
-                                                                setState(() {});
-                                                              });
-                                                              Navigator.of(ctx).pop();
-                                                            },
-                                                            child: Container(
-                                                              decoration: BoxDecoration(
-                                                                  color: Colors.green,
-                                                                  borderRadius: BorderRadius.circular(11)),
-                                                              width: 100,
-                                                              padding: const EdgeInsets.all(14),
-                                                              child: const Center(
-                                                                  child: Text(
-                                                                    "okay",
-                                                                    style: TextStyle(color: Colors.white),
-                                                                  )),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              ),
+                                    ),
+                                    item.deactivate
+                                        ? Image.asset(
+                                            'assets/images/deactivate.png',
+                                            height: 20,
+                                            width: 20,
+                                          )
+                                        : const SizedBox(),
+                                    const Spacer(),
+                                    PopupMenuButton<int>(
+                                        icon: const Icon(
+                                          Icons.more_vert,
+                                          color: Colors.black,
+                                        ),
+                                        color: Colors.white,
+                                        itemBuilder: (context) {
+                                          return [
+                                            PopupMenuItem(
+                                              value: 1,
+                                              onTap: () {
+                                                Get.to(AddCouponScreen(
+                                                  isEditMode: true,
+                                                  documentId: item.docid,
+                                                  promocode: item.promoCodeName,
+                                                  discount: item.discount,
+                                                  code: item.code,
+                                                  startdate: item.startDate,
+                                                  maxDiscount: item.maxDiscount.toString(),
+                                                  enddate: item.endDate,
+                                                  resturentName: item.userName,
+                                                ));
+                                              },
+                                              child: const Text("Edit"),
                                             ),
-                                          );
-                                        },
-                                        child: const Text("Delete"),
-                                      ),
-                                      PopupMenuItem(
-                                        value: 3,
-                                        onTap: () {
-                                          item.deactivate
-                                              ? FirebaseFirestore.instance
-                                                  .collection('Coupon_data')
-                                                  .doc(item.docid)
-                                                  .update({"deactivate": false})
-                                              : FirebaseFirestore.instance
-                                                  .collection('Coupon_data')
-                                                  .doc(item.docid)
-                                                  .update({"deactivate": true});
-                                          setState(() {});
-                                        },
-                                        child: Text(item.deactivate
-                                            ? "Activate"
-                                            : "Deactivate"),
-                                      ),
-                                    ];
-                                  }),
-                              const SizedBox(
-                                width: 10,
-                              )
-                            ],
-                          ),
-                        ).appPaddingForScreen;
-                      })
-                  : const Center(
-                      child: Text("No Coupon Found"),
-                    );
-            }
-            return const Center(child: CircularProgressIndicator());
-          },
+                                            PopupMenuItem(
+                                              value: 2,
+                                              onTap: () {
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (ctx) => AlertDialog(
+                                                    title: const Text("Delete Coupon"),
+                                                    content: SizedBox(
+                                                      height: 140,
+                                                      child: Column(
+                                                        children: [
+                                                          const Text("Are you sure you want to delete this coupon"),
+                                                          const SizedBox(
+                                                            height: 20,
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child: TextButton(
+                                                                  onPressed: () {
+                                                                    Navigator.of(ctx).pop();
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors.red,
+                                                                        borderRadius: BorderRadius.circular(11)),
+                                                                    // width: 100,
+                                                                    padding: const EdgeInsets.all(14),
+                                                                    child: const Center(
+                                                                        child: Text(
+                                                                          "Cancel",
+                                                                          style: TextStyle(color: Colors.white),
+                                                                        )),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Expanded(
+                                                                child: TextButton(
+                                                                  onPressed: () async {
+                                                                    FirebaseFirestore.instance
+                                                                        .collection(
+                                                                        "Coupon_data")
+                                                                        .doc(item.docid)
+                                                                        .delete()
+                                                                        .then((value) {
+                                                                      setState(() {});
+                                                                    });
+                                                                    Navigator.of(ctx).pop();
+                                                                  },
+                                                                  child: Container(
+                                                                    decoration: BoxDecoration(
+                                                                        color: Colors.green,
+                                                                        borderRadius: BorderRadius.circular(11)),
+                                                                    width: 100,
+                                                                    padding: const EdgeInsets.all(14),
+                                                                    child: const Center(
+                                                                        child: Text(
+                                                                          "okay",
+                                                                          style: TextStyle(color: Colors.white),
+                                                                        )),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text("Delete"),
+                                            ),
+                                            PopupMenuItem(
+                                              value: 3,
+                                              onTap: () {
+                                                item.deactivate
+                                                    ? FirebaseFirestore.instance
+                                                        .collection('Coupon_data')
+                                                        .doc(item.docid)
+                                                        .update({"deactivate": false})
+                                                    : FirebaseFirestore.instance
+                                                        .collection('Coupon_data')
+                                                        .doc(item.docid)
+                                                        .update({"deactivate": true});
+                                                setState(() {});
+                                              },
+                                              child: Text(item.deactivate
+                                                  ? "Activate"
+                                                  : "Deactivate"),
+                                            ),
+                                          ];
+                                        }),
+                                    const SizedBox(
+                                      width: 10,
+                                    )
+                                  ],
+                                ),
+                              ).appPaddingForScreen;
+                            })
+                        : const Center(
+                            child: Text("No Coupon Found"),
+                          );
+                  }
+                  return const Center(child: CircularProgressIndicator());
+                },
+              ),
+            ],
+          ),
         ));
   }
 

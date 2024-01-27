@@ -146,7 +146,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   Widget build(BuildContext context) {
     log(uid.toString());
     return Scaffold(
-        appBar: backAppBar(title: widget.isEditMode ? 'Edit Customer User' : 'Add Customer User', context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit Customer' : 'Add Customer'.tr, context: context),
         body: SingleChildScrollView(
           child: SingleChildScrollView(
             child: Form(
@@ -155,7 +155,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                 Align(
                   alignment: Alignment.center,
                   child: Text(
-                    'Create Account',
+                    'Create Account'.tr,
                     style: GoogleFonts.poppins(
                       color: Colors.black,
                       fontWeight: FontWeight.w600,
@@ -170,7 +170,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Enter Your Name',
+                        'Enter Your Name'.tr,
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -183,7 +183,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                       RegisterTextFieldWidget(
                         controller: userNameController,
                         textInputAction: TextInputAction.next,
-                        hint: 'Enter Your Name',
+                        hint: 'Enter Your Name'.tr,
                         validator: MultiValidator([
                           RequiredValidator(errorText: 'Please enter your name'),
                         ]).call,
@@ -193,7 +193,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                         height: 15,
                       ),
                       Text(
-                        'Enter Email',
+                        'Enter Email'.tr,
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontWeight: FontWeight.w400,
@@ -203,7 +203,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                       RegisterTextFieldWidget(
                           controller: emailController,
                           textInputAction: TextInputAction.next,
-                          hint: 'Enter your Email',
+                          hint: 'Enter your Email'.tr,
                           keyboardType: TextInputType.text,
                           validator: MultiValidator([
                             EmailValidator(errorText: "Valid Email is required"),
@@ -217,7 +217,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Password".tr,
+                              "Password".tr.tr,
                               style: const TextStyle(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                             ),
                             const SizedBox(
@@ -246,7 +246,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                               ]).call,
                               keyboardType: TextInputType.emailAddress,
                               // textInputAction: TextInputAction.next,
-                              hint: 'Enter your password',
+                              hint: 'Password'.tr,
                             ),
                             const SizedBox(
                               height: 10,
@@ -283,7 +283,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                               },
                               keyboardType: TextInputType.emailAddress,
                               // textInputAction: TextInputAction.next,
-                              hint: 'Enter your confirm password',
+                              hint: 'Confirm password'.tr,
                             ),
                             const SizedBox(
                               height: 10,
@@ -295,7 +295,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Enter Mobile number',
+                              'Enter Mobile number'.tr,
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400,
@@ -317,9 +317,9 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                               dropdownTextStyle: const TextStyle(color: Colors.black),
                               style: const TextStyle(color: Colors.black),
                               controller: phoneNumberController,
-                              decoration: const InputDecoration(
+                              decoration:  InputDecoration(
                                   hintStyle: TextStyle(color: Colors.black),
-                                  labelText: 'Phone Number',
+                                  labelText: 'Phone Number'.tr,
                                   labelStyle: TextStyle(color: Colors.black),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(),
@@ -351,7 +351,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                             if (!widget.isEditMode) checkEmailInFirestore();
                           }
                         },
-                        text: 'Create Account',
+                        text: 'Create Account'.tr,
                         color: Colors.white,
                         backgroundcolor: Colors.black,
                       ),

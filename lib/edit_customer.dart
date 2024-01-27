@@ -377,7 +377,7 @@ class _EditCustomerState extends State<EditCustomer> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Name',
+                                'Name'.tr,
                                 style:
                                     GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
@@ -387,12 +387,12 @@ class _EditCustomerState extends State<EditCustomer> {
                               RegisterTextFieldWidget(
                                   controller: firstNameController,
                                   validator: RequiredValidator(errorText: 'Please enter your name').call,
-                                  hint: "Name"),
+                                  hint: "Name".tr),
                               const SizedBox(
                                 height: 20,
                               ),
                               Text(
-                                "Email",
+                                "Email".tr,
                                 style:
                                     GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.w500, fontSize: 15),
                               ),
@@ -408,7 +408,7 @@ class _EditCustomerState extends State<EditCustomer> {
                                 ]).call,
                                 keyboardType: TextInputType.emailAddress,
                                 // textInputAction: TextInputAction.next,
-                                hint: "abc@gmail.com",
+                                hint: "Email".tr,
                               ),
                               const SizedBox(
                                 height: 20,
@@ -470,7 +470,7 @@ class _EditCustomerState extends State<EditCustomer> {
                                     updateProfileToFirestore();
                                   }
                                 },
-                                text: 'Save',
+                                text: 'Save'.tr,
                                 color: Colors.white,
                                 backgroundcolor: Colors.black,
                               ),
