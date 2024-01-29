@@ -79,7 +79,7 @@ class _AddFAQScreenState extends State<AddFAQScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Add FAQ', context: context),
+        appBar: backAppBar(title: 'Add FAQ'.tr, context: context),
         body: Form(
             key: formKey,
             child: SizedBox(
@@ -100,8 +100,8 @@ class _AddFAQScreenState extends State<AddFAQScreen> {
                             physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               const SizedBox(height: 10),
-                              const Text(
-                                "Question",
+                               Text(
+                                "Question".tr,
                                 style: TextStyle(color: Colors.black),
                               ),
                               const SizedBox(height: 5),
@@ -113,14 +113,14 @@ class _AddFAQScreenState extends State<AddFAQScreen> {
                                   return null;
                                 },
                                 controller: descriptionController,
-                                hintText: 'Question',
+                                hintText: 'Question'.tr,
                                 obscureText: false,
                                 color: Colors.white,
                               ),
 
                               const SizedBox(height: 20),
-                              const Text(
-                                "Answer",
+                               Text(
+                                "Answer".tr,
                                 style: TextStyle(color: Colors.black),
                               ),
                               const SizedBox(height: 5),
@@ -132,7 +132,7 @@ class _AddFAQScreenState extends State<AddFAQScreen> {
                                   return null;
                                 },
                                 controller: answerController,
-                                hintText: 'Answer',
+                                hintText: 'Answer'.tr,
                                 obscureText: false,
                                 minLines: 5,
                                 maxLines: 5,
@@ -156,7 +156,7 @@ class _AddFAQScreenState extends State<AddFAQScreen> {
                                     showToast('Please add data');
                                   }
                                 },
-                                text: menuItemData != null ? 'Update' : 'Add',
+                                text: menuItemData != null ? 'Update'.tr : 'Add'.tr,
                               ),
 
                               const SizedBox(height: 50),

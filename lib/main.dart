@@ -41,12 +41,8 @@ class _MyAppState extends State<MyApp> {
     String? appLanguage = sharedPreferences.getString("app_language");
     if (appLanguage == null || appLanguage == "English") {
       Get.updateLocale(const Locale('en', 'US'));
-    } else if (appLanguage == "Spanish") {
-      Get.updateLocale(const Locale('es', 'ES'));
     } else if (appLanguage == "French") {
       Get.updateLocale(const Locale('fr', 'FR'));
-    } else if (appLanguage == "Arabic") {
-      Get.updateLocale(const Locale('ar', 'AE'));
     }
   }
 

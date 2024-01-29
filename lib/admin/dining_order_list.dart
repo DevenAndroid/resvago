@@ -26,8 +26,8 @@ class _DiningorderListScreenState extends State<DiningorderListScreen> {
           iconTheme: const IconThemeData(color: Colors.white),
           backgroundColor: Colors.white,
           surfaceTintColor: Colors.white,
-          title: const Text(
-            'Dining Order List',
+          title: Text(
+            'Dining Order List'.tr,
             style: TextStyle(color: Color(0xff423E5E),fontWeight: FontWeight.bold),
           ),
           leading: Padding(

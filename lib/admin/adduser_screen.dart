@@ -3,28 +3,21 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places_hoc081098/flutter_google_places_hoc081098.dart';
-import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:get/get.dart';
-import 'package:google_api_headers/google_api_headers.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/my_button.dart';
 import 'package:resvago/firebase_service/firebase_userSerivce.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Firebase_service/firebase_service.dart';
-import '../components/addsize.dart';
-import '../components/appassets.dart';
 import '../components/apptheme.dart';
 import '../components/helper.dart';
 import '../components/my_textfield.dart';
@@ -121,7 +114,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       return;
     }
     final QuerySnapshot result1 =
-    await FirebaseFirestore.instance.collection('customer_users').where('email', isEqualTo: emailController.text).get();
+        await FirebaseFirestore.instance.collection('customer_users').where('email', isEqualTo: emailController.text).get();
     if (result1.docs.isNotEmpty) {
       Fluttertoast.showToast(msg: 'Email already used in customer please use another account');
       return;
@@ -139,28 +132,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
       geo = Geoflutterfire();
       GeoFirePoint geoFirePoint =
           geo!.point(latitude: double.tryParse(latitude.toString()) ?? 0, longitude: double.tryParse(longitude.toString()) ?? 0);
-      // String? imageUrlProfile = kIsWeb ? null : categoryFile.path;
-      // if (kIsWeb) {
-      //   if (pickedFile != null) {
-      //     UploadTask uploadTask = FirebaseStorage.instance
-      //         .ref("profile_image/${FirebaseAuth.instance.currentUser!.uid}")
-      //         .child("image")
-      //         .putData(pickedFile!);
-      //     TaskSnapshot snapshot = await uploadTask;
-      //     imageUrlProfile = await snapshot.ref.getDownloadURL();
-      //   } else {
-      //     imageUrlProfile = fileUrl;
-      //   }
-      // } else {
-      //   if (!categoryFile.path.contains("http") && categoryFile.path.isNotEmpty) {
-      //     UploadTask uploadTask = FirebaseStorage.instance
-      //         .ref("profileImage/${FirebaseAuth.instance.currentUser!.uid}")
-      //         .child("image")
-      //         .putFile(categoryFile);
-      //     TaskSnapshot snapshot = await uploadTask;
-      //     imageUrlProfile = await snapshot.ref.getDownloadURL();
-      //   }
-      // }
       String? uid;
       if (!widget.isEditMode) {
         FirebaseAuth.instance
@@ -228,21 +199,12 @@ class _AddUserScreenState extends State<AddUserScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      getVendorCategories();
-    });
-  }
-
-  final TextEditingController _searchController = TextEditingController();
-  GooglePlacesModel? googlePlacesModel;
-  Places? selectedPlace;
-
-  Future<void> _searchPlaces(String query) async {
+  Future<void> _searchPlaces(String query, String language) async {
     const cloudFunctionUrl = 'https://us-central1-resvago-ire.cloudfunctions.net/searchPlaces';
-    FirebaseFunctions.instance.httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?query=$query')).call().then((value) {
+    FirebaseFunctions.instance
+        .httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?input=$query&language=$language'))
+        .call()
+        .then((value) {
       List<Places> places = [];
       if (value.data != null && value.data['places'] != null) {
         List<dynamic> data = List.from(value.data['places']);
@@ -254,6 +216,28 @@ class _AddUserScreenState extends State<AddUserScreen> {
       setState(() {});
     });
   }
+
+  String? appLanguage = "English";
+  getLanguage() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    appLanguage = sharedPreferences.getString("app_language");
+    print("hfgdhfgh$appLanguage");
+    setState(() {});
+  }
+
+
+  @override
+  void initState() {
+    super.initState();
+    getLanguage();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      getVendorCategories();
+    });
+  }
+
+  final TextEditingController _searchController = TextEditingController();
+  GooglePlacesModel? googlePlacesModel;
+  Places? selectedPlace;
 
   Timer? timer;
 
@@ -304,7 +288,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         validator: RequiredValidator(errorText: 'Please enter your Restaurant Name ').call,
                         // keyboardType: TextInputType.none,
                         // textInputAction: TextInputAction.next,
-                        hint: 'Mac Restaurant'.tr,
+                        hint: 'Restaurant Name'.tr,
                       ),
                       const SizedBox(
                         height: 10,
@@ -542,7 +526,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                         hint: 'Search your location'.tr,
                         onChanged: (value) {
                           makeDelay(delay: () {
-                            _searchPlaces(value);
+                            _searchPlaces(value, appLanguage == "French" ? "fr_FR" : "en_US");
                             setState(() {});
                           });
                         },
@@ -561,7 +545,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                   final item = googlePlacesModel!.places![index];
                                   return InkWell(
                                       onTap: () {
-                                        _searchController.text = item.name ?? "";
+                                        _searchController.text = item.formattedAddress ?? "";
                                         selectedPlace = item;
                                         googlePlacesModel = null;
                                         log(selectedPlace!.geometry!.toJson().toString());
@@ -571,7 +555,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                       },
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                        child: Text(item.name ?? ""),
+                                        child: Text(item.formattedAddress ?? ""),
                                       ));
                                 },
                               ),

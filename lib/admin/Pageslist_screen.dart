@@ -40,8 +40,8 @@ class _PagesListScreenState extends State<PagesListScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text(
-          'Pages List',
+        title: Text(
+          'Pages List'.tr,
           style:
               TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),

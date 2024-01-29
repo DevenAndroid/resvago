@@ -321,7 +321,7 @@ class HomePageState extends State<HomePage> {
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
-                title: Text('Settings'.tr),
+                title: Text('Setting'.tr),
                 onTap: () {
                   Get.to(const settingScreen(
                     isEditMode: false,

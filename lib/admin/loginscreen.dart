@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -26,9 +28,20 @@ class _LogInScreenState extends State<LogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
+  // getUser() async {
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   var userId = sharedPreferences.getString("userId");
+  //   if (userId != null) {
+  //    Get.offAll(()=>const HomePage());
+  //   } else {
+  //     Get.offAll(()=>const LogInScreen());
+  //   }
+  // }
+
   @override
   void initState() {
     super.initState();
+
   }
 
   @override
@@ -63,7 +76,7 @@ class _LogInScreenState extends State<LogInScreen> {
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Welcome back to\'LogIn'.tr,
+                  'Welcome back to LogIn'.tr,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -156,13 +169,15 @@ class _LogInScreenState extends State<LogInScreen> {
                   try {
                     await FirebaseAuth.instance
                         .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
-                        .then((value) {
+                        .then((value) async {
                       Helper.hideLoader(loader);
                       FirebaseFirestore.instance.collection('admin_login').doc(value.user!.uid).set({
                         'email': emailController.text,
                         'Password': passwordController.text,
                         "UserId": FirebaseAuth.instance.currentUser!.uid
                       });
+                      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                      sharedPreferences.setString("userId", value.user!.uid);
                       Helper.hideLoader(loader);
                       emailController.clear();
                       passwordController.clear();

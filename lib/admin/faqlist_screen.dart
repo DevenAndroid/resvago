@@ -39,9 +39,9 @@ class _FaqListScreenState extends State<FaqListScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text(
-          'FAQ List',
-          style: TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
+        title: Text(
+          'FAQ List'.tr,
+          style: const TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),

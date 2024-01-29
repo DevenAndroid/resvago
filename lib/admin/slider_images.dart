@@ -56,8 +56,8 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title: const Text(
-          'Image Slider',
+        title: Text(
+          'Image Slider'.tr,
           style:
               TextStyle(color: Color(0xff423E5E), fontWeight: FontWeight.bold),
         ),

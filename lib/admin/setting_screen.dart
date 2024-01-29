@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:resvago/components/helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/my_button.dart';
@@ -83,7 +84,7 @@ class _settingScreenState extends State<settingScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Setting', context: context),
+        appBar: backAppBar(title: 'Setting'.tr, context: context),
         body: SingleChildScrollView(
           child: Form(
               key: formKey,
@@ -107,9 +108,9 @@ class _settingScreenState extends State<settingScreen> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Text(
-                                  "Email Id",
-                                  style: TextStyle(color: Colors.black),
+                                 Text(
+                                  "Email".tr,
+                                  style: const TextStyle(color: Colors.black),
                                 ),
                                 const SizedBox(height: 5),
                                 MyTextField(
@@ -120,16 +121,16 @@ class _settingScreenState extends State<settingScreen> {
                                     return null;
                                   },
                                   controller: emailController,
-                                  hintText: 'Email',
+                                  hintText: 'Email'.tr,
                                   obscureText: false,
                                   color: Colors.white,
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Text(
-                                  "Password",
-                                  style: TextStyle(color: Colors.black),
+                                 Text(
+                                  "Password".tr,
+                                  style: const TextStyle(color: Colors.black),
                                 ),
                                 const SizedBox(height: 5),
                                 MyTextField(
@@ -140,15 +141,15 @@ class _settingScreenState extends State<settingScreen> {
                                     return null;
                                   },
                                   controller: passwordController,
-                                  hintText: 'Password',
+                                  hintText: 'Password'.tr,
                                   obscureText: false,
                                   color: Colors.white,
                                 ),
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                const Text(
-                                  "Admin Commission(%)",
+                                Text(
+                                  "Admin Commission(%)".tr,
                                   style: TextStyle(color: Colors.black),
                                 ),
                                 const SizedBox(height: 5),
@@ -161,7 +162,7 @@ class _settingScreenState extends State<settingScreen> {
                                     return null;
                                   },
                                   controller: commissionPercentage,
-                                  hintText: 'Commission',
+                                  hintText: 'Commission'.tr,
                                   obscureText: false,
                                   color: Colors.white,
                                 ),
@@ -174,7 +175,7 @@ class _settingScreenState extends State<settingScreen> {
                                       addSettingToFirestore();
                                     }
                                   },
-                                  text: widget.isEditMode ? 'Update setting' : 'Add setting',
+                                  text: widget.isEditMode ? 'Update setting'.tr : 'Add setting'.tr,
                                 ),
                               ]),
                             ),

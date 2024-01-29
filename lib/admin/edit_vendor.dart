@@ -19,7 +19,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:resvago/components/my_button.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Firebase_service/firebase_service.dart';
 import '../components/addsize.dart';
 import '../components/apptheme.dart';
@@ -100,21 +100,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   GooglePlacesModel? googlePlacesModel;
   Places? selectedPlace;
 
-  Future<void> _searchPlaces(String query) async {
+  Future<void> _searchPlaces(String query, String language) async {
     const cloudFunctionUrl = 'https://us-central1-resvago-ire.cloudfunctions.net/searchPlaces';
-    FirebaseFunctions.instance.httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?query=$query')).call().then((value) {
+    FirebaseFunctions.instance
+        .httpsCallableFromUri(Uri.parse('$cloudFunctionUrl?input=$query&language=$language'))
+        .call()
+        .then((value) {
       List<Places> places = [];
       if (value.data != null && value.data['places'] != null) {
-        log("jhkgj${jsonEncode(value.data.toString())}");
         List<dynamic> data = List.from(value.data['places']);
-
         for (var v in data) {
           places.add(Places.fromJson(v));
         }
       }
       googlePlacesModel = GooglePlacesModel(places: places);
-
-      log("fgfdh${jsonEncode(googlePlacesModel.toString())}");
       setState(() {});
     });
   }
@@ -337,7 +336,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       }
     });
   }
-
+  String? appLanguage = "English";
+  getLanguage() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    appLanguage = sharedPreferences.getString("app_language");
+    print("hfgdhfgh" + appLanguage.toString());
+    setState(() {});
+  }
   @override
   void initState() {
     super.initState();
@@ -345,6 +350,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       fetchdata();
     });
     getVendorCategories();
+    getLanguage();
   }
 
   String code = "+353";
@@ -776,7 +782,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             hint: 'Search your location',
                             onChanged: (value) {
                               makeDelay(delay: () {
-                                _searchPlaces(value);
+                                _searchPlaces(value, appLanguage == "French" ? "fr" : "en");
                               });
                             },
                           ),
@@ -794,7 +800,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                       final item = googlePlacesModel!.places![index];
                                       return InkWell(
                                           onTap: () {
-                                            _searchController.text = item.name ?? "";
+                                            _searchController.text = item.formattedAddress ?? "";
                                             selectedPlace = item;
                                             googlePlacesModel = null;
                                             latitude = selectedPlace!.geometry!.location!.lat;
@@ -806,7 +812,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                           },
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                            child: Text(item.name ?? ""),
+                                            child: Text(item.formattedAddress ?? ""),
                                           ));
                                     },
                                   ),
