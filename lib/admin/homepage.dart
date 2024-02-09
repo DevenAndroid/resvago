@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +14,9 @@ import 'package:resvago/admin/vendor_datalist.dart';
 import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/helper.dart';
+import 'package:resvago/user_type_screen.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
-import 'faq_screen.dart';
 import 'faqlist_screen.dart';
 import 'language_screen.dart';
 import 'productcategory_list_screen.dart';
@@ -36,10 +35,17 @@ class HomePageState extends State<HomePage> {
   late bool isShowingMainData;
   int touchedIndex = -1;
   bool isDropdownOpen = false;
+  bool isDropdownOpen1 = false;
 
   void toggleDropdown() {
     setState(() {
       isDropdownOpen = !isDropdownOpen;
+    });
+  }
+
+  void toggleDropdown1() {
+    setState(() {
+      isDropdownOpen1 = !isDropdownOpen1;
     });
   }
 
@@ -92,6 +98,23 @@ class HomePageState extends State<HomePage> {
     });
   }
 
+
+  int totalCount = 0;
+  int getTotalMenuItemCount(MyOrderModel order) {
+    if (order.orderDetails != null && order.orderDetails!.menuList != null) {
+      totalCount = order.orderDetails!.menuList!.length;
+    }
+    return totalCount;
+  }
+  int totalCount1 = 0;
+  int getTotalMenuItemCount1(MyDiningOrderModel order) {
+    if (order.menuList != null) {
+      totalCount1 = order.menuList!.length;
+    }
+    return totalCount1;
+  }
+
+  int menuData = 0;
   @override
   void initState() {
     super.initState();
@@ -281,10 +304,10 @@ class HomePageState extends State<HomePage> {
                   size: 30,
                 ),
                 onTap: () {
-                  toggleDropdown();
+                  toggleDropdown1();
                 },
               ),
-              if (isDropdownOpen)
+              if (isDropdownOpen1)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -348,7 +371,7 @@ class HomePageState extends State<HomePage> {
                 title: Text('Logout'.tr),
                 onTap: () async {
                   FirebaseAuth.instance.signOut();
-                  Get.to(const LogInScreen());
+                  Get.to(const UserTypeScreen());
                 },
               ),
             ],
@@ -460,9 +483,9 @@ class HomePageState extends State<HomePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Text(
-                        '${0}',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
+                       Text(
+                        '${totalCount + totalCount1}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 30, color: Colors.white),
                       ),
                       Text(
                         'Total Products'.tr,
@@ -597,7 +620,6 @@ class HomePageState extends State<HomePage> {
                               child: Text("Order Not Found"),
                             );
                     }
-                    return const CircularProgressIndicator();
                   },
                 ),
                 StreamBuilder<List<MyOrderModel>>(
@@ -714,7 +736,6 @@ class HomePageState extends State<HomePage> {
                               child: Text("No User Found"),
                             );
                     }
-                    return const CircularProgressIndicator();
                   },
                 ),
               ]),

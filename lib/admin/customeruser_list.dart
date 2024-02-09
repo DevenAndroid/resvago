@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
 import 'package:resvago/components/helper.dart';
-import '../edit_customer.dart';
+import 'edit_customer.dart';
 import 'model/customer_register_model.dart';
 
 class CustomeruserListScreen extends StatefulWidget {

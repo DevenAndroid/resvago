@@ -14,11 +14,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:resvago/components/my_button.dart';
-import 'admin/model/customer_model.dart';
-import 'components/addsize.dart';
-import 'components/apptheme.dart';
-import 'components/helper.dart';
-import 'components/my_textfield.dart';
+import 'model/customer_model.dart';
+import '../components/addsize.dart';
+import '../components/apptheme.dart';
+import '../components/helper.dart';
+import '../components/my_textfield.dart';
 
 class EditCustomer extends StatefulWidget {
   EditCustomer({super.key, required this.uid});
@@ -41,7 +41,8 @@ class _EditCustomerState extends State<EditCustomer> {
   Uint8List? pickedFile;
   String fileUrl = "";
   bool twoStepVerification = false;
-  void fetchdata() {
+
+  void fetchData() {
     FirebaseFirestore.instance.collection("customer_users").doc(widget.uid).get().then((value) {
       if (value.exists) {
         if (value.data() == null) return;
@@ -124,9 +125,9 @@ class _EditCustomerState extends State<EditCustomer> {
         "country": country,
         "profile_image": imageUrlProfile,
       }).then((value) => Fluttertoast.showToast(msg: "Profile Updated"));
-      log("profile data" + profileData.mobileNumber.toString());
+      log("profile data${profileData.mobileNumber}");
       Helper.hideLoader(loader);
-      fetchdata();
+      fetchData();
     } catch (e) {
       Helper.hideLoader(loader);
       throw Exception(e);
@@ -139,7 +140,7 @@ class _EditCustomerState extends State<EditCustomer> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchdata();
+    fetchData();
   }
 
   bool apiLoaded = false;
@@ -357,7 +358,7 @@ class _EditCustomerState extends State<EditCustomer> {
                         Align(
                           alignment: Alignment.topCenter,
                           child: Text(
-                            profileData.userName.toString(),
+                            (profileData.userName ?? "").toString(),
                             style: GoogleFonts.poppins(color: AppTheme.registortext, fontWeight: FontWeight.bold, fontSize: 20),
                           ),
                         ),

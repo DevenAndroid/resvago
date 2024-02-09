@@ -16,7 +16,8 @@ import '../main.dart';
 import 'language_screen.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({Key? key}) : super(key: key);
+  String type;
+   LogInScreen({Key? key,required this.type}) : super(key: key);
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
@@ -174,7 +175,8 @@ class _LogInScreenState extends State<LogInScreen> {
                       FirebaseFirestore.instance.collection('admin_login').doc(value.user!.uid).set({
                         'email': emailController.text,
                         'Password': passwordController.text,
-                        "UserId": FirebaseAuth.instance.currentUser!.uid
+                        "UserId": FirebaseAuth.instance.currentUser!.uid,
+                        "key":widget.type
                       });
                       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
                       sharedPreferences.setString("userId", value.user!.uid);

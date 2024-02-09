@@ -137,7 +137,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                 itemBuilder: (context, index) {
                                   final item = myOrderModel!.orderDetails!.menuList![index];
                                   if (kDebugMode) {
-                                    print("manish ${item.dishName}");
+                                    print(" ${item.dishName}");
                                   }
                                   return GestureDetector(
                                     behavior: HitTestBehavior.translucent,
@@ -191,7 +191,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                               style: GoogleFonts.poppins(
                                                   color: const Color(0xFF384953), fontWeight: FontWeight.w300, fontSize: 15),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 10,
                                             )
                                           ],
@@ -243,7 +243,7 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                           color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                     ),
                                     Text(
-                                      myOrderModel!.customerData!.userName,
+                                      myOrderModel!.customerData!.userName ?? "",
                                       style: GoogleFonts.poppins(
                                           color: const Color(0xFF21283D), fontWeight: FontWeight.w500, fontSize: 16),
                                     ),
@@ -278,25 +278,25 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                           color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                     ),
                                     Text(
-                                      myOrderModel!.customerData!.mobileNumber,
+                                      myOrderModel!.customerData!.mobileNumber ?? "",
                                       style: GoogleFonts.poppins(
                                           color: const Color(0xFF21283D), fontWeight: FontWeight.w500, fontSize: 16),
                                     ),
                                   ],
                                 ),
                                 const Spacer(),
-                                // GestureDetector(
-                                //   onTap: () {
-                                //     String phoneNumber = myOrderModel!
-                                //         .customerData!
-                                //         .mobileNumber; // Replace with the actual phone number retrieved from your API
-                                //     launchPhoneCall(phoneNumber);
-                                //   },
-                                //   child: Image.asset(
-                                //     AppAssets.call,
-                                //     height: 40,
-                                //   ),
-                                // )
+                                GestureDetector(
+                                  onTap: () {
+                                    String phoneNumber = myOrderModel!
+                                        .customerData!
+                                        .mobileNumber; // Replace with the actual phone number retrieved from your API
+                                    launchPhoneCall(phoneNumber);
+                                  },
+                                  child: Image.asset(
+                                    AppAssets.call,
+                                    height: 40,
+                                  ),
+                                )
                               ],
                             ),
                           ),
@@ -332,20 +332,19 @@ class _DeliveryOderDetailsScreenState extends State<DeliveryOderDetailsScreen> {
                                     ],
                                   ),
                                 ),
-                                const Spacer(),
-                                // Image.asset(
-                                //   'assets/images/location.png',
-                                //   height: 40,
-                                // )
+                                Image.asset(
+                                  'assets/images/location.png',
+                                  height: 40,
+                                )
                               ],
                             ),
                           ),
                         ],
                       ))),
               Padding(
-                  padding: EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Container(
-                      padding: EdgeInsets.all(14),
+                      padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                       child: Column(
                         children: [

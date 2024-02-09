@@ -253,7 +253,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                                         color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                   ),
                                   Text(
-                                    myDiningOrderModel!.customerData!.userName,
+                                    myDiningOrderModel!.customerData!.userName ?? "",
                                     style: GoogleFonts.poppins(
                                         color: const Color(0xFF21283D), fontWeight: FontWeight.w500, fontSize: 16),
                                   ),
@@ -288,7 +288,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                                         color: const Color(0xFF486769), fontWeight: FontWeight.w300, fontSize: 14),
                                   ),
                                   Text(
-                                    myDiningOrderModel!.customerData!.mobileNumber,
+                                    myDiningOrderModel!.customerData!.mobileNumber ?? "",
                                     style: GoogleFonts.poppins(
                                         color: const Color(0xFF21283D), fontWeight: FontWeight.w500, fontSize: 16),
                                   ),
@@ -297,7 +297,7 @@ class _OderDetailsScreenState extends State<OderDetailsScreen> {
                               const Spacer(),
                               GestureDetector(
                                 onTap: () {
-                                  _makingPhoneCall(myDiningOrderModel!.customerData!.mobileNumber);
+                                  _makingPhoneCall(myDiningOrderModel!.customerData!.mobileNumber.toString());
                                 },
                                 child: Image.asset(
                                   AppAssets.call,

@@ -108,6 +108,8 @@ class LocaleString extends Translations {
           "Dining Order List":"Dining Order List",
           "Admin Commission(%)":"Admin Commission(%)",
           "Add Setting":"Add Setting",
+
+          "Search...":"Search...",
         },
 
         // french Language

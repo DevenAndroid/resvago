@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/loginscreen.dart';
+import 'package:resvago/user_type_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'components/local_string.dart';
 
@@ -61,8 +62,9 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.grey.shade50,
       ),
-      home: const LogInScreen(),
+      home: const UserTypeScreen(),
     );
   }
 }

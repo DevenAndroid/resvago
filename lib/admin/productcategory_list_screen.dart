@@ -129,7 +129,7 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
               stream: getMenuItemStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator(); // Show a loading indicator while data is being fetched
+                  return const Center(child: CircularProgressIndicator()); // Show a loading indicator while data is being fetched
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
