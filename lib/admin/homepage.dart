@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,13 +20,15 @@ import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'faqlist_screen.dart';
 import 'language_screen.dart';
+import 'model/admin_model.dart';
 import 'productcategory_list_screen.dart';
 import 'deliveryOrder_details_screen.dart';
 import 'model/delivery_order_details_modal.dart';
 import 'model/dining_order_model.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  String type;
+   HomePage({super.key,required this.type});
 
   @override
   State<StatefulWidget> createState() => HomePageState();
@@ -120,6 +123,7 @@ class HomePageState extends State<HomePage> {
     super.initState();
     isShowingMainData = true;
     fetchTotalEarnings();
+    getAdminData();
   }
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -234,23 +238,29 @@ class HomePageState extends State<HomePage> {
                 thickness: 1,
                 color: Colors.grey.shade300,
               ),
-              ListTile(
-                leading: const Icon(Icons.food_bank),
-                title: Text('Vendor Category'.tr),
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => VendorDataScreen(
-                                collectionReference: FirebaseFirestore.instance.collection("resturent"),
-                                key: ValueKey(DateTime.now().millisecondsSinceEpoch),
-                              )));
-                },
+              if(widget.type == "Admin")
+              Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.food_bank),
+                    title: Text('Vendor Category'.tr),
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => VendorDataScreen(
+                                    collectionReference: FirebaseFirestore.instance.collection("resturent"),
+                                    key: ValueKey(DateTime.now().millisecondsSinceEpoch),
+                                  )));
+                    },
+                  ),
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                ],
               ),
-              Divider(
-                thickness: 1,
-                color: Colors.grey.shade300,
-              ),
+
               ListTile(
                 leading: const Icon(Icons.menu_book),
                 title: Text('Product Category'.tr),
@@ -744,8 +754,19 @@ class HomePageState extends State<HomePage> {
         ));
   }
 
+  AdminModel? adminModel;
+  void getAdminData() {
+    FirebaseFirestore.instance.collection("customer_care_login").get().then((value) {
+      if(value.docs.first.data().isNotEmpty){
+        adminModel = AdminModel.fromJson(value.docs.first.data());
+        log(jsonEncode(value.docs.first.data()).toString());
+        setState(() {});
+      }
+    });
+  }
+
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('dining_order').snapshots().map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('dining_order').orderBy("time",descending: true).snapshots().map((querySnapshot) {
       List<MyDiningOrderModel> diningorders = [];
       try {
         for (var doc in querySnapshot.docs) {
@@ -759,7 +780,7 @@ class HomePageState extends State<HomePage> {
   }
 
   Stream<List<MyOrderModel>> getDeliveryOrdersStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('order').snapshots().map((querySnapshot) {
+    return FirebaseFirestore.instance.collection('order').orderBy("time",descending: true).snapshots().map((querySnapshot) {
       List<MyOrderModel> orders = [];
       try {
         for (var doc in querySnapshot.docs) {

@@ -162,6 +162,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
             "deactivate": false,
             "password": passwordController.text.trim(),
             "confirmPassword": confirmPasswordController.text.trim(),
+            "verified":false
           });
           FirebaseFirestore.instance.collection("send_mail").add({
             "to": emailController.text.trim(),

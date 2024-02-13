@@ -84,6 +84,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
             "password": passwordController.text,
             "deactivate": false,
             "time": DateTime.now(),
+            "verified":false
           }).then((value) {
             log("fghgfkjhgjfk"+uid.toString());
             Get.back();

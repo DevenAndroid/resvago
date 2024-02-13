@@ -13,8 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/apptheme.dart';
 import '../components/helper.dart';
 import '../components/my_button.dart';
+import 'admin/customer_care_login_screen.dart';
 import 'admin/language_screen.dart';
-
 
 class UserTypeScreen extends StatefulWidget {
   const UserTypeScreen({Key? key}) : super(key: key);
@@ -42,7 +42,6 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -54,65 +53,71 @@ class _UserTypeScreenState extends State<UserTypeScreen> {
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
           child: Container(
-            height: Get.height,
-            width: Get.width,
-            decoration: const BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.fill,
-                    image: kIsWeb
-                        ? AssetImage(
-                      "assets/images/loginscreen.png",
-                    )
-                        : AssetImage(
-                      "assets/images/login.png",
-                    ))),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0,vertical: 25),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 150,
-                  ),
-                  const SizedBox(height: 25),
-                  GestureDetector(
-                    onTap: (){
-                      Get.to(LogInScreen(type: "Admin",));
-                    },
-                    child: Container(
-                      width: Get.width,
-                      decoration:  BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Text("Login as a admin",style: TextStyle(fontSize: 20),textAlign: TextAlign.center,),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20,),
-                  GestureDetector(
-                    onTap: (){
-                      Get.to(LogInScreen(type:"Customer Care"));
-                    },
-                    child: Container(
-                      width: Get.width,
-                      decoration:  BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white
-                      ),
-                      child: const Padding(
-                        padding: EdgeInsets.all(15.0),
-                        child: Text("Login as a Customer Care",style: TextStyle(fontSize: 20),textAlign: TextAlign.center,),
-                      ),
-                    ),
-                  ),
-                ],
+        height: Get.height,
+        width: Get.width,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                fit: BoxFit.fill,
+                image: kIsWeb
+                    ? AssetImage(
+                        "assets/images/loginscreen.png",
+                      )
+                    : AssetImage(
+                        "assets/images/login.png",
+                      ))),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 25),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 150,
               ),
-            ),
-          ).appPaddingForScreen),
+              const SizedBox(height: 25),
+              GestureDetector(
+                onTap: () {
+                  Get.to(LogInScreen(
+                    type: "Admin",
+                  ));
+                },
+                child: Container(
+                  width: Get.width,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      "Login as a admin",
+                      style: TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () {
+                  Get.to(CustomerCareLogInScreen(type: "Customer Care"));
+                },
+                child: Container(
+                  width: Get.width,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
+                  child: const Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Text(
+                      "Login as a Customer Care",
+                      style: TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ).appPaddingForScreen),
     );
   }
 

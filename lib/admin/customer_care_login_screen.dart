@@ -15,17 +15,17 @@ import '../components/my_button.dart';
 import '../main.dart';
 import 'language_screen.dart';
 
-class LogInScreen extends StatefulWidget {
+class CustomerCareLogInScreen extends StatefulWidget {
   String type;
-   LogInScreen({Key? key,required this.type}) : super(key: key);
+  CustomerCareLogInScreen({Key? key, required this.type}) : super(key: key);
 
   @override
-  State<LogInScreen> createState() => _LogInScreenState();
+  State<CustomerCareLogInScreen> createState() => _CustomerCareLogInScreenState();
 }
 
 final GoogleSignIn googleSignIn = GoogleSignIn();
 
-class _LogInScreenState extends State<LogInScreen> {
+class _CustomerCareLogInScreenState extends State<CustomerCareLogInScreen> {
   TextEditingController passwordController = TextEditingController();
   TextEditingController emailController = TextEditingController();
 
@@ -42,7 +42,6 @@ class _LogInScreenState extends State<LogInScreen> {
   @override
   void initState() {
     super.initState();
-
   }
 
   @override
@@ -77,7 +76,7 @@ class _LogInScreenState extends State<LogInScreen> {
               Align(
                 alignment: Alignment.center,
                 child: Text(
-                  'Welcome back to LogIn'.tr,
+                  'Login as a Customer Care'.tr,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -168,18 +167,21 @@ class _LogInScreenState extends State<LogInScreen> {
                   OverlayEntry loader = Helper.overlayLoader(context);
                   Overlay.of(context).insert(loader);
                   try {
-                    final QuerySnapshot result =
-                    await FirebaseFirestore.instance.collection('admin_login').where('email', isEqualTo: emailController.text).get();
-                    if(result.docs.isNotEmpty){
+                    final QuerySnapshot result = await FirebaseFirestore.instance
+                        .collection('customer_care_login')
+                        .where('email', isEqualTo: emailController.text)
+                        .get();
+                    if (result.docs.isNotEmpty) {
                       await FirebaseAuth.instance
-                          .signInWithEmailAndPassword(email: emailController.text.trim(), password: passwordController.text.trim())
+                          .signInWithEmailAndPassword(
+                              email: emailController.text.trim(), password: passwordController.text.trim())
                           .then((value) async {
                         Helper.hideLoader(loader);
-                        FirebaseFirestore.instance.collection('admin_login').doc(value.user!.uid).set({
+                        FirebaseFirestore.instance.collection('customer_care_login').doc(value.user!.uid).set({
                           'email': emailController.text,
                           'Password': passwordController.text,
                           "UserId": FirebaseAuth.instance.currentUser!.uid,
-                          "key":widget.type
+                          "key": widget.type
                         });
                         Helper.hideLoader(loader);
                         emailController.clear();
@@ -187,8 +189,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         showToast('Login successfully');
                         Get.to(HomePage(type: widget.type));
                       });
-                    }
-                    else {
+                    } else {
                       Helper.hideLoader(loader);
                       if (!kIsWeb) {
                         Fluttertoast.showToast(msg: 'Email not exist');
