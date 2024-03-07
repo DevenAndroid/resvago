@@ -8,6 +8,8 @@ import 'package:resvago/admin/addproduct_screen.dart';
 import 'package:resvago/admin/model/menuitem_model.dart';
 import 'package:resvago/components/helper.dart';
 
+import 'controller/profil_controller.dart';
+
 class ProductCategoryScreen extends StatefulWidget {
   final CollectionReference collectionReference;
   final MenuItemData? menuItemData;
@@ -18,6 +20,7 @@ class ProductCategoryScreen extends StatefulWidget {
 }
 
 class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -27,6 +30,12 @@ class _ProductCategoryScreenState extends State<ProductCategoryScreen> {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controller.getAdminData();
   }
 
   @override

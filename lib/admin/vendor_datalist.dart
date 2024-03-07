@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addVendor_screen.dart';
 import 'package:resvago/components/helper.dart';
+import 'controller/profil_controller.dart';
 import 'model/resturent_model.dart';
 
 class VendorDataScreen extends StatefulWidget {
@@ -18,6 +19,7 @@ class VendorDataScreen extends StatefulWidget {
 }
 
 class _VendorDataScreenState extends State<VendorDataScreen> {
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -27,6 +29,12 @@ class _VendorDataScreenState extends State<VendorDataScreen> {
     setState(() {
       isTextFieldVisible = !isTextFieldVisible;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    controller.getAdminData();
   }
 
   @override

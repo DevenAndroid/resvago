@@ -14,10 +14,8 @@ import 'package:resvago/firebase_service/firebase_userSerivce.dart';
 import '../components/apptheme.dart';
 import '../components/helper.dart';
 import '../firebase_service/firebase_service.dart';
-import 'controller/logincontroller.dart';
-import 'customeruser_list.dart';
 
-class AddCustomerUserScreen extends StatefulWidget {
+class AddCustomerCareScreen extends StatefulWidget {
   final bool isEditMode;
   final String? documentId;
   final String? userName;
@@ -25,24 +23,24 @@ class AddCustomerUserScreen extends StatefulWidget {
   final String? phonenumber;
   final String? code;
   final String? country;
-  const AddCustomerUserScreen(
+  const AddCustomerCareScreen(
       {super.key,
-      required this.isEditMode,
-      this.documentId,
-      this.userName,
-      this.email,
-      this.phonenumber,
-      this.code,
-      this.country});
+        required this.isEditMode,
+        this.documentId,
+        this.userName,
+        this.email,
+        this.phonenumber,
+        this.code,
+        this.country});
   static var signupScreen = "/signupScreen";
 
   @override
-  State<AddCustomerUserScreen> createState() => _AddCustomerUserScreenState();
+  State<AddCustomerCareScreen> createState() => _AddCustomerUserScreenState();
 }
 
-class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
+class _AddCustomerUserScreenState extends State<AddCustomerCareScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final loginController = Get.put(LoginController());
+  // final loginController = Get.put(LoginController());
   TextEditingController userNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneNumberController = TextEditingController();
@@ -75,32 +73,23 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
         print("User UID: $uid");
         log(uid.toString());
         if (FirebaseAuth.instance.currentUser != null) {
-          CollectionReference collection = FirebaseFirestore.instance.collection('customer_users');
+          CollectionReference collection = FirebaseFirestore.instance.collection('customer_care');
           var DocumentReference = collection.doc(uid);
           DocumentReference.set({
-            "userName": userNameController.text,
             "email": emailController.text,
             "docid": uid,
             "password": passwordController.text,
             "deactivate": false,
             "time": DateTime.now(),
-            "verified":false
           }).then((value) {
             log("fghgfkjhgjfk"+uid.toString());
             Get.back();
-            FirebaseFirestore.instance.collection("send_mail").add({
-              "to": emailController.text.trim(),
-              "message": {
-                "subject": "This is a otp email",
-                "html": "Your account has been created",
-                "text": "asdfgwefddfgwefwn",
-              }
-            });
             Helper.hideLoader(loader);
           });
         }
       }).catchError((e) {
         Helper.hideLoader(loader);
+        showToast(e.toString());
         print("Error creating user: $e");
       });
     }
@@ -108,7 +97,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
 
   void checkEmailInFirestore() async {
     final QuerySnapshot result =
-        await FirebaseFirestore.instance.collection('customer_users').where('email', isEqualTo: emailController.text).get();
+    await FirebaseFirestore.instance.collection('customer_care').where('email', isEqualTo: emailController.text).get();
 
     if (result.docs.isNotEmpty) {
       Fluttertoast.showToast(msg: 'Email already exits');
@@ -120,6 +109,12 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
       Fluttertoast.showToast(msg: 'Email already used in vendor please use another account');
       return;
     }
+    final QuerySnapshot result2 =
+    await FirebaseFirestore.instance.collection('customer_users').where('email', isEqualTo: emailController.text).get();
+    if (result1.docs.isNotEmpty) {
+      Fluttertoast.showToast(msg: 'Email already used in customer please use another account');
+      return;
+    }
     addUserToFirestore();
   }
 
@@ -127,11 +122,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
     if (widget.isEditMode == true) {
       kk++;
       setState(() {
-        userNameController.text = widget.userName!;
         emailController.text = widget.email!;
-        phoneNumberController.text = widget.phonenumber ?? "";
-        code = widget.code ?? "";
-        country = widget.country ?? "";
         log(code);
       });
     }
@@ -148,7 +139,7 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
   Widget build(BuildContext context) {
     log(uid.toString());
     return Scaffold(
-        appBar: backAppBar(title: widget.isEditMode ? 'Edit Customer' : 'Add Customer'.tr, context: context),
+        appBar: backAppBar(title: widget.isEditMode ? 'Edit Customer Care' : 'Add Customer Care'.tr, context: context),
         body: SingleChildScrollView(
           child: SingleChildScrollView(
             child: Form(
@@ -171,29 +162,6 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Enter Your Name'.tr,
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      RegisterTextFieldWidget(
-                        controller: userNameController,
-                        textInputAction: TextInputAction.next,
-                        hint: 'Enter Your Name'.tr,
-                        validator: MultiValidator([
-                          RequiredValidator(errorText: 'Please enter your name'),
-                        ]).call,
-                        keyboardType: TextInputType.text,
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
                       Text(
                         'Enter Email'.tr,
                         style: GoogleFonts.poppins(
@@ -241,10 +209,6 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                                   )),
                               validator: MultiValidator([
                                 RequiredValidator(errorText: 'Please enter your password'),
-                                MinLengthValidator(8,
-                                    errorText: 'Password must be at least 8 characters, with 1 special character & 1 numerical'),
-                                PatternValidator(r"(?=.*\W)(?=.*?[#?!@$%^&*-])(?=.*[0-9])",
-                                    errorText: "Password must be at least with 1 special character & 1 numerical"),
                               ]).call,
                               keyboardType: TextInputType.emailAddress,
                               // textInputAction: TextInputAction.next,
@@ -292,60 +256,6 @@ class _AddCustomerUserScreenState extends State<AddCustomerUserScreen> {
                             ),
                           ],
                         ),
-                      if (widget.isEditMode)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Enter Mobile number'.tr,
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            IntlPhoneField(
-                              key: ValueKey(kk),
-                              flagsButtonPadding: const EdgeInsets.all(8),
-                              dropdownIconPosition: IconPosition.trailing,
-                              cursorColor: Colors.black,
-                              dropdownIcon: const Icon(
-                                Icons.arrow_drop_down_rounded,
-                                color: Colors.black,
-                              ),
-                              dropdownTextStyle: const TextStyle(color: Colors.black),
-                              style: const TextStyle(color: Colors.black),
-                              controller: phoneNumberController,
-                              decoration:  InputDecoration(
-                                  hintStyle: TextStyle(color: Colors.black),
-                                  labelText: 'Phone Number'.tr,
-                                  labelStyle: TextStyle(color: Colors.black),
-                                  border: OutlineInputBorder(
-                                    borderSide: BorderSide(),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.black))),
-                              initialCountryCode: country,
-                              onCountryChanged: (phone) {
-                                setState(() {
-                                  code = "+${phone.dialCode}";
-                                  country = phone.code;
-                                  log(code.toString());
-                                  log(country.toString());
-                                });
-                              },
-                              onChanged: (phone) {
-                                code = phone.countryCode.toString();
-                              },
-                            ),
-                          ],
-                        ),
-                      const SizedBox(
-                        height: 20,
-                      ),
                       MyButton(
                         onTap: () {
                           if (_formKey.currentState!.validate()) {

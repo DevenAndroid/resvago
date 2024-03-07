@@ -181,6 +181,10 @@ class _LogInScreenState extends State<LogInScreen> {
                           "UserId": FirebaseAuth.instance.currentUser!.uid,
                           "key":widget.type
                         });
+                        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                         sharedPreferences.setString("login_type","admin");
+                         sharedPreferences.setString("User_email",emailController.text);
+
                         Helper.hideLoader(loader);
                         emailController.clear();
                         passwordController.clear();

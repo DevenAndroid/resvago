@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:resvago/admin/addpages_screen.dart';
 import 'package:resvago/components/helper.dart';
 
+import 'controller/profil_controller.dart';
 import 'model/Pages_model.dart';
 
 class PagesListScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class PagesListScreen extends StatefulWidget {
 }
 
 class _PagesListScreenState extends State<PagesListScreen> {
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -30,6 +32,7 @@ class _PagesListScreenState extends State<PagesListScreen> {
   @override
   void initState() {
     super.initState();
+    controller.getAdminData();
   }
 
   @override

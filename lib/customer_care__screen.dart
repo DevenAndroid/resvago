@@ -9,14 +9,14 @@ import 'package:resvago/components/helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
-import 'model/admin_model.dart';
+import 'admin/model/admin_model.dart';
 
-class settingScreen extends StatefulWidget {
+class CustomerCareScreen extends StatefulWidget {
   final bool isEditMode;
   final String? documentId;
   final String? email;
 
-  const settingScreen({
+  const CustomerCareScreen({
     super.key,
     required this.isEditMode,
     this.documentId,
@@ -24,10 +24,10 @@ class settingScreen extends StatefulWidget {
   });
 
   @override
-  State<settingScreen> createState() => _settingScreenState();
+  State<CustomerCareScreen> createState() => _settingScreenState();
 }
 
-class _settingScreenState extends State<settingScreen> {
+class _settingScreenState extends State<CustomerCareScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController commissionPercentage = TextEditingController();
@@ -37,14 +37,21 @@ class _settingScreenState extends State<settingScreen> {
     OverlayEntry loader = Helper.overlayLoader(context);
     Overlay.of(context).insert(loader);
     try {
-        FirebaseFirestore.instance.collection('admin_login').doc(FirebaseAuth.instance.currentUser!.uid).update({
-          // 'email': emailController.text,
-          // 'Password': passwordController.text,
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
+      );
+      User? user = userCredential.user;
+      await user!.updatePassword(passwordController.text.trim()).then((value) async {
+        FirebaseFirestore.instance.collection('customer_care_login').doc(user.uid).update({
+          'email': emailController.text,
+          'Password': passwordController.text,
           "admin_commission": commissionPercentage.text.trim(),
-          // "UserId": FirebaseAuth.instance.currentUser!.uid
+          "UserId": FirebaseAuth.instance.currentUser!.uid
         });
         Helper.hideLoader(loader);
-        showToast('Setting Updated');
+        showToast('Customer Care Updated');
+      });
     } catch (error) {
       print('Error updating settings: $error');
       Helper.hideLoader(loader);
@@ -54,13 +61,14 @@ class _settingScreenState extends State<settingScreen> {
 
   AdminModel? adminModel;
   void getAdminData() {
-    FirebaseFirestore.instance.collection("admin_login").get().then((value) {
+    FirebaseFirestore.instance.collection("customer_care_login").get().then((value) {
       adminModel = AdminModel.fromJson(value.docs.first.data());
       log(jsonEncode(value.docs.first.data()).toString());
       if (adminModel != null) {
-        emailController.text = adminModel!.email;
-        commissionPercentage.text = adminModel!.adminCommission;
-        passwordController.text = adminModel!.password;
+        emailController.text = adminModel!.email ?? "";
+        commissionPercentage.text = adminModel!.adminCommission ?? "";
+        passwordController.text = adminModel!.password ?? "";
+
       }
       setState(() {});
     });
@@ -76,7 +84,7 @@ class _settingScreenState extends State<settingScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: backAppBar(title: 'Setting'.tr, context: context),
+        appBar: backAppBar(title: 'Customer Care'.tr, context: context),
         body: SingleChildScrollView(
           child: Form(
               key: formKey,
@@ -97,64 +105,43 @@ class _settingScreenState extends State<settingScreen> {
                             child: SingleChildScrollView(
                               physics: const AlwaysScrollableScrollPhysics(),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                // const SizedBox(
-                                //   height: 10,
-                                // ),
-                                //  Text(
-                                //   "Email".tr,
-                                //   style: const TextStyle(color: Colors.black),
-                                // ),
-                                // const SizedBox(height: 5),
-                                // MyTextField(
-                                //   validator: (value) {
-                                //     if (value!.isEmpty) {
-                                //       return 'Please enter your Email';
-                                //     }
-                                //     return null;
-                                //   },
-                                //   controller: emailController,
-                                //   hintText: 'Email'.tr,
-                                //   obscureText: false,
-                                //   color: Colors.white,
-                                // ),
-                                // const SizedBox(
-                                //   height: 10,
-                                // ),
-                                //  Text(
-                                //   "Password".tr,
-                                //   style: const TextStyle(color: Colors.black),
-                                // ),
-                                // const SizedBox(height: 5),
-                                // MyTextField(
-                                //   validator: (value) {
-                                //     if (value!.isEmpty) {
-                                //       return 'Please enter your Password';
-                                //     }
-                                //     return null;
-                                //   },
-                                //   controller: passwordController,
-                                //   hintText: 'Password'.tr,
-                                //   obscureText: false,
-                                //   color: Colors.white,
-                                // ),
                                 const SizedBox(
                                   height: 10,
                                 ),
                                 Text(
-                                  "Admin Commission(%)".tr,
-                                  style: TextStyle(color: Colors.black),
+                                  "Email".tr,
+                                  style: const TextStyle(color: Colors.black),
                                 ),
                                 const SizedBox(height: 5),
                                 MyTextField(
-                                  keyboardtype: TextInputType.number,
-                                  validator: (v) {
-                                    if (v != null && v.trim().isNotEmpty && (double.tryParse(v.toString()) ?? 0) > 100) {
-                                      return "Commission % should be less than or equal to 100";
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter your Email';
                                     }
                                     return null;
                                   },
-                                  controller: commissionPercentage,
-                                  hintText: 'Commission'.tr,
+                                  controller: emailController,
+                                  hintText: 'Email'.tr,
+                                  obscureText: false,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  "Password".tr,
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                const SizedBox(height: 5),
+                                MyTextField(
+                                  validator: (value) {
+                                    if (value!.isEmpty) {
+                                      return 'Please enter your Password';
+                                    }
+                                    return null;
+                                  },
+                                  controller: passwordController,
+                                  hintText: 'Password'.tr,
                                   obscureText: false,
                                   color: Colors.white,
                                 ),
@@ -167,7 +154,7 @@ class _settingScreenState extends State<settingScreen> {
                                       addSettingToFirestore();
                                     }
                                   },
-                                  text: widget.isEditMode ? 'Update setting'.tr : 'Add setting'.tr,
+                                  text: widget.isEditMode ? 'Update Customer Care'.tr : 'Add Customer Care'.tr,
                                 ),
                               ]),
                             ),

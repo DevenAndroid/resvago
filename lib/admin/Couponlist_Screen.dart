@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addcoupon_screen.dart';
+import 'package:resvago/admin/controller/profil_controller.dart';
 import 'package:resvago/admin/model/coupen_model.dart';
 import 'package:resvago/components/helper.dart';
 import 'model/vendor_register_model.dart';
@@ -21,6 +22,8 @@ class CouponListScreen extends StatefulWidget {
 }
 
 class _CouponListScreenState extends State<CouponListScreen> {
+
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -50,6 +53,7 @@ class _CouponListScreenState extends State<CouponListScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    controller.getAdminData();
   }
 
   @override

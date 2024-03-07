@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:resvago/admin/Couponlist_Screen.dart';
 import 'package:resvago/admin/Pageslist_screen.dart';
+import 'package:resvago/admin/controller/profil_controller.dart';
 import 'package:resvago/admin/dining_order_list.dart';
 import 'package:resvago/admin/loginscreen.dart';
 import 'package:resvago/admin/order_list_screen.dart';
@@ -16,6 +17,8 @@ import 'package:resvago/admin/slider_images.dart';
 import 'package:resvago/admin/userdata_screen.dart';
 import 'package:resvago/components/helper.dart';
 import 'package:resvago/user_type_screen.dart';
+import '../customer_care__screen.dart';
+import 'customer_care_list.dart';
 import 'customeruser_list.dart';
 import 'diningOrders_details_screen.dart';
 import 'faqlist_screen.dart';
@@ -35,6 +38,7 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  final controller = Get.put(ProfileController());
   late bool isShowingMainData;
   int touchedIndex = -1;
   bool isDropdownOpen = false;
@@ -123,7 +127,7 @@ class HomePageState extends State<HomePage> {
     super.initState();
     isShowingMainData = true;
     fetchTotalEarnings();
-    getAdminData();
+    controller.getAdminData();
   }
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -144,11 +148,11 @@ class HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hi Admin..'.tr,
+                'Hi User...'.tr,
                 style: const TextStyle(color: Colors.black, fontSize: 20),
               ),
               Text(
-                FirebaseAuth.instance.currentUser!.email.toString(),
+                controller.userEmail.toString(),
                 style: const TextStyle(color: Colors.black, fontSize: 12),
               ),
             ],
@@ -183,7 +187,7 @@ class HomePageState extends State<HomePage> {
                           'assets/images/girl.jpg',
                         )),
                     Text(
-                      FirebaseAuth.instance.currentUser!.email.toString(),
+                      controller.userEmail.toString(),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -223,6 +227,22 @@ class HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
+              // if(widget.type == "Admin")
+             Column(
+               children: [
+                 Divider(
+                   thickness: 1,
+                   color: Colors.grey.shade300,
+                 ),
+                 ListTile(
+                   leading:  const Icon(Icons.help_center_outlined),
+                   title: Text('Customer Care'.tr),
+                   onTap: () {
+                     Get.to(const CustomerCareList()); // Closes the drawer
+                   },
+                 ),
+               ],
+             ),
               Divider(
                 thickness: 1,
                 color: Colors.grey.shade300,
@@ -238,7 +258,6 @@ class HomePageState extends State<HomePage> {
                 thickness: 1,
                 color: Colors.grey.shade300,
               ),
-              if(widget.type == "Admin")
               Column(
                 children: [
                   ListTile(
@@ -348,18 +367,23 @@ class HomePageState extends State<HomePage> {
                   Get.to(const LanguageChangeScreen());
                 },
               ),
-              Divider(
-                thickness: 1,
-                color: Colors.grey.shade300,
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings),
-                title: Text('Setting'.tr),
-                onTap: () {
-                  Get.to(const settingScreen(
-                    isEditMode: false,
-                  ));
-                },
+              if(widget.type == "Admin")
+              Column(
+                children: [
+                  Divider(
+                    thickness: 1,
+                    color: Colors.grey.shade300,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: Text('Setting'.tr),
+                    onTap: () {
+                      Get.to(const settingScreen(
+                        isEditMode: false,
+                      ));
+                    },
+                  ),
+                ],
               ),
               Divider(
                 thickness: 1,
@@ -754,16 +778,16 @@ class HomePageState extends State<HomePage> {
         ));
   }
 
-  AdminModel? adminModel;
-  void getAdminData() {
-    FirebaseFirestore.instance.collection("customer_care_login").get().then((value) {
-      if(value.docs.first.data().isNotEmpty){
-        adminModel = AdminModel.fromJson(value.docs.first.data());
-        log(jsonEncode(value.docs.first.data()).toString());
-        setState(() {});
-      }
-    });
-  }
+  // AdminModel? adminModel;
+  // void getAdminData() {
+  //   FirebaseFirestore.instance.collection("customer_care_login").get().then((value) {
+  //     if(value.docs.first.data().isNotEmpty){
+  //       adminModel = AdminModel.fromJson(value.docs.first.data());
+  //       log(jsonEncode(value.docs.first.data()).toString());
+  //       setState(() {});
+  //     }
+  //   });
+  // }
 
   Stream<List<MyDiningOrderModel>> getOrdersStreamFromFirestore() {
     return FirebaseFirestore.instance.collection('dining_order').orderBy("time",descending: true).snapshots().map((querySnapshot) {

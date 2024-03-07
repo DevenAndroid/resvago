@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:resvago/admin/addpages_screen.dart';
 import 'package:resvago/admin/faq_screen.dart';
 import 'package:resvago/components/helper.dart';
+import 'controller/profil_controller.dart';
 import 'model/Pages_model.dart';
 import 'model/faq_model.dart';
 
@@ -16,6 +17,7 @@ class FaqListScreen extends StatefulWidget {
 }
 
 class _FaqListScreenState extends State<FaqListScreen> {
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -29,6 +31,7 @@ class _FaqListScreenState extends State<FaqListScreen> {
   @override
   void initState() {
     super.initState();
+    controller.getAdminData();
   }
 
   @override

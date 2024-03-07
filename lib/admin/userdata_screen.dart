@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/adduser_screen.dart';
+import 'package:resvago/admin/controller/profil_controller.dart';
 import 'package:resvago/admin/wallet_screen.dart';
 import 'package:resvago/components/helper.dart';
 import 'edit_vendor.dart';
@@ -18,6 +19,7 @@ class UsersDataScreen extends StatefulWidget {
 }
 
 class _UsersDataScreenState extends State<UsersDataScreen> {
+  final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
   bool isTextFieldVisible = false;
@@ -31,6 +33,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
   @override
   void initState() {
     super.initState();
+    controller.getAdminData();
   }
 
   @override
@@ -263,6 +266,7 @@ class _UsersDataScreenState extends State<UsersDataScreen> {
                                                     },
                                                     child: const Text("Edit"),
                                                   ),
+                                                  if( controller.userType == "admin")
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {

@@ -141,7 +141,10 @@ class _WalletScreenState extends State<WalletScreen> {
                           GestureDetector(
                             onTap: () {
                               if (walletItem.status == "Processing") {
-                                _showPopup1(docid: walletItem.docid, status: walletItem.status,);
+                                _showPopup1(
+                                  docid: walletItem.docid,
+                                  status: walletItem.status,
+                                );
                               } else {
                                 null;
                               }
@@ -152,8 +155,8 @@ class _WalletScreenState extends State<WalletScreen> {
                                   color: walletItem.status == "Approve"
                                       ? Colors.green
                                       : walletItem.status == "Reject"
-                                      ? Colors.red
-                                      : const Color(0xFFFFB26B),
+                                          ? Colors.red
+                                          : const Color(0xFFFFB26B),
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12),
                             ),

@@ -1,23 +1,25 @@
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:resvago/admin/addCustomer_user.dart';
+import 'package:resvago/admin/edit_customer_care.dart';
 import 'package:resvago/components/helper.dart';
+import '../add_customer_Care.dart';
 import 'controller/profil_controller.dart';
 import 'edit_customer.dart';
+import 'model/customer_care_list_screen.dart';
 import 'model/customer_register_model.dart';
 
-class CustomeruserListScreen extends StatefulWidget {
-  const CustomeruserListScreen({Key? key}) : super(key: key);
+class CustomerCareList extends StatefulWidget {
+  const CustomerCareList({super.key});
 
   @override
-  State<CustomeruserListScreen> createState() => _CustomeruserListScreenState();
+  State<CustomerCareList> createState() => _CustomerCareListState();
 }
 
-class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
+class _CustomerCareListState extends State<CustomerCareList> {
   final controller = Get.put(ProfileController());
   bool userDeactivate = false;
   String searchQuery = '';
@@ -44,9 +46,9 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.white,
         surfaceTintColor: Colors.white,
-        title:  Text(
-          'Customer Users List'.tr,
-          style: TextStyle(color: Color(0xFF423E5E), fontSize: 20, fontWeight: FontWeight.bold),
+        title: Text(
+          'Customer Care List'.tr,
+          style: const TextStyle(color: Color(0xFF423E5E), fontSize: 20, fontWeight: FontWeight.bold),
         ),
         leading: Padding(
           padding: const EdgeInsets.all(15),
@@ -75,7 +77,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
           ),
           GestureDetector(
               onTap: () {
-                Get.to(const AddCustomerUserScreen(
+                Get.to(const AddCustomerCareScreen(
                   isEditMode: false,
                 ));
               },
@@ -88,11 +90,9 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                 ),
               )),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               isDescendingOrder = !isDescendingOrder;
-              setState(() {
-
-              });
+              setState(() {});
             },
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -108,31 +108,31 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            if(isDescendingOrder == true)
-            Padding(
-              key: ValueKey(isDescendingOrder),
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  hintText: 'Search...',
-                  hintStyle: TextStyle(color: Colors.black),
-                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color
+            if (isDescendingOrder == true)
+              Padding(
+                key: ValueKey(isDescendingOrder),
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  style: const TextStyle(color: Colors.black),
+                  decoration: const InputDecoration(
+                    hintText: 'Search...',
+                    hintStyle: TextStyle(color: Colors.black),
+                    border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
+                    ),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.black), // Change the outline border color when focused
-                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
               ),
-            ),
-            StreamBuilder<List<CustomerRegisterData>>(
+            StreamBuilder<List<CustomerCareData>>(
               stream: getUsersStreamFromFirestore(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -140,7 +140,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  List<CustomerRegisterData> users = snapshot.data ?? [];
+                  List<CustomerCareData> users = snapshot.data ?? [];
                   final filteredUsers = filterUsers(users, searchQuery); // Apply the search filter
 
                   return filteredUsers.isNotEmpty
@@ -150,7 +150,6 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
                             final item = filteredUsers[index];
-                            log("dydfyhf${item.code}");
                             return Container(
                               height: 90,
                               margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -178,7 +177,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                         maxLines: 1,
                                         textScaleFactor: 1,
                                         text: TextSpan(
-                                          text: item.userName.toString(),
+                                          text: item.email.toString(),
                                           style: DefaultTextStyle.of(context).style,
                                         ),
                                       ),
@@ -187,7 +186,6 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                         width: 80,
                                         child: Icon(Icons.person),
                                       ),
-                                      subtitle: Text(item.email),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -210,7 +208,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
-                                                      Get.to(() => EditCustomer(
+                                                      Get.to(() => EditCustomerCare(
                                                             uid: item.docid,
                                                           ));
                                                       // Get.to(AddCustomerUserScreen(
@@ -225,7 +223,6 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                     },
                                                     child: const Text("Edit"),
                                                   ),
-                                                  if( controller.userType == "admin")
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
@@ -266,7 +263,7 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                                       child: TextButton(
                                                                         onPressed: () async {
                                                                           FirebaseFirestore.instance
-                                                                              .collection("customer_users")
+                                                                              .collection("customer_care")
                                                                               .doc(item.docid)
                                                                               .delete()
                                                                               .then((value) {
@@ -303,11 +300,11 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
                                                     onTap: () {
                                                       item.deactivate
                                                           ? FirebaseFirestore.instance
-                                                              .collection('customer_users')
+                                                              .collection('customer_care')
                                                               .doc(item.docid)
                                                               .update({"deactivate": false})
                                                           : FirebaseFirestore.instance
-                                                              .collection('customer_users')
+                                                              .collection('customer_care')
                                                               .doc(item.docid)
                                                               .update({"deactivate": true});
                                                       setState(() {});
@@ -333,31 +330,31 @@ class _CustomeruserListScreenState extends State<CustomeruserListScreen> {
     );
   }
 
-  List<CustomerRegisterData> filterUsers(List<CustomerRegisterData> users, String query) {
+  List<CustomerCareData> filterUsers(List<CustomerCareData> users, String query) {
     if (query.isEmpty) {
       return users; // Return all users if the search query is empty
     } else {
       // Filter the users based on the search query
       return users.where((user) {
-        if (user.userName is String) {
-          return user.userName.toLowerCase().contains(query.toLowerCase());
+        if (user.email is String) {
+          return user.email.toLowerCase().contains(query.toLowerCase());
         }
         return false;
       }).toList();
     }
   }
 
-  Stream<List<CustomerRegisterData>> getUsersStreamFromFirestore() {
-    return FirebaseFirestore.instance.collection('customer_users').orderBy("time",descending: true).snapshots().map((querySnapshot) {
-      List<CustomerRegisterData> users = [];
+  Stream<List<CustomerCareData>> getUsersStreamFromFirestore() {
+    return FirebaseFirestore.instance
+        .collection('customer_care')
+        .orderBy("time", descending: true)
+        .snapshots()
+        .map((querySnapshot) {
+      List<CustomerCareData> users = [];
       try {
         for (var doc in querySnapshot.docs) {
-          users.add(CustomerRegisterData(
-            userName: doc.data()['userName'],
+          users.add(CustomerCareData(
             email: doc.data()['email'],
-            mobileNumber: doc.data()['mobileNumber'],
-            code: doc.data()['code'],
-            country: doc.data()['country'],
             deactivate: doc.data()['deactivate'] ?? false,
             docid: doc.id,
           ));

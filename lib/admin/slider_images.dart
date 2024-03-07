@@ -11,6 +11,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../components/helper.dart';
+import 'controller/profil_controller.dart';
 
 class SliderImagesScreen extends StatefulWidget {
   const SliderImagesScreen({super.key});
@@ -20,6 +21,7 @@ class SliderImagesScreen extends StatefulWidget {
 }
 
 class _SliderImagesScreenState extends State<SliderImagesScreen> {
+  final controller = Get.put(ProfileController());
   File categoryFile = File("");
   String? imageUrl;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -46,6 +48,7 @@ class _SliderImagesScreenState extends State<SliderImagesScreen> {
   @override
   void initState() {
     super.initState();
+    controller.getAdminData();
   }
 
   @override
