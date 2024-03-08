@@ -223,6 +223,7 @@ class _CustomerCareListState extends State<CustomerCareList> {
                                                     },
                                                     child: const Text("Edit"),
                                                   ),
+                                                  if( controller.userType == "admin")
                                                   PopupMenuItem(
                                                     value: 1,
                                                     onTap: () {
